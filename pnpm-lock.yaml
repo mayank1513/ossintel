@@ -175,6 +175,13 @@ importers:
         version: 6.0.3
 
   packages/insights:
+    dependencies:
+      '@ossintel/github-normalizer':
+        specifier: workspace:*
+        version: link:../github-normalizer
+      '@ossintel/scoring':
+        specifier: workspace:*
+        version: link:../scoring
     devDependencies:
       '@types/node':
         specifier: latest

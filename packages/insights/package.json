@@ -37,6 +37,10 @@
     "clean": "rm -rf dist",
     "dev": "tsup --watch"
   },
+  "dependencies": {
+    "@ossintel/github-normalizer": "workspace:*",
+    "@ossintel/scoring": "workspace:*"
+  },
   "devDependencies": {
     "@types/node": "latest",
     "tsup": "latest",

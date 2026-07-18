@@ -16,6 +16,6 @@ Note: We only accept pull requests addressing security vulnerabilities. Addition
 
 ## Reporting Vulnerabilities
 
-Kindly report vulnerabilities [here](https://github.com/turboforge-dev/turboforge/security/advisories/new).
+Kindly report vulnerabilities [here](https://github.com/mayank1513/ossintel.git/security/advisories/new).
 
 Refrain from sharing vulnerabilities publicly or privately via any other channel until a fix is published.

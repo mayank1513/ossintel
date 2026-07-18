@@ -1,11 +1,25 @@
+import type {
+  NormalizedDeveloper,
+  NormalizedOrganization,
+  NormalizedRepository,
+} from "@ossintel/github-normalizer";
+import type { Finding, Recommendation } from "@ossintel/insights";
 import { calculateRepositoryScore } from "@ossintel/scoring";
 
+interface RepositoryScoreItem {
+  repoName: string;
+  fullName: string;
+  scores: ReturnType<typeof calculateRepositoryScore>;
+  stars: number;
+  forks: number;
+}
+
 export const auditDeveloper = (
-  developer: any,
-  repositories: any[],
-  organizations: any[],
+  developer: NormalizedDeveloper,
+  repositories: NormalizedRepository[],
+  organizations: NormalizedOrganization[],
 ) => {
-  const repoScores = repositories
+  const repoScores: RepositoryScoreItem[] = repositories
     .map((r) => {
       try {
         return {
@@ -19,7 +33,7 @@ export const auditDeveloper = (
         return null;
       }
     })
-    .filter(Boolean) as any[];
+    .filter((r): r is RepositoryScoreItem => r !== null);
 
   const count = repoScores.length;
   const avgHealth = Math.round(
@@ -69,8 +83,8 @@ export const auditDeveloper = (
     risk: avgRisk,
   };
 
-  const findings: any[] = [];
-  const recommendations: any[] = [];
+  const findings: Finding[] = [];
+  const recommendations: Recommendation[] = [];
 
   if (devScores.risk > 50) {
     findings.push({

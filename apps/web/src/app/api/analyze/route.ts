@@ -6,6 +6,9 @@ import {
   fetchReleases,
   fetchRepositories,
   fetchRepository,
+  type NormalizedContributor,
+  type NormalizedLanguage,
+  type NormalizedRelease,
 } from "@ossintel/github-normalizer";
 import { generateInsights } from "@ossintel/insights";
 import { calculateRepositoryScore } from "@ossintel/scoring";
@@ -37,9 +40,9 @@ export async function POST(request: Request) {
 
       // Fetch repository data
       const repository = await fetchRepository(owner, repo, options);
-      let contributors: any[] = [];
-      let releases: any[] = [];
-      let languages: any[] = [];
+      let contributors: NormalizedContributor[] = [];
+      let releases: NormalizedRelease[] = [];
+      let languages: NormalizedLanguage[] = [];
 
       try {
         contributors = await fetchContributors(owner, repo, {
@@ -141,11 +144,10 @@ export async function POST(request: Request) {
     }
 
     return NextResponse.json({ error: "Invalid audit type" }, { status: 400 });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Analysis API failed", error);
-    return NextResponse.json(
-      { error: error.message || "Failed to analyze entity" },
-      { status: 500 },
-    );
+    const message =
+      error instanceof Error ? error.message : "Failed to analyze entity";
+    return NextResponse.json({ error: message }, { status: 500 });
   }
 }

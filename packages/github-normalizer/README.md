@@ -21,12 +21,69 @@
 
 > @ossintel/github-normalizer: Typed utilities for fetching and normalizing GitHub REST and GraphQL data into a consistent domain model for analytics and reporting.
 
+# @ossintel/github-normalizer
+
+Typed utilities for fetching and normalizing GitHub data.
+
+## Purpose
+
+GitHub's REST and GraphQL APIs expose excellent data but with inconsistent shapes and multiple endpoints.
+
+This package provides a stable domain model consumed by the rest of OSSIntel.
+
+## Responsibilities
+
+- Fetch GitHub data
+- Normalize responses
+- Hide API complexity
+- Handle pagination
+- Handle rate limits
+- Provide strongly typed models
+
+## Non-goals
+
+- Scoring
+- AI
+- Business logic
+- UI
+
+## Planned API
+
+```ts
+fetchDeveloper();
+
+fetchRepositories();
+
+fetchRepository();
+
+fetchOrganizations();
+
+fetchContributors();
+
+fetchLanguages();
+
+fetchReleases();
+```
+
+## Output
+
+Always returns normalized domain models.
+
+Never expose raw GitHub responses.
+
+## Design Principles
+
+- Pure TypeScript
+- Strong typing
+- Stable contracts
+- Easily replaceable backend
+
 ---
 
 ## ✨ Why @ossintel/github-normalizer?
 
-- 
-- 
+-
+-
 
 ---
 
@@ -47,7 +104,6 @@ $ npm install @ossintel/github-normalizer
 ```bash
 $ yarn add @ossintel/github-normalizer
 ```
-
 
 ## License
 

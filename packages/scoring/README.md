@@ -21,12 +21,64 @@
 
 > @ossintel/scoring: Deterministic scoring engine for calculating OSS health, impact, risk, activity, and community metrics from normalized repository and ecosystem data.
 
+# @ossintel/scoring
+
+Deterministic OSS scoring engine.
+
+## Purpose
+
+Converts normalized repository and developer metrics into objective scores.
+
+## Responsibilities
+
+Calculate:
+
+- Overall Score
+- Health Score
+- Impact Score
+- Activity Score
+- Community Score
+- Risk Score
+
+## Philosophy
+
+Scores should always be reproducible.
+
+The same inputs should always produce the same outputs.
+
+No AI should participate in score calculation.
+
+## Inputs
+
+Normalized domain models.
+
+## Outputs
+
+```ts
+{
+  overall, health, impact, activity, community, risk;
+}
+```
+
+## Non-goals
+
+- API calls
+- AI
+- Charts
+- UI
+
+## Testing
+
+Every scoring algorithm should have comprehensive unit tests.
+
+No external dependencies should affect score calculation.
+
 ---
 
 ## ✨ Why @ossintel/scoring?
 
-- 
-- 
+-
+-
 
 ---
 
@@ -47,7 +99,6 @@ $ npm install @ossintel/scoring
 ```bash
 $ yarn add @ossintel/scoring
 ```
-
 
 ## License
 

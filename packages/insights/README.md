@@ -21,12 +21,68 @@
 
 > @ossintel/insights: Rule-based insight engine that converts OSS metrics into actionable findings, recommendations, and AI-ready summaries with minimal hallucination.
 
+# @ossintel/insights
+
+Transforms metrics into actionable insights.
+
+## Purpose
+
+Numbers alone rarely tell the complete story.
+
+This package converts metrics into meaningful findings and recommendations.
+
+## Responsibilities
+
+Generate:
+
+- Findings
+- Recommendations
+- Warnings
+- Highlights
+- AI-ready summaries
+
+## Design
+
+Three layers:
+
+1. Deterministic rules
+2. Template generation
+3. Optional AI summarization
+
+## Philosophy
+
+AI should explain the data.
+
+AI should never invent the data.
+
+## Inputs
+
+- Scores
+- Metrics
+- Statistics
+
+## Outputs
+
+```ts
+Finding[]
+
+Recommendation[]
+
+PromptContext
+```
+
+## Non-goals
+
+- Fetching APIs
+- Calculating scores
+- Rendering UI
+
 ---
 
 ## ✨ Why @ossintel/insights?
 
-- 
-- 
+-
+-
 
 ---
 
@@ -47,7 +103,6 @@ $ npm install @ossintel/insights
 ```bash
 $ yarn add @ossintel/insights
 ```
-
 
 ## License
 

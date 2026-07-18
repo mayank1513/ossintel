@@ -1,6 +1,17 @@
 {
   "extends": ["@commitlint/config-conventional"],
   "rules": {
-    "scope-enum": [2, "always", ["@app/web", "@tool/scripts", "@tool/tsconfig"]]
+    "scope-enum": [
+      2,
+      "always",
+      [
+        "@app/web",
+        "@ossintel/github-normalizer",
+        "@ossintel/insights",
+        "@ossintel/scoring",
+        "@tool/scripts",
+        "@tool/tsconfig"
+      ]
+    ]
   }
 }

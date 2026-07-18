@@ -3,6 +3,16 @@
   "compilerOptions": {
     "ignoreDeprecations": "6.0",
     "rootDir": "../../",
-    "paths": {}
+    "paths": {
+      "@ossintel/github-normalizer": [
+        "./packages/github-normalizer/src",
+        "./packages/github-normalizer/dist"
+      ],
+      "@ossintel/insights": [
+        "./packages/insights/src",
+        "./packages/insights/dist"
+      ],
+      "@ossintel/scoring": ["./packages/scoring/src", "./packages/scoring/dist"]
+    }
   }
 }

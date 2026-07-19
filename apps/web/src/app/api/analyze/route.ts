@@ -8,6 +8,7 @@ import {
   fetchReleases,
   fetchRepositories,
   fetchRepository,
+  GitHubRateLimitError,
   type NormalizedContributor,
   type NormalizedLanguage,
   type NormalizedRelease,
@@ -15,12 +16,8 @@ import {
   suggestLinkedIdentities,
 } from "@ossintel/github-normalizer";
 import { generateInsights } from "@ossintel/insights";
-import {
-  calculateRepositoryScore,
-  type NpmPackageStats,
-} from "@ossintel/scoring";
+import { calculateRepositoryScore } from "@ossintel/scoring";
 import { NextResponse } from "next/server";
-import { auditDeveloper, auditOrganization } from "@/lib/audit";
 
 export const dynamic = "force-dynamic";
 
@@ -28,92 +25,59 @@ async function getOwnerType(
   owner: string,
   token?: string,
 ): Promise<"User" | "Organization"> {
-  try {
-    const res = await fetch(`https://api.github.com/users/${owner}`, {
-      headers: token ? { Authorization: `token ${token}` } : {},
-    });
-    if (res.ok) {
-      const data = await res.json();
-      return data.type === "Organization" ? "Organization" : "User";
-    }
-  } catch (e) {
-    console.error("Failed to fetch owner type", e);
+  const headers: Record<string, string> = {
+    Accept: "application/vnd.github+json",
+    "X-GitHub-Api-Version": "2022-11-28",
+  };
+  if (token) {
+    headers["Authorization"] = `Bearer ${token}`;
   }
-  return "User";
+
+  const res = await fetch(`https://api.github.com/users/${owner}`, { headers });
+  if (!res.ok) {
+    throw new Error(`Failed to fetch user/org type for ${owner}`);
+  }
+  const data = await res.json();
+  return data.type as "User" | "Organization";
 }
 
 export async function POST(request: Request) {
   try {
-    let {
-      query,
-      token,
-      selectedOrgs = [],
-      linkedNpm,
-      linkedSO,
-      owner,
-      repo,
-    } = await request.json();
-
-    if (!query) {
-      if (owner && repo) {
-        query = `${owner}/${repo}`;
-      } else if (owner) {
-        query = owner;
-      } else {
-        return NextResponse.json(
-          { error: "Search query is required" },
-          { status: 400 },
-        );
-      }
-    }
+    const { query, token, type, owner, repo } = await request.json();
 
     const options = { token };
-    const detection = detectInput(query);
 
-    // 1. GitHub Repository
-    if (detection.platform === "github" && detection.type === "repo") {
-      const owner = detection.owner || "";
-      const repo = detection.repo || "";
+    // 1. GitHub Repository Direct Request
+    if (type === "repo") {
+      const ownerName = owner || "";
+      const repoName = repo || "";
 
-      const repository = await fetchRepository(owner, repo, options);
+      const repository = await fetchRepository(ownerName, repoName, options);
       let contributors: NormalizedContributor[] = [];
       let releases: NormalizedRelease[] = [];
       let languages: NormalizedLanguage[] = [];
 
       try {
-        contributors = await fetchContributors(owner, repo, {
-          ...options,
-          allPages: false,
-          perPage: 100,
-        });
+        contributors = await fetchContributors(ownerName, repoName, options);
       } catch (e) {
-        console.error("Contributors error", e);
+        console.error("Failed to fetch contributors", e);
       }
 
       try {
-        releases = await fetchReleases(owner, repo, {
-          ...options,
-          allPages: false,
-          perPage: 100,
-        });
+        releases = await fetchReleases(ownerName, repoName, options);
       } catch (e) {
-        console.error("Releases error", e);
+        console.error("Failed to fetch releases", e);
       }
 
       try {
-        languages = await fetchLanguages(owner, repo, options);
+        languages = await fetchLanguages(ownerName, repoName, options);
       } catch (e) {
-        console.error("Languages error", e);
+        console.error("Failed to fetch languages", e);
       }
 
-      const scores = calculateRepositoryScore({
-        repository,
-        contributors,
-        releases,
-        languages,
-      });
+      const scores = calculateRepositoryScore({ repository });
       const insightsResult = generateInsights(
-        { repository, contributors, releases, languages },
+        { repository, releases, contributors, languages },
         scores,
       );
 
@@ -146,19 +110,23 @@ export async function POST(request: Request) {
       });
     }
 
-    // 2. GitHub User or Org (bare input or user/org URL)
-    if (detection.platform === "github") {
-      const login = detection.owner || query.trim();
-      const ownerType = await getOwnerType(login, token);
+    // 2. GitHub User or Org (dynamic detection or specific type)
+    if (type === "org" || type === "user") {
+      const login = query || "";
+      const determinedType =
+        type === "org"
+          ? "Organization"
+          : type === "user"
+            ? "User"
+            : await getOwnerType(login, token);
 
-      if (ownerType === "Organization") {
+      if (determinedType === "Organization") {
         const org = await fetchOrganization(login, options);
         const repositories = await fetchRepositories(login, {
           ...options,
           allPages: false,
           perPage: 100,
         });
-        const auditResult = auditOrganization(org, repositories);
 
         return NextResponse.json({
           type: "org",
@@ -174,7 +142,7 @@ export async function POST(request: Request) {
             followers: org.followers,
             description: org.description,
           },
-          ...auditResult,
+          repositories,
         });
       } else {
         const developer = await fetchDeveloper(login, options);
@@ -185,41 +153,29 @@ export async function POST(request: Request) {
         });
         const organizations = await fetchOrganizations(login, options);
 
-        // Fetch organization repositories if any selected
-        const orgReposPromises = selectedOrgs.map(async (orgLogin: string) => {
-          try {
-            return await fetchRepositories(orgLogin, {
-              ...options,
-              allPages: false,
-              perPage: 50,
-            });
-          } catch (e) {
-            console.error(`Failed to fetch repos for org ${orgLogin}`, e);
-            return [];
+        // Fetch user profile README
+        let readme = "";
+        try {
+          const readmeRes = await fetch(
+            `https://api.github.com/repos/${login}/${login}/readme`,
+            {
+              headers: token ? { Authorization: `token ${token}` } : {},
+            },
+          );
+          if (readmeRes.ok) {
+            const readmeData = await readmeRes.json();
+            if (readmeData.content && readmeData.encoding === "base64") {
+              readme = Buffer.from(readmeData.content, "base64").toString(
+                "utf-8",
+              );
+            }
           }
-        });
-        const fetchedOrgRepos = (await Promise.all(orgReposPromises)).flat();
-        const allRepositories = [...personalRepos, ...fetchedOrgRepos];
+        } catch (e) {
+          console.error("Failed to fetch README", e);
+        }
 
         // Suggestions
         const suggestions = suggestLinkedIdentities(developer, personalRepos);
-
-        // npm Packages Mock if NPM identity is linked
-        let npmPackages: NpmPackageStats[] = [];
-        if (linkedNpm) {
-          npmPackages = [
-            { name: `${linkedNpm}-helper`, downloads: 45000, stars: 12 },
-            { name: `react-${linkedNpm}`, downloads: 125000, stars: 45 },
-          ];
-        }
-
-        const auditResult = auditDeveloper(
-          developer,
-          allRepositories,
-          organizations,
-          { npm: linkedNpm, stackoverflow: linkedSO },
-          npmPackages,
-        );
 
         return NextResponse.json({
           type: "user",
@@ -238,16 +194,119 @@ export async function POST(request: Request) {
             createdAt: developer.createdAt,
             organizations,
             suggestions,
+            readme,
+            twitterUsername: developer.twitterUsername,
+            email: developer.email,
           },
-          ...auditResult,
+          repositories: personalRepos,
         });
       }
     }
 
-    // 3. Fallback for npm package or stackoverflow or GitLab
+    // Dynamic fallback when type isn't specified (e.g., from home search box direct links)
+    const detection = detectInput(query || "");
+    if (detection.platform === "github" && detection.type === "repo") {
+      const ownerName = detection.owner || "";
+      const repoName = detection.repo || "";
+      const repository = await fetchRepository(ownerName, repoName, options);
+      // Run fallback calculations
+      const scores = calculateRepositoryScore({ repository });
+      const insightsResult = generateInsights({ repository }, scores);
+      return NextResponse.json({
+        type: "repo",
+        metadata: {
+          name: repository.name,
+          fullName: repository.fullName,
+          description: repository.description,
+          stars: repository.stargazersCount,
+          forks: repository.forksCount,
+          watchers: repository.watchersCount,
+          openIssues: repository.openIssuesCount,
+          language: repository.language,
+          topics: repository.topics,
+          defaultBranch: repository.defaultBranch,
+          isFork: repository.isFork,
+          isArchived: repository.isArchived,
+          htmlUrl: repository.htmlUrl,
+          pushedAt: repository.pushedAt,
+          updatedAt: repository.updatedAt,
+          owner: repository.owner,
+        },
+        scores,
+        findings: insightsResult.findings,
+        recommendations: insightsResult.recommendations,
+        promptContext: insightsResult.promptContext,
+        languages: [],
+        contributorsCount: 0,
+      });
+    }
+
+    if (
+      detection.platform === "github" &&
+      (detection.type === "user" || detection.type === "org")
+    ) {
+      const login = detection.owner || query || "";
+      const ownerType = await getOwnerType(login, token);
+      if (ownerType === "Organization") {
+        const org = await fetchOrganization(login, options);
+        const repositories = await fetchRepositories(login, {
+          ...options,
+          allPages: false,
+          perPage: 100,
+        });
+        return NextResponse.json({
+          type: "org",
+          metadata: {
+            login: org.login,
+            name: org.name,
+            avatarUrl: org.avatarUrl,
+            htmlUrl: org.htmlUrl,
+            location: org.location,
+            email: org.email,
+            blog: org.blog,
+            publicRepos: org.publicRepos,
+            followers: org.followers,
+            description: org.description,
+          },
+          repositories,
+        });
+      } else {
+        const developer = await fetchDeveloper(login, options);
+        const personalRepos = await fetchRepositories(login, {
+          ...options,
+          allPages: false,
+          perPage: 100,
+        });
+        const organizations = await fetchOrganizations(login, options);
+        const suggestions = suggestLinkedIdentities(developer, personalRepos);
+        return NextResponse.json({
+          type: "user",
+          metadata: {
+            login: developer.login,
+            name: developer.name,
+            avatarUrl: developer.avatarUrl,
+            htmlUrl: developer.htmlUrl,
+            company: developer.company,
+            blog: developer.blog,
+            location: developer.location,
+            bio: developer.bio,
+            followers: developer.followers,
+            following: developer.following,
+            publicRepos: developer.publicRepos,
+            createdAt: developer.createdAt,
+            organizations,
+            suggestions,
+            readme: "",
+            twitterUsername: developer.twitterUsername,
+            email: developer.email,
+          },
+          repositories: personalRepos,
+        });
+      }
+    }
+
     if (detection.platform === "npm") {
-      const name = detection.name || query.trim();
-      // Mock repository score representing the npm package
+      const name = detection.name || query || "";
       const mockRepo: NormalizedRepository = {
         id: 9999,
         name,
@@ -314,6 +373,28 @@ export async function POST(request: Request) {
     );
   } catch (error: unknown) {
     console.error("Analysis API failed", error);
+    if (
+      error instanceof GitHubRateLimitError ||
+      (error &&
+        typeof error === "object" &&
+        "name" in error &&
+        error.name === "GitHubRateLimitError")
+    ) {
+      const errObj = error as {
+        resetTime?: { toISOString: () => string };
+        message?: string;
+      };
+      return NextResponse.json(
+        {
+          error: "rate_limit",
+          resetTime: errObj.resetTime
+            ? errObj.resetTime.toISOString()
+            : new Date(Date.now() + 3600 * 1000).toISOString(),
+          message: errObj.message || "GitHub API Rate Limit Exceeded",
+        },
+        { status: 403 },
+      );
+    }
     const message =
       error instanceof Error ? error.message : "Failed to analyze entity";
     return NextResponse.json({ error: message }, { status: 500 });

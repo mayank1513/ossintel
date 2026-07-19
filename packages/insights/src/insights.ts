@@ -1,6 +1,9 @@
+import type { NormalizedRepository } from "@ossintel/github-normalizer";
 import type { RepositoryScores, ScoringInputs } from "@ossintel/scoring";
 import type {
   Finding,
+  IdentityInsights,
+  IdentityMetadata,
   PromptContext,
   Recommendation,
   RepositoryInsights,
@@ -213,6 +216,162 @@ export const generateInsights = (
     ...findings.map(
       (f) =>
         `- [${f.type.toUpperCase()}] (${f.category}): **${f.title}** (Score: ${f.score ?? "N/A"}) - ${f.description}`,
+    ),
+  ].join("\n");
+
+  const recommendationsText = [
+    "### Recommendations",
+    ...recommendations.map(
+      (r) =>
+        `- [Priority: ${r.priority.toUpperCase()}] (${r.category}) **${r.title}**: ${r.description}`,
+    ),
+  ].join("\n");
+
+  const promptContext: PromptContext = {
+    summary,
+    scoresText,
+    metricsText,
+    findingsText,
+    recommendationsText,
+  };
+
+  return {
+    findings,
+    recommendations,
+    promptContext,
+  };
+};
+
+export const generateIdentityInsights = (
+  repositories: NormalizedRepository[],
+  scores: RepositoryScores,
+  identityMetadata: IdentityMetadata,
+): IdentityInsights => {
+  const findings: Finding[] = [];
+  const recommendations: Recommendation[] = [];
+
+  const totalRepos = repositories.length;
+  const archivedRepos = repositories.filter((r) => r.isArchived).length;
+  const activeRepos = totalRepos - archivedRepos;
+
+  findings.push({
+    id: "identity_composition",
+    type: "highlight",
+    category: "community",
+    title: `${identityMetadata.type === "user" ? "Maintainer" : "Organization"} Portfolio Composition`,
+    description: `Analyzed a portfolio of ${totalRepos} public repositories (${activeRepos} active, ${archivedRepos} archived).`,
+  });
+
+  if (archivedRepos > 0) {
+    findings.push({
+      id: "archived_repos_present",
+      type: "highlight",
+      category: "impact",
+      title: "Archived Historical Assets",
+      description: `${archivedRepos} archived repositories contribute to lifetime star and fork impact, but are excluded from active maintenance metrics.`,
+    });
+  }
+
+  if (identityMetadata.linkedIdentities?.npm) {
+    findings.push({
+      id: "linked_identity_npm",
+      type: "highlight",
+      category: "impact",
+      title: "Linked npm Profile",
+      description: `Unified metrics include ecosystem reach from linked npm account: @${identityMetadata.linkedIdentities.npm}.`,
+    });
+  }
+
+  if (identityMetadata.linkedIdentities?.stackoverflow) {
+    findings.push({
+      id: "linked_identity_so",
+      type: "highlight",
+      category: "community",
+      title: "Linked Stack Overflow Profile",
+      description: `Developer community expertise enriched by linked Stack Overflow profile ID ${identityMetadata.linkedIdentities.stackoverflow}.`,
+    });
+  }
+
+  if (scores.risk > 60) {
+    findings.push({
+      id: "identity_risk_high",
+      type: "warning",
+      category: "risk",
+      title: "High Portfolio Maintenance Risk",
+      description:
+        "Average risk across active repositories is elevated, suggesting potential maintenance single points of failure.",
+      score: scores.risk,
+    });
+    recommendations.push({
+      id: "identity_risk_mitigate",
+      category: "risk",
+      title: "Onboard Co-Maintainers",
+      description:
+        "Consider recruiting co-maintainers to safeguard active portfolios and decrease risk index.",
+      priority: "high",
+    });
+  }
+
+  if (scores.health < 40) {
+    findings.push({
+      id: "identity_health_low",
+      type: "warning",
+      category: "health",
+      title: "Neglected Portfolio Issue Backlog",
+      description:
+        "Active repositories exhibit a significant cumulative open issue backlog relative to ecosystem adoption.",
+      score: scores.health,
+    });
+    recommendations.push({
+      id: "identity_health_triage",
+      category: "health",
+      title: "Organize Backlog Triage Cycles",
+      description:
+        "Establish dedicated bug triage sprints to reduce unresolved issue backlogs on active projects.",
+      priority: "medium",
+    });
+  }
+
+  if (scores.impact > 70) {
+    findings.push({
+      id: "identity_impact_high",
+      type: "highlight",
+      category: "impact",
+      title: "Major Ecosystem Influence",
+      description:
+        "The maintainer portfolio has high stars, forks, and adoption, indicating critical ecosystem significance.",
+      score: scores.impact,
+    });
+  }
+
+  const summary = `OSSIntel analysis report for ${identityMetadata.type} ${identityMetadata.login}. Calculated Overall score is ${scores.overall}/100.`;
+
+  const scoresText = [
+    "### Calculated Scores",
+    `- Overall Score: ${scores.overall}/100`,
+    `- Health Score: ${scores.health}/100`,
+    `- Impact Score: ${scores.impact}/100`,
+    `- Activity Score: ${scores.activity}/100`,
+    `- Community Score: ${scores.community}/100`,
+    `- Risk Score: ${scores.risk}/100`,
+  ].join("\n");
+
+  const metricsText = [
+    "### Identity Metrics",
+    `- Profile Type: ${identityMetadata.type}`,
+    `- Login/Name: ${identityMetadata.name ?? identityMetadata.login}`,
+    `- Total Repositories: ${totalRepos}`,
+    `- Active Repositories: ${activeRepos}`,
+    `- Archived Repositories: ${archivedRepos}`,
+    `- Linked npm Username: ${identityMetadata.linkedIdentities?.npm ?? "None"}`,
+    `- Linked Stack Overflow ID: ${identityMetadata.linkedIdentities?.stackoverflow ?? "None"}`,
+  ].join("\n");
+
+  const findingsText = [
+    "### Findings",
+    ...findings.map(
+      (f) =>
+        `- [${f.type.toUpperCase()}] (${f.category}): **${f.title}** - ${f.description}`,
     ),
   ].join("\n");
 

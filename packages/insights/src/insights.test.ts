@@ -1,6 +1,6 @@
 import type { RepositoryScores, ScoringInputs } from "@ossintel/scoring";
 import { describe, expect, test } from "vitest";
-import { generateInsights } from "./insights";
+import { generateIdentityInsights, generateInsights } from "./insights";
 
 const mockRepository = (
   overrides?: Partial<ScoringInputs["repository"]>,
@@ -111,5 +111,34 @@ describe("insights engine", () => {
     expect(priorities).toContain("high");
     expect(priorities).toContain("medium");
     expect(priorities).toContain("low");
+  });
+
+  test("generateIdentityInsights - checks user and org metadata, archived repos", () => {
+    const repos = [
+      mockRepository({ isArchived: true }),
+      mockRepository({ isArchived: false }),
+    ];
+    const scores: RepositoryScores = {
+      overall: 80,
+      health: 85,
+      impact: 90,
+      activity: 70,
+      community: 75,
+      risk: 10,
+    };
+    const metadata = {
+      type: "user" as const,
+      login: "testuser",
+      linkedIdentities: {
+        npm: "npmuser",
+        stackoverflow: "12345",
+      },
+    };
+
+    const result = generateIdentityInsights(repos, scores, metadata);
+    expect(result.findings).toHaveLength(4); // composition, archived present, npm, stackoverflow
+    expect(result.recommendations).toHaveLength(0); // low risk, good health
+    expect(result.promptContext.summary).toContain("testuser");
+    expect(result.promptContext.metricsText).toContain("npmuser");
   });
 });

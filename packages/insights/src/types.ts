@@ -28,3 +28,19 @@ export interface RepositoryInsights {
   recommendations: Recommendation[];
   promptContext: PromptContext;
 }
+
+export interface IdentityMetadata {
+  type: "user" | "org";
+  login: string;
+  name?: string | null;
+  linkedIdentities?: {
+    npm?: string;
+    stackoverflow?: string;
+  };
+}
+
+export interface IdentityInsights {
+  findings: Finding[];
+  recommendations: Recommendation[];
+  promptContext: PromptContext;
+}

@@ -17,7 +17,6 @@ import { FindingsList } from "@/components/dashboard/findings-list";
 import { OrgSelector } from "@/components/dashboard/org-selector";
 import { OverviewCard } from "@/components/dashboard/overview-card";
 import { ProfileCard } from "@/components/dashboard/profile-card";
-import { ReadmeCard } from "@/components/dashboard/readme-card";
 import { RecommendationsGrid } from "@/components/dashboard/recommendations-grid";
 import { RepositoriesTable } from "@/components/dashboard/repositories-table";
 import { useDeveloperScores } from "@/hooks/use-developer-scores";
@@ -406,20 +405,6 @@ export default function UserPage() {
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
               {/* Left Column */}
               <div className="lg:col-span-1 flex flex-col gap-6">
-                {/* Profile Details atomic Component */}
-                <ProfileCard
-                  avatarUrl={userQuery.data.metadata.avatarUrl}
-                  name={userQuery.data.metadata.name}
-                  login={userQuery.data.metadata.login}
-                  bio={userQuery.data.metadata.bio}
-                  company={userQuery.data.metadata.company}
-                  location={userQuery.data.metadata.location}
-                  email={userQuery.data.metadata.email}
-                  htmlUrl={userQuery.data.metadata.htmlUrl}
-                  twitterUsername={userQuery.data.metadata.twitterUsername}
-                  blog={userQuery.data.metadata.blog}
-                />
-
                 <OverviewCard data={fullAnalysisData} />
                 <DimensionBreakdown scores={clientIntel.scores} />
 
@@ -451,8 +436,20 @@ export default function UserPage() {
 
               {/* Right Column */}
               <div className="lg:col-span-2 flex flex-col gap-8">
-                {/* Profile README atomic Component */}
-                <ReadmeCard readme={userQuery.data.metadata.readme} />
+                {/* Profile Details atomic Component */}
+                <ProfileCard
+                  avatarUrl={userQuery.data.metadata.avatarUrl}
+                  name={userQuery.data.metadata.name}
+                  login={userQuery.data.metadata.login}
+                  bio={userQuery.data.metadata.bio}
+                  company={userQuery.data.metadata.company}
+                  location={userQuery.data.metadata.location}
+                  email={userQuery.data.metadata.email}
+                  htmlUrl={userQuery.data.metadata.htmlUrl}
+                  twitterUsername={userQuery.data.metadata.twitterUsername}
+                  blog={userQuery.data.metadata.blog}
+                  readme={userQuery.data.metadata.readme}
+                />
 
                 <AINarrator promptContext={clientIntel.promptContext} />
                 <FindingsList findings={clientIntel.findings} />

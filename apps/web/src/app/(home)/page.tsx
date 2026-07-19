@@ -252,9 +252,14 @@ export default function HomePage() {
       <footer className="relative border-t border-slate-900 bg-slate-950/20 z-10">
         <div className="max-w-7xl mx-auto px-6 py-8 flex flex-col md:flex-row items-center justify-between gap-4 text-xs font-semibold text-slate-500">
           <span>&copy; 2026 OSSIntel. Licensed under MIT.</span>
-          <div className="flex gap-4">
-            <span className="text-slate-400">Aesthetics Built Premium</span>
-          </div>
+          <a
+            href="https://mayankchaudhari.com/"
+            target="_blank"
+            rel="noreferrer noopener"
+            className="flex gap-4"
+          >
+            <span className="text-slate-400">Mayank Chaudhari</span>
+          </a>
         </div>
       </footer>
     </div>

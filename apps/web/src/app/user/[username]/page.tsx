@@ -3,19 +3,26 @@
 import {
   AlertTriangle,
   ArrowLeft,
-  Building,
+  RefreshCw,
   Sparkles,
   User,
 } from "lucide-react";
 import { useParams, useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
+// React icons
+import { FaKey } from "react-icons/fa";
 import { AINarrator } from "@/components/dashboard/ai-narrator";
 import { DimensionBreakdown } from "@/components/dashboard/dimension-breakdown";
 import { FindingsList } from "@/components/dashboard/findings-list";
+import { OrgSelector } from "@/components/dashboard/org-selector";
 import { OverviewCard } from "@/components/dashboard/overview-card";
+import { ProfileCard } from "@/components/dashboard/profile-card";
+import { ReadmeCard } from "@/components/dashboard/readme-card";
 import { RecommendationsGrid } from "@/components/dashboard/recommendations-grid";
 import { RepositoriesTable } from "@/components/dashboard/repositories-table";
-import type { AnalysisData } from "@/lib/types";
+import { useDeveloperScores } from "@/hooks/use-developer-scores";
+import { useGithubOrgs } from "@/hooks/use-github-orgs";
+import { useGithubUser } from "@/hooks/use-github-user";
 
 const STEPS = [
   "Establishing connection to GitHub APIs...",
@@ -31,63 +38,114 @@ export default function UserPage() {
   const router = useRouter();
   const username = params.username as string;
 
-  const [loading, setLoading] = useState(true);
   const [loadingStep, setLoadingStep] = useState(0);
-  const [data, setData] = useState<AnalysisData | null>(null);
-  const [error, setError] = useState<string | null>(null);
-
-  // Identity aggregation state
   const [selectedOrgs, setSelectedOrgs] = useState<string[]>([]);
   const [linkedNpm, setLinkedNpm] = useState<string>("");
   const [linkedSO, setLinkedSO] = useState<string>("");
+  const [includeUserRepos, setIncludeUserRepos] = useState<boolean>(true);
 
+  // 1. Fetch user data (repos, orgs, metadata) using custom hook
+  const userQuery = useGithubUser(username);
+
+  // 2. Fetch selected organizations data using custom hook
+  const orgsQuery = useGithubOrgs(selectedOrgs);
+
+  // PAT config state
+  const [patInput, setPatInput] = useState("");
+  const [showPatConfig, setShowPatConfig] = useState(false);
+
+  // Rate limiting countdown state
+  const [rateLimitReset, setRateLimitReset] = useState<string | null>(null);
+  const [cooldown, setCooldown] = useState("");
+
+  const isInitialLoad = useRef(true);
+
+  // loading steps animation
   useEffect(() => {
     let interval: NodeJS.Timeout;
-    if (loading) {
-      interval = setInterval(() => {
-        setLoadingStep((prev) => (prev < STEPS.length - 1 ? prev + 1 : prev));
-      }, 1000);
-    }
+    interval = setInterval(() => {
+      setLoadingStep((prev) => (prev < STEPS.length - 1 ? prev + 1 : prev));
+    }, 900);
     return () => clearInterval(interval);
-  }, [loading]);
+  }, []);
 
+  // Cooldown countdown timer
   useEffect(() => {
-    if (!username) return;
-
-    const fetchData = async () => {
-      try {
-        setLoading(true);
-        const token = sessionStorage.getItem("github_token") || "";
-        const res = await fetch("/api/analyze", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            query: username,
-            token,
-            selectedOrgs,
-            linkedNpm,
-            linkedSO,
-          }),
-        });
-        const result = await res.json();
-        if (!res.ok) {
-          throw new Error(
-            result.error || "Failed to analyze developer portfolio",
-          );
-        }
-        setData(result);
-      } catch (err: unknown) {
-        const message =
-          err instanceof Error
-            ? err.message
-            : "Failed to fetch developer details";
-        setError(message);
-      } finally {
-        setLoading(false);
+    if (!rateLimitReset) return;
+    const interval = setInterval(() => {
+      const resetDate = new Date(rateLimitReset);
+      const diffSec = Math.ceil((resetDate.getTime() - Date.now()) / 1000);
+      if (diffSec <= 0) {
+        setRateLimitReset(null);
+        setCooldown("");
+        clearInterval(interval);
+        userQuery.refetch();
+      } else {
+        const mins = Math.floor(diffSec / 60);
+        const secs = diffSec % 60;
+        setCooldown(mins > 0 ? `${mins}m ${secs}s` : `${secs}s`);
       }
+    }, 1000);
+    return () => clearInterval(interval);
+  }, [rateLimitReset, userQuery]);
+
+  // Load token from storage on mount
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const savedToken = sessionStorage.getItem("github_token");
+      if (savedToken) setPatInput(savedToken);
+    }
+  }, []);
+
+  // Auto-select all organizations by default on initial load
+  useEffect(() => {
+    if (isInitialLoad.current && userQuery.data?.metadata?.organizations) {
+      const orgLogins = userQuery.data.metadata.organizations.map(
+        (o: { login: string }) => o.login,
+      );
+      setSelectedOrgs(orgLogins);
+      isInitialLoad.current = false;
+    }
+  }, [userQuery.data]);
+
+  // Handle manual full refresh
+  const handleRefresh = async () => {
+    await userQuery.refresh();
+    await orgsQuery.refreshAll();
+  };
+
+  const handleSavePat = () => {
+    if (typeof window !== "undefined") {
+      sessionStorage.setItem("github_token", patInput);
+    }
+    setShowPatConfig(false);
+    setRateLimitReset(null);
+    setCooldown("");
+    handleRefresh();
+  };
+
+  // 3. Perform dynamic, client-side score calculations
+  const clientIntel = useDeveloperScores({
+    userRepos: userQuery.data?.repositories || [],
+    orgsQueries: orgsQuery.queries,
+    includeUserRepos,
+    linkedNpm,
+    linkedSO,
+    userLogin: userQuery.data?.metadata?.login || "",
+    userName: userQuery.data?.metadata?.name || "",
+  });
+
+  const fullAnalysisData = useMemo(() => {
+    return {
+      ...clientIntel,
+      type: "user" as const,
+      metadata: userQuery.data?.metadata || {},
     };
-    fetchData();
-  }, [username, selectedOrgs, linkedNpm, linkedSO]);
+  }, [clientIntel, userQuery.data]);
+
+  const isLoadingCombined = userQuery.isLoading || orgsQuery.isLoading;
+  const isFetchingCombined = userQuery.isFetching || orgsQuery.isFetching;
+  const errorCombined = userQuery.error || orgsQuery.error;
 
   return (
     <div className="min-h-screen bg-slate-950 text-slate-100 font-sans antialiased selection:bg-indigo-500/30">
@@ -115,7 +173,8 @@ export default function UserPage() {
 
       {/* Main Content */}
       <main className="relative max-w-7xl mx-auto px-6 py-12 z-10 flex flex-col gap-10">
-        {loading && (
+        {/* Loading overlay */}
+        {isLoadingCombined && (
           <div className="max-w-xl mx-auto w-full p-8 bg-slate-900/80 border border-slate-800 rounded-3xl shadow-2xl flex flex-col gap-6 items-center text-center">
             <div className="relative">
               <div className="h-16 w-16 border-4 border-indigo-500/10 border-t-indigo-500 rounded-full animate-spin" />
@@ -140,38 +199,115 @@ export default function UserPage() {
           </div>
         )}
 
-        {error && (
-          <div className="max-w-lg mx-auto w-full p-5 bg-rose-500/10 border border-rose-500/20 rounded-2xl flex gap-3.5 items-start text-rose-200">
-            <AlertTriangle className="h-6 w-6 text-rose-500 shrink-0" />
-            <div className="space-y-1">
-              <h4 className="font-bold text-sm">Analysis Failed</h4>
-              <p className="text-xs text-rose-300 leading-relaxed">{error}</p>
+        {/* Custom Rate Limit Error Box */}
+        {errorCombined?.message.includes("Rate Limit Exceeded") && (
+          <div className="max-w-xl mx-auto w-full p-6 bg-slate-900/90 border border-rose-500/30 rounded-3xl shadow-xl flex flex-col gap-4 text-left">
+            <div className="flex gap-4 items-start text-rose-200">
+              <AlertTriangle className="h-6 w-6 text-rose-500 shrink-0 mt-1" />
+              <div className="space-y-1">
+                <h4 className="font-extrabold text-sm text-rose-400">
+                  GitHub API Rate Limit Exceeded
+                </h4>
+                <p className="text-xs text-slate-300 leading-relaxed">
+                  Your search rate limit was reached. It will automatically
+                  reset in{" "}
+                  <strong className="text-indigo-400">
+                    {cooldown || "a moment"}
+                  </strong>
+                  .
+                </p>
+              </div>
+            </div>
+
+            {/* PAT retry interface */}
+            <div className="border-t border-slate-800/80 pt-4 mt-2 space-y-3">
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-bold text-slate-400 flex items-center gap-1.5">
+                  <FaKey className="text-indigo-400 h-3.5 w-3.5" /> Have a
+                  GitHub Access Token?
+                </span>
+                <button
+                  type="button"
+                  onClick={() => setShowPatConfig(!showPatConfig)}
+                  className="text-xs font-bold text-indigo-400 hover:text-indigo-300 underline"
+                >
+                  {showPatConfig ? "Cancel" : "Add Git PAT"}
+                </button>
+              </div>
+
+              {showPatConfig && (
+                <div className="flex gap-2">
+                  <input
+                    type="password"
+                    placeholder="ghp_..."
+                    value={patInput}
+                    onChange={(e) => setPatInput(e.target.value)}
+                    className="flex-1 bg-slate-950 border border-slate-800 text-xs rounded-xl px-3 py-2 text-slate-200 outline-none focus:border-indigo-500/40"
+                  />
+                  <button
+                    type="button"
+                    onClick={handleSavePat}
+                    className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold rounded-xl transition-all"
+                  >
+                    Save & Retry
+                  </button>
+                </div>
+              )}
             </div>
           </div>
         )}
 
-        {data && !loading && (
-          <div className="space-y-8 animate-fade-in">
-            {/* Identity Badge Header */}
-            <div className="flex flex-wrap items-center justify-between gap-4">
-              <div className="flex items-center gap-3">
-                {data.type === "org" ? (
-                  <div className="flex items-center gap-2 px-3 py-1.5 bg-indigo-500/10 border border-indigo-500/20 rounded-full text-indigo-400 text-xs font-bold uppercase tracking-wider">
-                    <Building className="h-3.5 w-3.5" /> Organization Profile
-                  </div>
-                ) : (
-                  <div className="flex items-center gap-2 px-3 py-1.5 bg-indigo-500/10 border border-indigo-500/20 rounded-full text-indigo-400 text-xs font-bold uppercase tracking-wider">
-                    <User className="h-3.5 w-3.5" /> Developer Maintainer
-                    Profile
-                  </div>
-                )}
+        {/* General Error box */}
+        {errorCombined &&
+          !errorCombined.message.includes("Rate Limit Exceeded") && (
+            <div className="max-w-lg mx-auto w-full p-5 bg-rose-500/10 border border-rose-500/20 rounded-2xl flex gap-3.5 items-start text-rose-200">
+              <AlertTriangle className="h-6 w-6 text-rose-500 shrink-0" />
+              <div className="space-y-1">
+                <h4 className="font-bold text-sm">Analysis Failed</h4>
+                <p className="text-xs text-rose-300 leading-relaxed">
+                  {errorCombined.message}
+                </p>
+                <button
+                  type="button"
+                  onClick={handleRefresh}
+                  className="text-xs text-indigo-400 hover:text-indigo-300 font-bold underline mt-2 block"
+                >
+                  Retry Request
+                </button>
               </div>
             </div>
+          )}
 
-            {/* Suggestions Prompts */}
-            {data.type === "user" && data.metadata.suggestions && (
+        {/* Dashboard Panels */}
+        {userQuery.data && clientIntel && !isLoadingCombined && (
+          <div className="space-y-8 animate-fade-in">
+            {/* Caching status banner */}
+            <div className="flex flex-wrap items-center justify-between gap-4 p-4 bg-slate-900/60 border border-slate-800 rounded-2xl shadow-md">
+              <div className="flex items-center gap-3">
+                <div className="flex items-center gap-2 px-3 py-1 bg-indigo-500/10 border border-indigo-500/20 rounded-full text-indigo-400 text-xs font-bold uppercase tracking-wider">
+                  <User className="h-3.5 w-3.5" /> Developer Profile
+                </div>
+                {isFetchingCombined && (
+                  <span className="text-xs text-indigo-400 font-semibold animate-pulse">
+                    Refreshing organization cache...
+                  </span>
+                )}
+              </div>
+
+              <button
+                type="button"
+                onClick={handleRefresh}
+                className="flex items-center gap-1 px-4 py-2 bg-slate-950 border border-slate-800 text-slate-300 hover:text-white text-xs font-bold rounded-xl transition-all"
+              >
+                <RefreshCw className="h-3.5 w-3.5 animate-spin-slow" /> Refresh
+                Analysis
+              </button>
+            </div>
+
+            {/* Suggestions prompts */}
+            {userQuery.data.metadata?.suggestions && (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {data.metadata.suggestions.npm && !linkedNpm && (
+                {userQuery.data.metadata.suggestions.npm && !linkedNpm && (
                   <div className="p-5 bg-indigo-500/10 border border-indigo-500/20 rounded-2xl flex flex-col justify-between gap-4">
                     <div>
                       <h4 className="text-xs font-bold text-indigo-400 uppercase tracking-wider">
@@ -180,7 +316,7 @@ export default function UserPage() {
                       <p className="text-sm text-slate-200 mt-1">
                         Link npm account{" "}
                         <strong>
-                          @{data.metadata.suggestions.npm.username}
+                          @{userQuery.data.metadata.suggestions.npm.username}
                         </strong>{" "}
                         to aggregate package download metrics?
                       </p>
@@ -190,7 +326,8 @@ export default function UserPage() {
                         type="button"
                         onClick={() =>
                           setLinkedNpm(
-                            data.metadata.suggestions?.npm?.username || "",
+                            userQuery.data.metadata.suggestions?.npm
+                              ?.username || "",
                           )
                         }
                         className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold rounded-xl transition-all"
@@ -212,112 +349,121 @@ export default function UserPage() {
                     </div>
                   </div>
                 )}
-                {data.metadata.suggestions.stackoverflow && !linkedSO && (
-                  <div className="p-5 bg-indigo-500/10 border border-indigo-500/20 rounded-2xl flex flex-col justify-between gap-4">
-                    <div>
-                      <h4 className="text-xs font-bold text-indigo-400 uppercase tracking-wider">
-                        Suggested Stack Overflow Profile
-                      </h4>
-                      <p className="text-sm text-slate-200 mt-1">
-                        Link Stack Overflow profile ID{" "}
-                        <strong>
-                          {data.metadata.suggestions.stackoverflow.profileId}
-                        </strong>{" "}
-                        ({data.metadata.suggestions.stackoverflow.displayName})?
-                      </p>
+                {userQuery.data.metadata.suggestions.stackoverflow &&
+                  !linkedSO && (
+                    <div className="p-5 bg-indigo-500/10 border border-indigo-500/20 rounded-2xl flex flex-col justify-between gap-4">
+                      <div>
+                        <h4 className="text-xs font-bold text-indigo-400 uppercase tracking-wider">
+                          Suggested Stack Overflow Profile
+                        </h4>
+                        <p className="text-sm text-slate-200 mt-1">
+                          Link Stack Overflow profile ID{" "}
+                          <strong>
+                            {
+                              userQuery.data.metadata.suggestions.stackoverflow
+                                .profileId
+                            }
+                          </strong>{" "}
+                          (
+                          {
+                            userQuery.data.metadata.suggestions.stackoverflow
+                              .displayName
+                          }
+                          )?
+                        </p>
+                      </div>
+                      <div className="flex gap-2">
+                        <button
+                          type="button"
+                          onClick={() =>
+                            setLinkedSO(
+                              userQuery.data.metadata.suggestions?.stackoverflow
+                                ?.profileId || "",
+                            )
+                          }
+                          className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold rounded-xl transition-all"
+                        >
+                          Confirm
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            const soOverride = prompt(
+                              "Enter custom Stack Overflow Profile ID to override:",
+                            );
+                            if (soOverride) setLinkedSO(soOverride);
+                          }}
+                          className="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-bold rounded-xl transition-all"
+                        >
+                          Override
+                        </button>
+                      </div>
                     </div>
-                    <div className="flex gap-2">
-                      <button
-                        type="button"
-                        onClick={() =>
-                          setLinkedSO(
-                            data.metadata.suggestions?.stackoverflow
-                              ?.profileId || "",
-                          )
-                        }
-                        className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold rounded-xl transition-all"
-                      >
-                        Confirm
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => {
-                          const soOverride = prompt(
-                            "Enter custom Stack Overflow Profile ID to override:",
-                          );
-                          if (soOverride) setLinkedSO(soOverride);
-                        }}
-                        className="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-bold rounded-xl transition-all"
-                      >
-                        Override
-                      </button>
-                    </div>
-                  </div>
-                )}
+                  )}
               </div>
             )}
 
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
               {/* Left Column */}
               <div className="lg:col-span-1 flex flex-col gap-6">
-                <OverviewCard data={data} />
-                <DimensionBreakdown scores={data.scores} />
+                {/* Profile Details atomic Component */}
+                <ProfileCard
+                  avatarUrl={userQuery.data.metadata.avatarUrl}
+                  name={userQuery.data.metadata.name}
+                  login={userQuery.data.metadata.login}
+                  bio={userQuery.data.metadata.bio}
+                  company={userQuery.data.metadata.company}
+                  location={userQuery.data.metadata.location}
+                  email={userQuery.data.metadata.email}
+                  htmlUrl={userQuery.data.metadata.htmlUrl}
+                  twitterUsername={userQuery.data.metadata.twitterUsername}
+                  blog={userQuery.data.metadata.blog}
+                />
 
-                {/* Organization Selection checklist */}
-                {data.type === "user" &&
-                  data.metadata.organizations &&
-                  data.metadata.organizations.length > 0 && (
-                    <div className="p-6 bg-slate-900/90 border border-slate-800 rounded-3xl space-y-4 shadow-xl">
-                      <h4 className="text-sm font-bold text-slate-200">
-                        Include Organization Repositories
-                      </h4>
-                      <p className="text-xs text-slate-400">
-                        Select which organizations' repositories should
-                        contribute to your lifetime impact and scores.
-                      </p>
-                      <div className="space-y-2 max-h-48 overflow-y-auto pr-2">
-                        {data.metadata.organizations.map((org) => (
-                          <label
-                            key={org.login}
-                            className="flex items-center gap-3 p-2.5 bg-slate-950/50 border border-slate-800/80 rounded-xl cursor-pointer hover:border-slate-700 transition-colors"
-                          >
-                            <input
-                              type="checkbox"
-                              checked={selectedOrgs.includes(org.login)}
-                              onChange={(e) => {
-                                if (e.target.checked) {
-                                  setSelectedOrgs([...selectedOrgs, org.login]);
-                                } else {
-                                  setSelectedOrgs(
-                                    selectedOrgs.filter((o) => o !== org.login),
-                                  );
-                                }
-                              }}
-                              className="rounded border-slate-800 text-indigo-600 focus:ring-indigo-600 focus:ring-offset-slate-950 bg-slate-950"
-                            />
-                            {/* biome-ignore lint/performance/noImgElement: Github avatars are dynamic external resources loaded at runtime */}
-                            <img
-                              src={org.avatarUrl}
-                              alt={org.login}
-                              className="h-6 w-6 rounded-md object-cover"
-                            />
-                            <span className="text-xs font-semibold text-slate-200">
-                              @{org.login}
-                            </span>
-                          </label>
-                        ))}
-                      </div>
-                    </div>
-                  )}
+                <OverviewCard data={fullAnalysisData} />
+                <DimensionBreakdown scores={clientIntel.scores} />
+
+                {/* Exclude User Repos Toggle */}
+                <div className="p-6 bg-slate-900/90 border border-slate-800 rounded-3xl shadow-xl space-y-3">
+                  <h4 className="text-sm font-bold text-slate-200">
+                    Personal Repositories Filter
+                  </h4>
+                  <label className="flex items-center gap-3 p-3 bg-slate-950/50 border border-slate-800/80 rounded-xl cursor-pointer hover:border-slate-700 transition-colors">
+                    <input
+                      type="checkbox"
+                      checked={includeUserRepos}
+                      onChange={(e) => setIncludeUserRepos(e.target.checked)}
+                      className="rounded border-slate-800 text-indigo-600 focus:ring-indigo-600 focus:ring-offset-slate-950 bg-slate-950 h-4 w-4"
+                    />
+                    <span className="text-xs font-semibold text-slate-200">
+                      Include @{userQuery.data.metadata.login} repositories
+                    </span>
+                  </label>
+                </div>
+
+                {/* Organization Selection checklist atomic Component */}
+                <OrgSelector
+                  organizations={userQuery.data.metadata.organizations}
+                  selectedOrgs={selectedOrgs}
+                  onChangeSelectedOrgs={setSelectedOrgs}
+                />
               </div>
 
               {/* Right Column */}
               <div className="lg:col-span-2 flex flex-col gap-8">
-                <AINarrator promptContext={data.promptContext} />
-                <FindingsList findings={data.findings} />
-                <RecommendationsGrid recommendations={data.recommendations} />
-                {data.repositories && (
-                  <RepositoriesTable repositories={data.repositories} />
+                {/* Profile README atomic Component */}
+                <ReadmeCard readme={userQuery.data.metadata.readme} />
+
+                <AINarrator promptContext={clientIntel.promptContext} />
+                <FindingsList findings={clientIntel.findings} />
+                <RecommendationsGrid
+                  recommendations={clientIntel.recommendations}
+                />
+                {clientIntel.repositories && (
+                  <RepositoriesTable
+                    repositories={clientIntel.repositories}
+                    username={userQuery.data.metadata.login}
+                  />
                 )}
               </div>
             </div>

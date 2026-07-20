@@ -31,7 +31,8 @@ export const DimensionBreakdown: React.FC<DimensionBreakdownProps> = ({
     return "bg-rose-500";
   };
 
-  const isUser = "maintainer" in scores;
+  const scoresObj = scores;
+  const isUser = "maintainer" in scoresObj;
 
   // 1. Repository-mode fallback metrics
   const getHealthReason = (score: number) => {
@@ -77,35 +78,35 @@ export const DimensionBreakdown: React.FC<DimensionBreakdownProps> = ({
   const repoMetrics = [
     {
       label: "Health Score",
-      val: scores.health || 0,
+      val: (scoresObj as RepositoryScores).health || 0,
       icon: Heart,
       calc: "Evaluates the ratio of open issues to repo popularity (stars + forks) and the recency of code updates (last commit recency).",
       getReason: getHealthReason,
     },
     {
       label: "Impact Score",
-      val: scores.impact || 0,
+      val: (scoresObj as RepositoryScores).impact || 0,
       icon: Award,
       calc: "Logarithmic scale of GitHub stars (50%), forks (35%), and watchers (15%). Measures ecosystem footprint.",
       getReason: getImpactReason,
     },
     {
       label: "Activity Score",
-      val: scores.activity || 0,
+      val: (scoresObj as RepositoryScores).activity || 0,
       icon: Activity,
       calc: "Combines the recency of the last commit (60%) and the frequency of releases in the last 12 months (40%).",
       getReason: getActivityReason,
     },
     {
       label: "Community Score",
-      val: scores.community || 0,
+      val: (scoresObj as RepositoryScores).community || 0,
       icon: Users,
       calc: "Evaluates total contributors count (70%), repository topics (15%), and repository documentation completeness (15%). Falls back to star-based contributor estimates when throttled.",
       getReason: getCommunityReason,
     },
     {
       label: "Risk Score",
-      val: scores.risk || 0,
+      val: (scoresObj as RepositoryScores).risk || 0,
       icon: AlertTriangle,
       inverse: true,
       calc: "Assesses risk based on lack of updates (>3 months), low contributor counts (<5 developers), fork status, and open issues exceeding popularity.",
@@ -118,35 +119,35 @@ export const DimensionBreakdown: React.FC<DimensionBreakdownProps> = ({
     ? [
         {
           label: "Maintainer Score",
-          val: scores.maintainer || 0,
+          val: scoresObj.maintainer || 0,
           icon: Heart,
           calc: "Measures code quality, health, and activity across owned or maintained repositories, popularity-weighted to prioritize flagship projects.",
-          evidence: scores.evidence.maintainer,
-          factors: scores.factors.maintainer,
+          evidence: scoresObj.evidence.maintainer,
+          factors: scoresObj.factors.maintainer,
         },
         {
           label: "Contributor Score",
-          val: scores.contributor || 0,
+          val: scoresObj.contributor || 0,
           icon: GitPullRequest,
           calc: "Measures PR contributions to external repositories. Factored with dynamic project importance and repeat contributor bonuses.",
-          evidence: scores.evidence.contributor,
-          factors: scores.factors.contributor,
+          evidence: scoresObj.evidence.contributor,
+          factors: scoresObj.factors.contributor,
         },
         {
           label: "Organization Leadership",
-          val: scores.organization || 0,
+          val: scoresObj.organization || 0,
           icon: Users,
           calc: "Measures administrative scale and activity across organization workspaces you manage or lead.",
-          evidence: scores.evidence.organization,
-          factors: scores.factors.organization,
+          evidence: scoresObj.evidence.organization,
+          factors: scoresObj.factors.organization,
         },
         {
           label: "Community Influence",
-          val: scores.influence || 0,
+          val: scoresObj.influence || 0,
           icon: Award,
           calc: "Measures total downstream adoption based on log-scaled stars, forks, and weekly npm packages downloads.",
-          evidence: scores.evidence.influence,
-          factors: scores.factors.influence,
+          evidence: scoresObj.evidence.influence,
+          factors: scoresObj.factors.influence,
         },
       ]
     : [];
@@ -193,7 +194,7 @@ export const DimensionBreakdown: React.FC<DimensionBreakdownProps> = ({
                               Explainability Factors:
                             </p>
                             <ul className="space-y-0.5 text-[10px] text-slate-400 list-none pl-0">
-                              {metric.factors.map((f) => (
+                              {metric.factors.map((f: string) => (
                                 <li
                                   key={f}
                                   className={
@@ -238,7 +239,7 @@ export const DimensionBreakdown: React.FC<DimensionBreakdownProps> = ({
                 metric.evidence &&
                 metric.evidence.length > 0 && (
                   <ul className="grid grid-cols-1 sm:grid-cols-2 gap-1 text-[10px] text-slate-400 border-t border-slate-800/40 pt-2 list-none pl-0">
-                    {metric.evidence.map((ev) => (
+                    {metric.evidence.map((ev: string) => (
                       <li key={ev} className="flex items-center gap-1.5">
                         <div className="h-1 w-1 bg-indigo-500 rounded-full shrink-0" />
                         <span className="truncate">{ev}</span>

@@ -77,8 +77,9 @@ No external dependencies should affect score calculation.
 
 ## ✨ Why @ossintel/scoring?
 
--
--
+- **100% Deterministic & Transparent**: Zero network requests or probabilistic AI models; calculations are mathematical and fully reproducible.
+- **Detailed Sub-metrics**: Computes comprehensive scores for Activity, Impact, Health, Community, and Risk to give a multidimensional view.
+- **Fully Tested**: Every score calculation is validated by comprehensive unit tests to prevent regression.
 
 ---
 

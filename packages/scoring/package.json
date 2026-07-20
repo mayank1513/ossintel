@@ -3,7 +3,7 @@
   "author": "Mayank Kumar Chaudhari <https://mayankchaudhari.com>",
   "private": false,
   "version": "0.0.0",
-  "description": "Deterministic scoring engine for calculating OSS health, impact, risk, activity, and community metrics from normalized repository and ecosystem data.",
+  "description": "Mathematical, deterministic metrics calculator to evaluate open-source software health, impact, activity, community adoption, and risk profiles.",
   "license": "MIT",
   "main": "./dist/index.js",
   "module": "./dist/index.mjs",
@@ -57,7 +57,12 @@
     }
   ],
   "keywords": [
-    "@ossintel/scoring",
+    "deterministic-scoring",
+    "oss-health",
+    "software-metrics",
+    "risk-calculation",
+    "developer-impact",
+    "math-engine",
     "turboforge"
   ]
 }

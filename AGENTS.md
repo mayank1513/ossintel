@@ -134,6 +134,7 @@ Business logic belongs inside reusable packages whenever practical.
 - Prefer pure arrow functions.
 - Avoid unnecessary abstractions.
 - Add or update tests when business logic changes.
+- Run `pnpm.cmd lint:fix` to lint
 
 ---
 

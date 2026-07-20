@@ -136,8 +136,13 @@ export default function RepoPage() {
             <ArrowLeft className="h-4 w-4" /> Back to Search
           </button>
           <div className="flex items-center gap-2">
-            <div className="p-1.5 bg-gradient-to-tr from-indigo-500 to-purple-600 rounded-lg">
-              <Sparkles className="h-4 w-4 text-white" />
+            <div className="p-0.5 bg-slate-900 border border-slate-800 rounded-lg overflow-hidden">
+              {/* biome-ignore lint/performance/noImgElement: static logo asset */}
+              <img
+                src="/ossintel.png"
+                alt="OSSIntel Logo"
+                className="h-6 w-6 object-contain"
+              />
             </div>
             <span className="text-sm font-bold">OSSIntel</span>
           </div>

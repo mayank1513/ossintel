@@ -2,6 +2,16 @@
   "name": "@app/web",
   "version": "0.0.0",
   "private": true,
+  "description": "OSSIntel platform - Beautiful open source intelligence dashboard to audit developers, portfolios, and repositories using deterministic models.",
+  "keywords": [
+    "ossintel",
+    "nextjs",
+    "react-query",
+    "indexeddb",
+    "software-metrics",
+    "developer-profile",
+    "security-audit"
+  ],
   "scripts": {
     "build": "fumadocs-mdx && next build",
     "dev": "fumadocs-mdx && next dev",

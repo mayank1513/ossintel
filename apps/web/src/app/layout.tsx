@@ -13,36 +13,41 @@ const baseUrl = process.env.NEXT_PUBLIC_SITE_URL
     : `https://${process.env.NEXT_PUBLIC_SITE_URL}`
   : process.env.VERCEL_URL
     ? `https://${process.env.VERCEL_URL}`
-    : "https://promptshield.js.org";
+    : "https://ossintel.js.org";
 
 export const metadata: Metadata = {
   metadataBase: new URL(baseUrl),
   title: {
-    template: "%s | PromptShield",
-    default: "PromptShield - Adversarial Prompt Security Layer",
+    template: "%s | OSSIntel",
+    default: "OSSIntel - Open Source Intelligence Audit Platform",
   },
   description:
-    "Protect your LLMs from invisible Unicode characters, BIDI overrides (Trojan Source), homoglyph attacks, and prompt smuggling.",
+    "Evaluate, audit, and analyze open-source developers, portfolios, and repositories using deterministic metrics and security insights.",
   keywords: [
-    "prompt security",
-    "prompt injection defense",
-    "Unicode attack detection",
-    "invisible character detection",
-    "homoglyph attack prevention",
-    "LLM input validation",
-    "Trojan Source",
+    "ossintel",
+    "open-source intelligence",
+    "developer audit",
+    "repository scores",
+    "health metrics",
+    "security evaluation",
+    "npm dependency assessment",
   ],
+  icons: {
+    icon: "/ossintel.png",
+    shortcut: "/ossintel.png",
+    apple: "/ossintel.png",
+  },
   openGraph: {
     type: "website",
-    siteName: "PromptShield",
+    siteName: "OSSIntel",
     locale: "en_US",
-    title: "PromptShield - Adversarial Prompt Security Layer",
-    description: "Detect and sanitize adversarial prompts robustly.",
+    title: "OSSIntel - Open Source Intelligence Audit Platform",
+    description: "Evaluate developer portfolios and codebase health robustly.",
   },
   twitter: {
     card: "summary_large_image",
-    title: "PromptShield - Adversarial Prompt Security Layer",
-    description: "Detect and sanitize adversarial prompts robustly.",
+    title: "OSSIntel - Open Source Intelligence Audit Platform",
+    description: "Evaluate developer portfolios and codebase health robustly.",
   },
 };
 

@@ -11,7 +11,6 @@ import {
   KeyRound,
   ShieldCheck,
   Star,
-  Terminal,
   Users,
   Zap,
 } from "lucide-react";
@@ -22,6 +21,7 @@ interface OpenSourceImpactProps {
   limit: number;
   onLimitChange: (limit: number) => void;
   onRefresh: () => void;
+  badges?: string[];
 }
 
 export const OpenSourceImpact: React.FC<OpenSourceImpactProps> = ({
@@ -29,6 +29,7 @@ export const OpenSourceImpact: React.FC<OpenSourceImpactProps> = ({
   limit,
   onLimitChange,
   onRefresh,
+  badges = [],
 }) => {
   const [patInput, setPatInput] = useState("");
   const [hasToken, setHasToken] = useState(false);
@@ -105,55 +106,89 @@ export const OpenSourceImpact: React.FC<OpenSourceImpactProps> = ({
     .sort((a, b) => b - a);
 
   // 4. Badges eligibility checks
-  const badges = [
+  const genericBadgeDefinitions = [
     {
-      id: "ecosystem",
-      name: "Ecosystem Contributor",
-      description: "Contributed to 3 or more external projects",
-      icon: <Users className="h-5 w-5 text-indigo-400" />,
-      eligible: totalOrgs >= 3,
-    },
-    {
-      id: "core",
-      name: "Core Contributor",
-      description: "Contributed code to a Tier-1 framework (20k+ stars)",
+      id: "Framework Contributor",
+      name: "Framework Contributor",
+      description: "Contributed code to a major web framework",
       icon: <Zap className="h-5 w-5 text-amber-400" />,
-      eligible: contributions.some(
-        (c) => c.targetRepoStars >= 20000 && c.type === "code",
-      ),
     },
     {
-      id: "bug_hunter",
-      name: "Bug Hunter",
-      description: "Patched issues or code bugs in external repos",
-      icon: <Terminal className="h-5 w-5 text-rose-400" />,
-      eligible: contributions.some(
-        (c) =>
-          c.type === "code" &&
-          (c.title.toLowerCase().includes("fix") ||
-            c.title.toLowerCase().includes("bug") ||
-            c.labels.some(
-              (l) =>
-                l.toLowerCase().includes("bug") ||
-                l.toLowerCase().includes("fix"),
-            )),
-      ),
+      id: "OSS Founder",
+      name: "OSS Founder",
+      description: "Founded or manages an active organization namespace",
+      icon: <Users className="h-5 w-5 text-indigo-400" />,
     },
     {
-      id: "docs_hero",
-      name: "Documentation Hero",
-      description: "Helped improve project documentation and READMEs",
+      id: "Package Publisher",
+      name: "Package Publisher",
+      description: "Author and publisher of npm library packages",
       icon: <BookOpen className="h-5 w-5 text-emerald-400" />,
-      eligible: docsCount >= 2,
     },
     {
-      id: "test_champ",
+      id: "Test Champion",
       name: "Test Champion",
-      description: "Wrote tests or improved test suites",
+      description: "Merged 5+ PRs targeting testing and coverage",
       icon: <ShieldCheck className="h-5 w-5 text-sky-400" />,
-      eligible: testCount >= 1,
+    },
+    {
+      id: "Security Champion",
+      name: "Security Champion",
+      description: "Contributed security vulnerability patches and fixes",
+      icon: <ShieldCheck className="h-5 w-5 text-emerald-400" />,
+    },
+    {
+      id: "Prodigious Contributor",
+      name: "Prodigious Contributor",
+      description: "Merged 15+ external upstream pull requests",
+      icon: <Zap className="h-5 w-5 text-indigo-400" />,
+    },
+    {
+      id: "1k Stars Earned",
+      name: "1k Stars Earned",
+      description: "Accrued 1,000+ stars on personal projects",
+      icon: <Star className="h-5 w-5 text-amber-400" />,
+    },
+    {
+      id: "1M npm Downloads",
+      name: "1M npm Downloads",
+      description: "Ecosystem packages exceed 1M downloads/week",
+      icon: <Award className="h-5 w-5 text-violet-400" />,
     },
   ];
+
+  const mappedBadges = genericBadgeDefinitions.map((badgeDef) => {
+    const isEligible = badges.includes(badgeDef.id);
+    let displayName = badgeDef.name;
+    let desc = badgeDef.description;
+
+    if (isEligible && badgeDef.id === "Framework Contributor") {
+      const hasReact = contributions.some(
+        (c) => c.repoFullName === "facebook/react",
+      );
+      const hasNext = contributions.some(
+        (c) => c.repoFullName === "vercel/next.js",
+      );
+      if (hasReact && hasNext) {
+        displayName = "React & Next.js Contributor";
+        desc = "Contributed to both React and Next.js core frameworks";
+      } else if (hasReact) {
+        displayName = "React Contributor";
+        desc = "Contributed code to facebook/react core";
+      } else if (hasNext) {
+        displayName = "Next.js Contributor";
+        desc = "Contributed code to vercel/next.js core";
+      }
+    }
+
+    return {
+      id: badgeDef.id,
+      name: displayName,
+      description: desc,
+      icon: badgeDef.icon,
+      eligible: isEligible,
+    };
+  });
 
   return (
     <div className="bg-slate-900/90 border border-slate-800 rounded-3xl p-6 shadow-xl space-y-8">
@@ -351,7 +386,7 @@ export const OpenSourceImpact: React.FC<OpenSourceImpactProps> = ({
               Earned Contribution Badges
             </h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-              {badges.map((badge) => (
+              {mappedBadges.map((badge) => (
                 <div
                   key={badge.id}
                   className={`p-4 border rounded-2xl flex items-start gap-3 transition-colors ${
@@ -407,7 +442,8 @@ export const OpenSourceImpact: React.FC<OpenSourceImpactProps> = ({
                       className="w-full flex items-center justify-between text-left focus:outline-none group/year"
                     >
                       <h4 className="text-sm font-bold text-slate-200 group-hover/year:text-indigo-400 transition-colors">
-                        {year}
+                        {year} ({timelineByYear[year].length} contribution
+                        {timelineByYear[year].length > 1 ? "s" : ""})
                       </h4>
                       <ChevronDown
                         className={`h-4 w-4 text-slate-500 group-hover/year:text-indigo-400 transition-transform duration-200 ${

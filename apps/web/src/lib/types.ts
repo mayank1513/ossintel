@@ -39,11 +39,29 @@ export interface AnalysisData {
   };
   scores: {
     overall: number;
-    health: number;
-    impact: number;
-    activity: number;
-    community: number;
-    risk: number;
+    health?: number;
+    impact?: number;
+    activity?: number;
+    community?: number;
+    risk?: number;
+    maintainer?: number;
+    contributor?: number;
+    organization?: number;
+    influence?: number;
+    confidence?: "High" | "Medium" | "Low";
+    evidence?: {
+      maintainer: string[];
+      contributor: string[];
+      influence: string[];
+      organization: string[];
+    };
+    factors?: {
+      maintainer: string[];
+      contributor: string[];
+      influence: string[];
+      organization: string[];
+    };
+    badges?: string[];
   };
   findings: Array<{
     id: string;

@@ -2,6 +2,7 @@
 
 import type {
   NormalizedContribution,
+  NormalizedOrganization,
   NormalizedRepository,
 } from "@ossintel/github-normalizer";
 import { generateIdentityInsights } from "@ossintel/insights";
@@ -21,6 +22,7 @@ interface DeveloperScoresProps {
   userLogin: string;
   userName: string;
   externalContributions?: NormalizedContribution[];
+  organizations?: NormalizedOrganization[];
 }
 
 export const useDeveloperScores = ({
@@ -32,6 +34,7 @@ export const useDeveloperScores = ({
   userLogin,
   userName,
   externalContributions,
+  organizations = [],
 }: DeveloperScoresProps) => {
   return useMemo(() => {
     const orgRepos = orgsQueries
@@ -52,6 +55,7 @@ export const useDeveloperScores = ({
       repositories: combinedRepos,
       npmPackages,
       externalContributions,
+      organizations,
     });
 
     const insightsResult = generateIdentityInsights(combinedRepos, scores, {
@@ -110,5 +114,6 @@ export const useDeveloperScores = ({
     userLogin,
     userName,
     externalContributions,
+    organizations,
   ]);
 };

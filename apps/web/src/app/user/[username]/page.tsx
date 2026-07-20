@@ -146,6 +146,7 @@ export default function UserPage() {
     userLogin: userQuery.data?.metadata?.login || "",
     userName: userQuery.data?.metadata?.name || "",
     externalContributions: userQuery.data?.externalContributions || [],
+    organizations: userQuery.data?.metadata?.organizations || [],
   });
 
   const fullAnalysisData = useMemo(() => {
@@ -312,6 +313,7 @@ export default function UserPage() {
                     limit={contribLimit}
                     onLimitChange={setContribLimit}
                     onRefresh={handleRefresh}
+                    badges={clientIntel.scores.badges}
                   />
                 )}
                 <FindingsList findings={clientIntel.findings} />

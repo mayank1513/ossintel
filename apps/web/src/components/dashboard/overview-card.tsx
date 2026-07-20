@@ -80,6 +80,19 @@ export const OverviewCard: React.FC<OverviewCardProps> = ({ data }) => {
           <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">
             OSSIQ Score
           </span>
+          {"confidence" in data.scores && (
+            <span
+              className={`text-[9px] font-bold px-2 py-0.5 rounded border mt-1.5 uppercase tracking-wider ${
+                data.scores.confidence === "High"
+                  ? "bg-emerald-500/10 border-emerald-500/20 text-emerald-400"
+                  : data.scores.confidence === "Medium"
+                    ? "bg-amber-500/10 border-amber-500/20 text-amber-400"
+                    : "bg-rose-500/10 border-rose-500/20 text-rose-400"
+              }`}
+            >
+              Confidence: {data.scores.confidence}
+            </span>
+          )}
         </div>
       </div>
 

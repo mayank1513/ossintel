@@ -1,7 +1,9 @@
+import type { IdentityScores, RepositoryScores } from "@ossintel/scoring";
 import {
   Activity,
   AlertTriangle,
   Award,
+  GitPullRequest,
   Heart,
   Info,
   Users,
@@ -9,13 +11,7 @@ import {
 import type React from "react";
 
 interface DimensionBreakdownProps {
-  scores: {
-    health: number;
-    impact: number;
-    activity: number;
-    community: number;
-    risk: number;
-  };
+  scores: IdentityScores | RepositoryScores;
 }
 
 export const DimensionBreakdown: React.FC<DimensionBreakdownProps> = ({
@@ -35,6 +31,9 @@ export const DimensionBreakdown: React.FC<DimensionBreakdownProps> = ({
     return "bg-rose-500";
   };
 
+  const isUser = "maintainer" in scores;
+
+  // 1. Repository-mode fallback metrics
   const getHealthReason = (score: number) => {
     if (score >= 75)
       return "Excellent health. Active updates and well-managed issue tracker relative to its size.";
@@ -75,38 +74,38 @@ export const DimensionBreakdown: React.FC<DimensionBreakdownProps> = ({
     return "Low risk. Active development, diverse contributors, and healthy popularity ratio.";
   };
 
-  const metrics = [
+  const repoMetrics = [
     {
       label: "Health Score",
-      val: scores.health,
+      val: scores.health || 0,
       icon: Heart,
       calc: "Evaluates the ratio of open issues to repo popularity (stars + forks) and the recency of code updates (last commit recency).",
       getReason: getHealthReason,
     },
     {
       label: "Impact Score",
-      val: scores.impact,
+      val: scores.impact || 0,
       icon: Award,
       calc: "Logarithmic scale of GitHub stars (50%), forks (35%), and watchers (15%). Measures ecosystem footprint.",
       getReason: getImpactReason,
     },
     {
       label: "Activity Score",
-      val: scores.activity,
+      val: scores.activity || 0,
       icon: Activity,
       calc: "Combines the recency of the last commit (60%) and the frequency of releases in the last 12 months (40%).",
       getReason: getActivityReason,
     },
     {
       label: "Community Score",
-      val: scores.community,
+      val: scores.community || 0,
       icon: Users,
       calc: "Evaluates total contributors count (70%), repository topics (15%), and repository documentation completeness (15%). Falls back to star-based contributor estimates when throttled.",
       getReason: getCommunityReason,
     },
     {
       label: "Risk Score",
-      val: scores.risk,
+      val: scores.risk || 0,
       icon: AlertTriangle,
       inverse: true,
       calc: "Assesses risk based on lack of updates (>3 months), low contributor counts (<5 developers), fork status, and open issues exceeding popularity.",
@@ -114,22 +113,70 @@ export const DimensionBreakdown: React.FC<DimensionBreakdownProps> = ({
     },
   ];
 
+  // 2. User-mode reputation metrics
+  const userMetrics = isUser
+    ? [
+        {
+          label: "Maintainer Score",
+          val: scores.maintainer || 0,
+          icon: Heart,
+          calc: "Measures code quality, health, and activity across owned or maintained repositories, popularity-weighted to prioritize flagship projects.",
+          evidence: scores.evidence.maintainer,
+          factors: scores.factors.maintainer,
+        },
+        {
+          label: "Contributor Score",
+          val: scores.contributor || 0,
+          icon: GitPullRequest,
+          calc: "Measures PR contributions to external repositories. Factored with dynamic project importance and repeat contributor bonuses.",
+          evidence: scores.evidence.contributor,
+          factors: scores.factors.contributor,
+        },
+        {
+          label: "Organization Leadership",
+          val: scores.organization || 0,
+          icon: Users,
+          calc: "Measures administrative scale and activity across organization workspaces you manage or lead.",
+          evidence: scores.evidence.organization,
+          factors: scores.factors.organization,
+        },
+        {
+          label: "Community Influence",
+          val: scores.influence || 0,
+          icon: Award,
+          calc: "Measures total downstream adoption based on log-scaled stars, forks, and weekly npm packages downloads.",
+          evidence: scores.evidence.influence,
+          factors: scores.factors.influence,
+        },
+      ]
+    : [];
+
+  const metrics = isUser ? userMetrics : repoMetrics;
+
   return (
     <div className="p-6 bg-slate-900/90 border border-slate-800 rounded-3xl flex flex-col gap-4 shadow-xl">
       <h4 className="text-xs font-bold text-slate-500 uppercase tracking-widest">
-        Dimension Breakdown
+        {isUser ? "OSSIQ Engine Breakdown" : "Dimension Breakdown"}
       </h4>
-      <div className="space-y-3.5">
+      <div className="space-y-4">
         {metrics.map((metric) => {
           const Icon = metric.icon;
-          const displayColorVal = metric.inverse
-            ? 100 - metric.val
-            : metric.val;
+          const displayColorVal =
+            "inverse" in metric && metric.inverse
+              ? 100 - metric.val
+              : metric.val;
           return (
-            <div key={metric.label} className="space-y-1.5">
+            <div
+              key={metric.label}
+              className={`p-4 rounded-2xl flex flex-col gap-3 transition-colors ${
+                isUser
+                  ? "bg-slate-950/40 border border-slate-800/80 hover:border-slate-800"
+                  : ""
+              }`}
+            >
               <div className="flex items-center justify-between text-xs font-semibold">
                 <span className="flex items-center gap-1.5 text-slate-300">
-                  <Icon className="h-4 w-4 text-slate-500" />
+                  <Icon className="h-4 w-4 text-slate-400" />
                   {metric.label}
                   <div className="group relative flex items-center">
                     <Info className="h-3.5 w-3.5 text-slate-500 hover:text-indigo-400 transition-colors cursor-help" />
@@ -138,8 +185,39 @@ export const DimensionBreakdown: React.FC<DimensionBreakdownProps> = ({
                         How it's calculated:
                       </p>
                       <p className="text-slate-400 mb-2">{metric.calc}</p>
-                      <p className="font-bold text-slate-100 mb-1">Status:</p>
-                      <p>{metric.getReason(metric.val)}</p>
+                      {"factors" in metric &&
+                        metric.factors &&
+                        metric.factors.length > 0 && (
+                          <>
+                            <p className="font-bold text-slate-100 mb-1">
+                              Explainability Factors:
+                            </p>
+                            <ul className="space-y-0.5 text-[10px] text-slate-400 list-none pl-0">
+                              {metric.factors.map((f) => (
+                                <li
+                                  key={f}
+                                  className={
+                                    f.startsWith("+")
+                                      ? "text-emerald-400"
+                                      : f.startsWith("-")
+                                        ? "text-rose-400"
+                                        : ""
+                                  }
+                                >
+                                  {f}
+                                </li>
+                              ))}
+                            </ul>
+                          </>
+                        )}
+                      {"getReason" in metric && (
+                        <>
+                          <p className="font-bold text-slate-100 mb-1">
+                            Status:
+                          </p>
+                          <p>{metric.getReason(metric.val)}</p>
+                        </>
+                      )}
                     </div>
                   </div>
                 </span>
@@ -155,6 +233,19 @@ export const DimensionBreakdown: React.FC<DimensionBreakdownProps> = ({
                   style={{ width: `${metric.val}%` }}
                 />
               </div>
+              {/* Evidence Bullets */}
+              {"evidence" in metric &&
+                metric.evidence &&
+                metric.evidence.length > 0 && (
+                  <ul className="grid grid-cols-1 sm:grid-cols-2 gap-1 text-[10px] text-slate-400 border-t border-slate-800/40 pt-2 list-none pl-0">
+                    {metric.evidence.map((ev) => (
+                      <li key={ev} className="flex items-center gap-1.5">
+                        <div className="h-1 w-1 bg-indigo-500 rounded-full shrink-0" />
+                        <span className="truncate">{ev}</span>
+                      </li>
+                    ))}
+                  </ul>
+                )}
             </div>
           );
         })}

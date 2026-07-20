@@ -2,6 +2,8 @@
 
 - [ ] support npm
 - [ ] next themes
+- [ ] Add changesets since Sun, Jul 19, 10:53 PM
+- [ ] Enhance ecosysem distribution. Show all details as tables - sortable, filterable
 
 ## Step-by-Step Instructions and Checklist
 

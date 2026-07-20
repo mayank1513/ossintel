@@ -1,5 +1,5 @@
 import { existsSync, readdirSync } from "node:fs";
-import { defineConfig } from "vitest/config";
+import { defineConfig, type TestProjectConfiguration } from "vitest/config";
 
 export default defineConfig({
   resolve: {
@@ -11,30 +11,40 @@ export default defineConfig({
     globals: true,
     // setupFiles: ["vitest.setup.ts"], // Uncomment and create `vitest.setup.ts` for setting up mocks etc.
 
-    projects: readdirSync("./packages", { withFileTypes: true })
-      .filter((dirent) => dirent.isDirectory())
-      .map(({ name }) => {
-        const pkgDir = `./packages/${name}`;
-        const hasLocalConfig =
-          existsSync(`${pkgDir}/vitest.config.ts`) ||
-          existsSync(`${pkgDir}/vitest.config.mts`);
+    projects: [
+      ...readdirSync("./packages", { withFileTypes: true })
+        .filter((dirent) => dirent.isDirectory())
+        .map(({ name }) => {
+          const pkgDir = `./packages/${name}`;
+          const hasLocalConfig =
+            existsSync(`${pkgDir}/vitest.config.ts`) ||
+            existsSync(`${pkgDir}/vitest.config.mts`);
 
-        if (hasLocalConfig) {
-          return `packages/${name}`;
-        }
+          if (hasLocalConfig) {
+            return `packages/${name}`;
+          }
 
-        return {
-          extends: true,
-          test: {
-            name,
-            include: [`packages/${name}/**/*.test.*`],
-            environment: "happy-dom",
-          },
-        };
-      }),
+          return {
+            extends: true,
+            test: {
+              name,
+              include: [`packages/${name}/**/*.test.*`],
+              environment: "happy-dom",
+            },
+          };
+        }),
+      {
+        extends: true,
+        test: {
+          name: "web",
+          include: ["apps/web/**/*.test.*"],
+          environment: "happy-dom",
+        },
+      },
+    ] as TestProjectConfiguration[],
 
     coverage: {
-      include: ["packages/**/src/**"],
+      include: ["packages/**/src/**", "apps/**/src/**"],
       exclude: [
         "packages/**/index.ts", // comment this line if your project does not use barrel files
         "packages/**/types.ts",

@@ -1,5 +1,7 @@
 # OSSIntel
 
+![Banner](./ossintel-banner.jpg)
+
 > Open Source Intelligence Platform
 
 OSSIntel transforms GitHub profiles, repositories, and npm packages into actionable insights.

@@ -1,11 +1,11 @@
 import { useQuery } from "@tanstack/react-query";
 import { deleteCacheItem, getCacheItem, setCacheItem } from "@/lib/cache";
 
-export const useGithubUser = (username: string) => {
+export const useGithubUser = (username: string, limit = 10) => {
   const query = useQuery({
-    queryKey: ["user", username?.toLowerCase()],
+    queryKey: ["user", username?.toLowerCase(), limit],
     queryFn: async () => {
-      const cacheKey = `user:${username.toLowerCase()}`;
+      const cacheKey = `user:${username.toLowerCase()}:${limit}`;
       const cached = await getCacheItem<unknown>(cacheKey);
       if (cached) return cached;
 
@@ -13,7 +13,7 @@ export const useGithubUser = (username: string) => {
       const res = await fetch("/api/analyze", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ type: "user", query: username, token }),
+        body: JSON.stringify({ type: "user", query: username, token, limit }),
       });
       const data = await res.json();
       if (!res.ok) {
@@ -27,7 +27,7 @@ export const useGithubUser = (username: string) => {
   });
 
   const refresh = async () => {
-    const cacheKey = `user:${username.toLowerCase()}`;
+    const cacheKey = `user:${username.toLowerCase()}:${limit}`;
     await deleteCacheItem(cacheKey);
     await query.refetch();
   };

@@ -68,6 +68,25 @@ Transforms metrics into findings, recommendations, and AI-ready summaries.
 - Testable business logic
 - UI remains thin
 
+## Ecosystem Impact Engine
+
+OSSIntel includes a custom Ecosystem Impact Engine that maps developer reach across external projects. It classifies contributions dynamically (code vs. documentation vs. test suites) and weights them by target repository stargazers (importance Tier) to produce an **Ecosystem Contribution Score**.
+
+### Dataflow Pipeline
+
+```text
+   [User Input] ──► [github-normalizer] ──► [PR Classification] ──► [scoring Engine]
+                           │                                              │
+                    (Fetches PRs &                                 (Weights Tiers &
+                    Repo Stargazers)                               Quality Factors)
+                                                                          │
+                                                                          ▼
+                                                                  [Ecosystem Score]
+                                                                          │
+                                                                          ▼
+                                                                 [Next.js Dashboard]
+```
+
 ## AI-assisted Development
 
 This project itself demonstrates AI-assisted software engineering.

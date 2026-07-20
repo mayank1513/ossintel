@@ -249,3 +249,30 @@ export interface LinkedIdentitySuggestions {
     url: string;
   };
 }
+
+export interface RawGitHubSearchIssue {
+  title: string;
+  html_url: string;
+  repository_url: string;
+  number: number;
+  state: string;
+  created_at: string;
+  closed_at: string | null;
+  pull_request?: {
+    merged_at?: string | null;
+  };
+  labels: { name: string }[];
+}
+
+export interface NormalizedContribution {
+  title: string;
+  htmlUrl: string;
+  repoFullName: string;
+  number: number;
+  state: string;
+  createdAt: string;
+  mergedAt: string | null;
+  labels: string[];
+  type: "code" | "docs" | "test" | "chore";
+  targetRepoStars: number;
+}

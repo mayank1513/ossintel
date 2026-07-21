@@ -125,13 +125,14 @@ The Ecosystem Impact Engine measures developer impact beyond owned repositories,
 
 Merged pull requests are weighted according to target repository popularity and quality multipliers:
 
-| Target Repo Stargazers | Tier Category | Base Weight | Multiplier Applied |
-|---|---|---|---|
-| **&ge; 20,000 Stars** | **Tier 1 (Frameworks)** | 5.0 | Quality Multiplier (Docs: 0.4, Test: 1.2, Chore: 0.5, Code: 1.0) |
-| **&ge; 2,000 Stars** | **Tier 2 (Medium OSS)** | 3.0 | Quality Multiplier |
-| **&lt; 2,000 Stars** | **Tier 3 (Small OSS)** | 1.0 | Quality Multiplier |
+| Target Repo Stargazers | Tier Category           | Base Weight | Multiplier Applied                                               |
+| ---------------------- | ----------------------- | ----------- | ---------------------------------------------------------------- |
+| **&ge; 20,000 Stars**  | **Tier 1 (Frameworks)** | 5.0         | Quality Multiplier (Docs: 0.4, Test: 1.2, Chore: 0.5, Code: 1.0) |
+| **&ge; 2,000 Stars**   | **Tier 2 (Medium OSS)** | 3.0         | Quality Multiplier                                               |
+| **&lt; 2,000 Stars**   | **Tier 3 (Small OSS)**  | 1.0         | Quality Multiplier                                               |
 
 The resulting Ecosystem Contribution Score ($S_{\text{eco}}$) is aggregated as:
+
 $$
 S_{\text{eco}} = \min\left(100, \sum (\text{BaseWeight} \times \text{QualityMultiplier})\right)
 $$

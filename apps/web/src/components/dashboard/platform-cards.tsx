@@ -38,7 +38,7 @@ export const PlatformCards: React.FC<PlatformCardsProps> = ({
       {/* npm Card */}
       {npmUser && (
         <div className="relative overflow-hidden p-6 bg-slate-900/80 border border-slate-800/80 rounded-3xl shadow-xl space-y-6 group hover:border-indigo-500/30 transition-all duration-300">
-          <div className="absolute inset-0 bg-gradient-to-br from-red-500/5 via-transparent to-transparent opacity-50 pointer-events-none" />
+          <div className="absolute inset-0 bg-linear-to-br from-red-500/5 via-transparent to-transparent opacity-50 pointer-events-none" />
 
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
@@ -65,10 +65,10 @@ export const PlatformCards: React.FC<PlatformCardsProps> = ({
           <div className="grid grid-cols-2 gap-4">
             <div className="p-4 bg-slate-950/60 border border-slate-850 rounded-2xl">
               <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block">
-                Total Downloads
+                Total Weekly Downloads
               </span>
               <span className="text-xl font-extrabold text-slate-100 block mt-1">
-                {npmUser.totalDownloads.toLocaleString()}
+                {npmUser.totalWeeklyDownloads.toLocaleString()}
               </span>
               <span className="text-[10px] text-slate-400 block">
                 weekly downloads

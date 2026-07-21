@@ -285,7 +285,7 @@ export const generateIdentityInsights = (
       type: "highlight",
       category: "impact",
       title: "Active npm Publisher Profile",
-      description: `Unified metrics include ecosystem reach from @${npmUser.username} with ${npmUser.totalDownloads.toLocaleString()} weekly downloads across ${npmUser.packages.length} packages.`,
+      description: `Unified metrics include ecosystem reach from @${npmUser.username} with ${npmUser.totalWeeklyDownloads.toLocaleString()} weekly downloads across ${npmUser.packages.length} packages.`,
     });
 
     const deprecated = npmUser.packages.filter((p) => p.isDeprecated);
@@ -459,7 +459,7 @@ export const generateIdentityInsights = (
       `- npm Username: ${npmUser?.username || identityMetadata.linkedIdentities?.npm}`,
       ...(npmUser
         ? [
-            `- npm Downloads: ${npmUser.totalDownloads.toLocaleString()} weekly`,
+            `- npm Downloads: ${npmUser.totalWeeklyDownloads.toLocaleString()} weekly`,
             `- Published packages: ${npmUser.packages.length} (${npmUser.activePackagesCount} active)`,
             `- Flagship package: ${npmUser.popularPackage ?? "None"}`,
           ]

@@ -1,21 +1,25 @@
 # OSSIntel — TODO
 
 ## Active
-- [ ] Support npm package intelligence
+
+- [x] Support npm package intelligence
 - [ ] Add next-themes for dark mode
-- [ ] Enhance ecosystem distribution — show details as sortable/filterable tables
+- [x] Enhance ecosystem distribution — show details as sortable/filterable tables
 
 ## Backlog
+
+- [ ] Fix doc generation (Fumadoc)
 - [ ] Organization Intelligence
 - [ ] GitHub App integration
 - [ ] CLI tool
 - [ ] VS Code Extension
 - [ ] Historical trend tracking
 - [ ] Comparative analysis between developers/repos
-- [ ] Stack Overflow integration
-- [ ] Shared types package (`@ossintel/shared`)
+- [x] Stack Overflow integration
+- [ ] May be a shared types package (`@ossintel/shared`)
 
 ## Done
+
 - [x] Core data normalization pipeline
 - [x] Deterministic scoring engine
 - [x] Insight generation (findings + recommendations)

@@ -302,7 +302,7 @@ function UserDashboardContent() {
   const npmStats = useMemo(() => {
     if (!npmQuery.data) return null;
     return {
-      totalDownloads: npmQuery.data.totalDownloads,
+      totalDownloads: npmQuery.data.totalWeeklyDownloads,
       packageCount: npmQuery.data.packages.length,
       topPackage: npmQuery.data.packages[0]?.name || undefined,
     };

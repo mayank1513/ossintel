@@ -4,6 +4,7 @@ import type {
   IdentityScoringInputs,
   RepositoryScores,
   ScoringInputs,
+  TopicExpertise,
 } from "./types";
 
 export const calculateImpactScore = (
@@ -173,12 +174,59 @@ export const calculateRepositoryScore = (
   };
 };
 
+const TOPIC_MAPPINGS: Record<string, string[]> = {
+  React: ["react", "reactjs", "jsx", "react-dom", "remix", "nextjs", "next.js"],
+  TypeScript: ["typescript", "ts"],
+  "Node.js": [
+    "nodejs",
+    "node",
+    "express",
+    "koa",
+    "npm",
+    "yarn",
+    "pnpm",
+    "nest",
+    "nestjs",
+  ],
+  JavaScript: ["javascript", "js", "ecmascript"],
+  Python: ["python", "py", "django", "flask", "fastapi", "numpy", "pandas"],
+  Rust: ["rust", "cargo", "wasm-bindgen"],
+  "Next.js": ["nextjs", "next.js"],
+  Vue: ["vue", "vuejs", "nuxt", "nuxtjs"],
+  Docker: ["docker", "kubernetes", "k8s", "devops", "aws", "gcp"],
+  Database: [
+    "sql",
+    "postgres",
+    "postgresql",
+    "mysql",
+    "mongodb",
+    "redis",
+    "sqlite",
+    "prisma",
+  ],
+  CSS: ["css", "sass", "scss", "tailwind", "tailwindcss", "postcss"],
+};
+
+const matchTopic = (nameOrTopic: string): string | null => {
+  const normalized = nameOrTopic.toLowerCase().replace(/[^a-z0-9]/g, "");
+  for (const [category, keywords] of Object.entries(TOPIC_MAPPINGS)) {
+    if (category.toLowerCase() === normalized) return category;
+    for (const kw of keywords) {
+      if (kw.toLowerCase().replace(/[^a-z0-9]/g, "") === normalized) {
+        return category;
+      }
+    }
+  }
+  return null;
+};
+
 export const calculateIdentityScore = (
   inputs: IdentityScoringInputs,
 ): IdentityScores => {
   const {
     repositories = [],
-    npmPackages = [],
+    npmUser = null,
+    stackoverflowUser = null,
     externalContributions = [],
     organizations = [],
   } = inputs;
@@ -191,15 +239,14 @@ export const calculateIdentityScore = (
     (acc, r) => acc + r.forksCount,
     0,
   );
-  const totalNpmDownloads = npmPackages.reduce(
-    (acc, p) => acc + p.downloads,
-    0,
-  );
+  const totalNpmDownloads = npmUser?.totalDownloads ?? 0;
+  const soRep = stackoverflowUser?.reputation ?? 0;
 
   if (
     repositories.length === 0 &&
     externalContributions.length === 0 &&
-    npmPackages.length === 0 &&
+    !npmUser &&
+    !stackoverflowUser &&
     organizations.length === 0
   ) {
     return {
@@ -222,6 +269,7 @@ export const calculateIdentityScore = (
         organization: [],
       },
       badges: [],
+      skills: [],
     };
   }
 
@@ -248,7 +296,7 @@ export const calculateIdentityScore = (
       sustainedCount++;
     }
 
-    const repoNpm = npmPackages.find(
+    const repoNpm = (npmUser?.packages || []).find(
       (pkg) =>
         pkg.name.toLowerCase() === repo.name.toLowerCase() ||
         pkg.name.toLowerCase().endsWith(`/${repo.name.toLowerCase()}`),
@@ -352,10 +400,11 @@ export const calculateIdentityScore = (
   const starWeight = Math.log10(totalStarsCount + 1) * 20;
   const forkWeight = Math.log10(totalForksCount + 1) * 20;
   const npmWeight = Math.log10(totalNpmDownloads + 1) * 20;
+  const soWeight = Math.log10(soRep + 1) * 15;
 
   const influence = Math.min(
     100,
-    Math.round(starWeight + forkWeight + npmWeight),
+    Math.round(starWeight + forkWeight + npmWeight + soWeight),
   );
 
   // 5. Confidence Score
@@ -366,10 +415,11 @@ export const calculateIdentityScore = (
   if (
     totalReposCount >= 10 ||
     totalPRsCount >= 15 ||
-    totalNpmDownloads >= 5000
+    totalNpmDownloads >= 5000 ||
+    soRep >= 1000
   ) {
     confidence = "High";
-  } else if (totalReposCount >= 3 || totalPRsCount >= 3) {
+  } else if (totalReposCount >= 3 || totalPRsCount >= 3 || soRep >= 100) {
     confidence = "Medium";
   }
 
@@ -399,9 +449,23 @@ export const calculateIdentityScore = (
   if (activeOrgsCount >= 1) {
     badges.push("OSS Founder");
   }
-  if (npmPackages.length >= 1) {
+  if (npmUser?.packages && npmUser.packages.length >= 1) {
     badges.push("Package Publisher");
   }
+  if (soRep >= 10000) {
+    badges.push("StackOverflow Elite");
+  }
+  if (stackoverflowUser && stackoverflowUser.answerCount >= 100) {
+    badges.push("Community Helper");
+  }
+  if (
+    stackoverflowUser &&
+    stackoverflowUser.acceptanceRate >= 80 &&
+    stackoverflowUser.answerCount >= 10
+  ) {
+    badges.push("High Acceptance");
+  }
+
   const testPRsCount = externalContributions.filter(
     (c) => c.type === "test",
   ).length;
@@ -462,6 +526,11 @@ export const calculateIdentityScore = (
   if (totalNpmDownloads > 0) {
     influenceEvidence.push(
       `${totalNpmDownloads.toLocaleString()} weekly npm downloads`,
+    );
+  }
+  if (soRep > 0) {
+    influenceEvidence.push(
+      `Stack Overflow reputation: ${soRep.toLocaleString()}`,
     );
   }
 
@@ -546,6 +615,14 @@ export const calculateIdentityScore = (
       `+ Strong download footprint (${totalNpmDownloads.toLocaleString()} weekly downloads)`,
     );
   }
+  if (soRep >= 1000) {
+    influenceFactors.push(
+      `+ High developer authority (${soRep.toLocaleString()} Stack Overflow reputation)`,
+    );
+  }
+  if (!stackoverflowUser) {
+    influenceFactors.push("- No Stack Overflow activity linked");
+  }
   if (influenceFactors.length === 0) {
     influenceFactors.push("Growing library adoption and ecosystem footprint");
   }
@@ -569,6 +646,116 @@ export const calculateIdentityScore = (
     organization: orgFactors,
   };
 
+  // 10. Compute Skills Topic Expertise
+  const skillsMap: Record<string, TopicExpertise["evidence"]> = {};
+  for (const cat of Object.keys(TOPIC_MAPPINGS)) {
+    skillsMap[cat] = {
+      githubStars: 0,
+      githubPrs: 0,
+      npmDownloads: 0,
+      npmPackages: 0,
+      stackoverflowScore: 0,
+      stackoverflowAnswers: 0,
+    };
+  }
+
+  // Aggregate GitHub Repo metrics
+  for (const repo of repositories) {
+    const topicsToScan = [repo.language, ...(repo.topics || [])].filter(
+      Boolean,
+    ) as string[];
+    const matchedCats = new Set<string>();
+    for (const t of topicsToScan) {
+      const cat = matchTopic(t);
+      if (cat) matchedCats.add(cat);
+    }
+    for (const cat of matchedCats) {
+      skillsMap[cat].githubStars += repo.stargazersCount;
+    }
+  }
+
+  // Aggregate GitHub PR metrics
+  for (const c of externalContributions) {
+    const searchStr = `${c.repoFullName} ${c.title} ${c.labels.join(" ")}`;
+    const matchedCats = new Set<string>();
+    // Try scanning for matching keywords directly
+    for (const [cat, keywords] of Object.entries(TOPIC_MAPPINGS)) {
+      for (const kw of keywords) {
+        if (new RegExp(`\\b${kw}\\b`, "i").test(searchStr)) {
+          matchedCats.add(cat);
+        }
+      }
+    }
+    for (const cat of matchedCats) {
+      skillsMap[cat].githubPrs += 1;
+    }
+  }
+
+  // Aggregate npm package metrics
+  if (npmUser?.packages) {
+    for (const pkg of npmUser.packages) {
+      const searchStr = `${pkg.name} ${pkg.description || ""} ${pkg.categories.join(" ")}`;
+      const matchedCats = new Set<string>();
+      for (const [cat, keywords] of Object.entries(TOPIC_MAPPINGS)) {
+        for (const kw of keywords) {
+          if (new RegExp(`\\b${kw}\\b`, "i").test(searchStr)) {
+            matchedCats.add(cat);
+          }
+        }
+      }
+      for (const cat of matchedCats) {
+        skillsMap[cat].npmPackages += 1;
+        skillsMap[cat].npmDownloads += pkg.downloads;
+      }
+    }
+  }
+
+  // Aggregate StackOverflow tag metrics
+  if (stackoverflowUser?.topTags) {
+    for (const tag of stackoverflowUser.topTags) {
+      const cat = matchTopic(tag.name);
+      if (cat) {
+        skillsMap[cat].stackoverflowScore += tag.score;
+        skillsMap[cat].stackoverflowAnswers += tag.count;
+      }
+    }
+  }
+
+  // Calculate final dynamic skill scores
+  const skills: TopicExpertise[] = [];
+  for (const [topic, ev] of Object.entries(skillsMap)) {
+    const githubStarsWeight = Math.min(40, Math.log10(ev.githubStars + 1) * 10);
+    const githubPrsWeight = Math.min(25, ev.githubPrs * 2.5);
+    const npmPackagesWeight = Math.min(20, ev.npmPackages * 5);
+    const npmDownloadsWeight = Math.min(
+      30,
+      Math.log10(ev.npmDownloads + 1) * 5,
+    );
+    const soScoreWeight = Math.min(
+      35,
+      Math.log10(ev.stackoverflowScore + 1) * 10,
+    );
+    const soAnswersWeight = Math.min(25, ev.stackoverflowAnswers * 0.5);
+
+    const rawScore =
+      githubStarsWeight +
+      githubPrsWeight +
+      npmPackagesWeight +
+      npmDownloadsWeight +
+      soScoreWeight +
+      soAnswersWeight;
+    const score = Math.round(Math.min(100, rawScore));
+
+    if (score > 0) {
+      skills.push({
+        topic,
+        score,
+        evidence: ev,
+      });
+    }
+  }
+  skills.sort((a, b) => b.score - a.score);
+
   return {
     overall,
     maintainer,
@@ -579,5 +766,6 @@ export const calculateIdentityScore = (
     evidence,
     factors,
     badges,
+    skills,
   };
 };

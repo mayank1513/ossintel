@@ -143,6 +143,7 @@ describe("insights engine", () => {
         organization: [],
       },
       badges: [],
+      skills: [],
     };
     const metadata = {
       type: "user" as const,

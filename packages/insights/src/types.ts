@@ -1,3 +1,6 @@
+import type { NormalizedNpmUser } from "@ossintel/npm";
+import type { NormalizedStackOverflowUser } from "@ossintel/stackoverflow";
+
 export interface Finding {
   id: string;
   type: "highlight" | "warning";
@@ -37,6 +40,8 @@ export interface IdentityMetadata {
     npm?: string;
     stackoverflow?: string;
   };
+  npmUser?: NormalizedNpmUser | null;
+  stackoverflowUser?: NormalizedStackOverflowUser | null;
 }
 
 export interface IdentityInsights {

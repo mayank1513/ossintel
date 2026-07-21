@@ -254,6 +254,8 @@ export const generateIdentityInsights = (
   const findings: Finding[] = [];
   const recommendations: Recommendation[] = [];
 
+  const { npmUser = null, stackoverflowUser = null } = identityMetadata;
+
   const totalRepos = repositories.length;
   const archivedRepos = repositories.filter((r) => r.isArchived).length;
   const activeRepos = totalRepos - archivedRepos;
@@ -276,24 +278,107 @@ export const generateIdentityInsights = (
     });
   }
 
-  if (identityMetadata.linkedIdentities?.npm) {
+  // npm Findings
+  if (npmUser) {
     findings.push({
       id: "linked_identity_npm",
       type: "highlight",
       category: "impact",
-      title: "Linked npm Profile",
-      description: `Unified metrics include ecosystem reach from linked npm account: @${identityMetadata.linkedIdentities.npm}.`,
+      title: "Active npm Publisher Profile",
+      description: `Unified metrics include ecosystem reach from @${npmUser.username} with ${npmUser.totalDownloads.toLocaleString()} weekly downloads across ${npmUser.packages.length} packages.`,
     });
+
+    const deprecated = npmUser.packages.filter((p) => p.isDeprecated);
+    if (deprecated.length > 0) {
+      findings.push({
+        id: "npm_deprecated_packages",
+        type: "warning",
+        category: "health",
+        title: "Deprecated Packages Found",
+        description: `Your npm portfolio contains ${deprecated.length} deprecated package(s). Consider archiving or directing users to newer alternatives.`,
+        score: deprecated.length,
+      });
+      recommendations.push({
+        id: "npm_clean_deprecated",
+        category: "health",
+        title: "Clean Up Deprecated npm Packages",
+        description:
+          "Review deprecated npm modules and add clear pointers on their READMEs to active packages.",
+        priority: "medium",
+      });
+    }
+
+    const lackingTS = npmUser.packages.filter(
+      (p) => !p.isDeprecated && !p.hasTypeScript,
+    );
+    if (lackingTS.length > 0) {
+      recommendations.push({
+        id: "npm_add_typescript",
+        category: "community",
+        title: "Add TypeScript Declarations",
+        description: `Add types to active package(s): ${lackingTS
+          .slice(0, 3)
+          .map((p) => p.name)
+          .join(", ")}. Developers prefer typed libraries.`,
+        priority: "low",
+      });
+    }
   }
 
-  if (identityMetadata.linkedIdentities?.stackoverflow) {
+  // StackOverflow Findings
+  if (stackoverflowUser) {
     findings.push({
       id: "linked_identity_so",
       type: "highlight",
       category: "community",
-      title: "Linked Stack Overflow Profile",
-      description: `Developer community expertise enriched by linked Stack Overflow profile ID ${identityMetadata.linkedIdentities.stackoverflow}.`,
+      title: "Verified Stack Overflow Authority",
+      description: `Linked Stack Overflow account has ${stackoverflowUser.reputation.toLocaleString()} reputation, ${stackoverflowUser.answerCount} answers, and ${stackoverflowUser.badgeCounts.gold} gold badges.`,
     });
+
+    if (
+      stackoverflowUser.acceptanceRate >= 80 &&
+      stackoverflowUser.answerCount >= 10
+    ) {
+      findings.push({
+        id: "so_high_acceptance",
+        type: "highlight",
+        category: "community",
+        title: "High-Quality Answer Rate",
+        description: `Stellar community contribution: ${stackoverflowUser.acceptanceRate}% of sample answers were marked as accepted by other developers.`,
+      });
+    }
+  }
+
+  // Topic Expertise / Skill Radar Findings
+  if (scores.skills && scores.skills.length > 0) {
+    const topSkills = scores.skills.slice(0, 3);
+    for (const skill of topSkills) {
+      if (skill.score >= 35) {
+        const evidenceParts: string[] = [];
+        if (skill.evidence.githubStars > 0) {
+          evidenceParts.push(`${skill.evidence.githubStars} stars`);
+        }
+        if (skill.evidence.githubPrs > 0) {
+          evidenceParts.push(`${skill.evidence.githubPrs} PRs`);
+        }
+        if (skill.evidence.npmDownloads > 0) {
+          evidenceParts.push(
+            `${skill.evidence.npmDownloads.toLocaleString()} weekly downloads`,
+          );
+        }
+        if (skill.evidence.stackoverflowAnswers > 0) {
+          evidenceParts.push(`${skill.evidence.stackoverflowAnswers} answers`);
+        }
+
+        findings.push({
+          id: `expert_${skill.topic.toLowerCase()}`,
+          type: "highlight",
+          category: "impact",
+          title: `${skill.topic} Expert`,
+          description: `Demonstrated expertise in ${skill.topic} (Score: ${skill.score}/100) backed by ${evidenceParts.join(", ")}.`,
+        });
+      }
+    }
   }
 
   const riskScore = 100 - scores.maintainer;
@@ -360,16 +445,42 @@ export const generateIdentityInsights = (
     `- Community Influence Score: ${scores.influence}/100`,
   ].join("\n");
 
-  const metricsText = [
+  const metricsArr = [
     "### Identity Metrics",
     `- Profile Type: ${identityMetadata.type}`,
     `- Login/Name: ${identityMetadata.name ?? identityMetadata.login}`,
     `- Total Repositories: ${totalRepos}`,
     `- Active Repositories: ${activeRepos}`,
     `- Archived Repositories: ${archivedRepos}`,
-    `- Linked npm Username: ${identityMetadata.linkedIdentities?.npm ?? "None"}`,
-    `- Linked Stack Overflow ID: ${identityMetadata.linkedIdentities?.stackoverflow ?? "None"}`,
-  ].join("\n");
+  ];
+
+  if (npmUser || identityMetadata.linkedIdentities?.npm) {
+    metricsArr.push(
+      `- npm Username: ${npmUser?.username || identityMetadata.linkedIdentities?.npm}`,
+      ...(npmUser
+        ? [
+            `- npm Downloads: ${npmUser.totalDownloads.toLocaleString()} weekly`,
+            `- Published packages: ${npmUser.packages.length} (${npmUser.activePackagesCount} active)`,
+            `- Flagship package: ${npmUser.popularPackage ?? "None"}`,
+          ]
+        : []),
+    );
+  }
+
+  if (stackoverflowUser || identityMetadata.linkedIdentities?.stackoverflow) {
+    metricsArr.push(
+      `- Stack Overflow ID: ${stackoverflowUser?.userId || identityMetadata.linkedIdentities?.stackoverflow}`,
+      ...(stackoverflowUser
+        ? [
+            `- Stack Overflow Reputation: ${stackoverflowUser.reputation.toLocaleString()}`,
+            `- Stack Overflow Badges: ${stackoverflowUser.badgeCounts.gold} Gold, ${stackoverflowUser.badgeCounts.silver} Silver, ${stackoverflowUser.badgeCounts.bronze} Bronze`,
+            `- Stack Overflow Answers: ${stackoverflowUser.answerCount} (${stackoverflowUser.acceptanceRate}% accepted)`,
+          ]
+        : []),
+    );
+  }
+
+  const metricsText = metricsArr.join("\n");
 
   const findingsText = [
     "### Findings",

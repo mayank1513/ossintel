@@ -38,7 +38,9 @@
     "dev": "tsup --watch"
   },
   "dependencies": {
-    "@ossintel/github-normalizer": "workspace:*"
+    "@ossintel/github-normalizer": "workspace:*",
+    "@ossintel/npm": "workspace:*",
+    "@ossintel/stackoverflow": "workspace:*"
   },
   "devDependencies": {
     "@types/node": "latest",

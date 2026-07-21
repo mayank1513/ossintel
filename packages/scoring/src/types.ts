@@ -5,6 +5,8 @@ import type {
   NormalizedRelease,
   NormalizedRepository,
 } from "@ossintel/github-normalizer";
+import type { NormalizedNpmUser } from "@ossintel/npm";
+import type { NormalizedStackOverflowUser } from "@ossintel/stackoverflow";
 
 export interface ScoringInputs {
   repository: NormalizedRepository;
@@ -22,15 +24,23 @@ export interface RepositoryScores {
   risk: number;
 }
 
-export interface NpmPackageStats {
-  name: string;
-  downloads: number;
-  stars?: number;
+export interface TopicExpertise {
+  topic: string;
+  score: number; // 0-100
+  evidence: {
+    githubStars: number;
+    githubPrs: number;
+    npmDownloads: number;
+    npmPackages: number;
+    stackoverflowScore: number;
+    stackoverflowAnswers: number;
+  };
 }
 
 export interface IdentityScoringInputs {
   repositories: NormalizedRepository[];
-  npmPackages?: NpmPackageStats[];
+  npmUser?: NormalizedNpmUser | null;
+  stackoverflowUser?: NormalizedStackOverflowUser | null;
   externalContributions?: NormalizedContribution[];
   organizations?: {
     login?: string;
@@ -64,4 +74,5 @@ export interface IdentityScores {
   evidence: PillarEvidence;
   factors: PillarFactors;
   badges: string[];
+  skills: TopicExpertise[];
 }

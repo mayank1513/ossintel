@@ -347,12 +347,39 @@ describe("scoring engine", () => {
 
     const result = calculateIdentityScore({
       repositories: repos,
-      npmPackages: [
-        {
-          name: "my-package",
-          downloads: 2000000, // 2M weekly downloads
-        },
-      ],
+      npmUser: {
+        username: "my-user",
+        url: "https://npmjs.com/~my-user",
+        packages: [
+          {
+            name: "my-package",
+            downloads: 2000000, // 2M weekly downloads
+            monthlyDownloads: 8000000,
+            created: "2020-01-01Z",
+            modified: "2020-01-01Z",
+            version: "1.0.0",
+            versionsCount: 1,
+            releaseFrequency: 1,
+            isDeprecated: false,
+            deprecationMessage: null,
+            hasTypeScript: true,
+            hasESM: true,
+            hasCJS: true,
+            license: "MIT",
+            dependentsCount: 100,
+            maintainers: ["my-user"],
+            bugs: null,
+            homepage: null,
+            repository: "github.com/test-owner/test-repo",
+            categories: ["typescript"],
+            description: "My library",
+          },
+        ],
+        totalDownloads: 2000000,
+        activePackagesCount: 1,
+        popularPackage: "my-package",
+        isVerifiedPublisher: true,
+      },
       organizations: [
         {
           login: "my-org",

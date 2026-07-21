@@ -53,7 +53,8 @@ export async function POST(request: Request) {
     const { query, token, type, owner, repo, limit } = await request.json();
 
     const options = { token };
-    const contribLimit = limit ? Number(limit) : 10;
+    const contribLimit =
+      limit === null || limit === undefined ? Infinity : Number(limit);
 
     // 1. GitHub Repository Direct Request
     if (type === "repo") {
@@ -114,7 +115,7 @@ export async function POST(request: Request) {
         const org = await fetchOrganization(login, options);
         const repositories = await fetchRepositories(login, {
           ...options,
-          allPages: false,
+          allPages: true,
           perPage: 100,
         });
 
@@ -123,7 +124,7 @@ export async function POST(request: Request) {
         const developer = await fetchDeveloper(login, options);
         const personalRepos = await fetchRepositories(login, {
           ...options,
-          allPages: false,
+          allPages: true,
           perPage: 100,
         });
         const organizations = await fetchOrganizations(login, options);
@@ -199,7 +200,7 @@ export async function POST(request: Request) {
         const org = await fetchOrganization(login, options);
         const repositories = await fetchRepositories(login, {
           ...options,
-          allPages: false,
+          allPages: true,
           perPage: 100,
         });
         return NextResponse.json(formatOrgResponse(org, repositories));
@@ -207,7 +208,7 @@ export async function POST(request: Request) {
         const developer = await fetchDeveloper(login, options);
         const personalRepos = await fetchRepositories(login, {
           ...options,
-          allPages: false,
+          allPages: true,
           perPage: 100,
         });
         const organizations = await fetchOrganizations(login, options);

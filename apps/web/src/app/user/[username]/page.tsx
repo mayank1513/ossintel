@@ -38,7 +38,7 @@ export default function UserPage() {
   const [linkedNpm, setLinkedNpm] = useState<string>("");
   const [linkedSO, setLinkedSO] = useState<string>("");
   const [includeUserRepos, setIncludeUserRepos] = useState<boolean>(true);
-  const [contribLimit, setContribLimit] = useState<number>(10);
+  const [contribLimit, setContribLimit] = useState<number>(Infinity);
 
   // Toast/Alert dismiss states
   const [dismissedNpm, setDismissedNpm] = useState<boolean>(false);

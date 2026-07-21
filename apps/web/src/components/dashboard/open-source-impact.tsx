@@ -245,7 +245,7 @@ export const OpenSourceImpact: React.FC<OpenSourceImpactProps> = ({
             <option value={10}>10 Repositories</option>
             <option value={25}>25 Repositories</option>
             <option value={50}>50 Repositories</option>
-            <option value={100}>All Repositories</option>
+            <option value={Infinity}>All Repositories</option>
           </select>
         </div>
       </div>

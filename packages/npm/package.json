@@ -40,7 +40,7 @@
   "devDependencies": {
     "@types/node": "latest",
     "tsup": "latest",
-    "typescript": "latest"
+    "typescript": "^6.0.3"
   },
   "forge": {
     "aliases": [],
@@ -48,10 +48,6 @@
     "description": ""
   },
   "funding": [
-    {
-      "type": "github",
-      "url": "https://github.com/sponsors/mayank1513"
-    },
     {
       "type": "github",
       "url": "https://github.com/sponsors/mayank1513"

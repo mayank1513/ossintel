@@ -40,13 +40,13 @@
   "dependencies": {
     "@ossintel/github-normalizer": "workspace:*",
     "@ossintel/npm": "workspace:*",
-    "@ossintel/stackoverflow": "workspace:*",
-    "@ossintel/scoring": "workspace:*"
+    "@ossintel/scoring": "workspace:*",
+    "@ossintel/stackoverflow": "workspace:*"
   },
   "devDependencies": {
     "@types/node": "latest",
     "tsup": "latest",
-    "typescript": "latest"
+    "typescript": "^6.0.3"
   },
   "forge": {
     "aliases": [],

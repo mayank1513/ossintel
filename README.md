@@ -24,25 +24,24 @@ Unlike GitHub, which primarily shows activity, OSSIntel helps answer questions s
 ## Architecture
 
 ```
-                GitHub APIs
-                     │
-               npm Registry
-                     │
-             Future Integrations
-                     │
-      ┌──────────────────────────┐
-      │ github-normalizer        │
-      └──────────────────────────┘
-                     │
-      ┌──────────────────────────┐
-      │ scoring                  │
-      └──────────────────────────┘
-                     │
-      ┌──────────────────────────┐
-      │ insights                 │
-      └──────────────────────────┘
-                     │
-             Next.js Dashboard
+      GitHub APIs    npm Registry    StackExchange API
+           │              │                 │
+      ┌────────────┐ ┌────────────┐ ┌──────────────┐
+      │ github-    │ │  npm       │ │ stackoverflow│
+      │ normalizer │ │            │ │              │
+      └────────────┘ └────────────┘ └──────────────┘
+           │              │                 │
+           └──────────────┼─────────────────┘
+                          │
+            ┌──────────────────────────┐
+            │ scoring                  │
+            └──────────────────────────┘
+                          │
+            ┌──────────────────────────┐
+            │ insights                 │
+            └──────────────────────────┘
+                          │
+                   Next.js Dashboard
 ```
 
 ## Tech Stack
@@ -65,19 +64,27 @@ Unlike GitHub, which primarily shows activity, OSSIntel helps answer questions s
 
 Fetches and normalizes GitHub data into a stable domain model.
 
+### @ossintel/npm
+
+Fetches and normalizes npm Registry data: package metadata, download statistics, maintainer information, and user profiles.
+
+### @ossintel/stackoverflow
+
+Fetches and normalizes StackExchange API data: user profiles, reputation, badges, and top tag expertise.
+
 ### @ossintel/scoring
 
-Deterministically calculates OSS metrics and scores. Depends on `github-normalizer` for input types.
+Deterministic, modular scoring engine with pillar architecture (Maintainer, Contributor, Organization, Influence) and capability-specific scoring (Package Publishing, Knowledge Sharing). Additive evidence bonuses from npm and Stack Overflow never reduce scores.
 
 ### @ossintel/insights
 
-Transforms metrics into findings, recommendations, and AI-ready summaries. Depends on `scoring` and `github-normalizer`.
+Transforms metrics into findings, recommendations, and AI-ready summaries. Depends on `scoring` and normalizer packages.
 
 ### @app/web
 
 Next.js dashboard — the presentation layer. Business logic lives in the packages above.
 
-Dependency chain: `github-normalizer` → `scoring` → `insights` → `web`
+Dependency chain: `normalizers (github, npm, stackoverflow)` → `scoring` → `insights` → `web`
 
 ## Principles
 

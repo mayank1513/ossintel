@@ -19,14 +19,15 @@
   <img alt="license" src="https://img.shields.io/npm/l/@ossintel/npm" />
 </p>
 
-> @ossintel/npm: 
+> @ossintel/npm: Robust, typed utilities to fetch, normalize, and sanitize raw npm Registry and download statistics API responses into consistent domain structures for open-source analytics.
 
 ---
 
 ## ✨ Why @ossintel/npm?
 
-- 
-- 
+- **Full Registry Normalization**: Fetches and normalizes package metadata, download statistics, version history, maintainer information, and dependency graphs from the npm Registry API into clean, typed domain structures.
+- **User Profile Aggregation**: Searches for all packages maintained by a given username, compiles total downloads, active package counts, and identifies popular packages — all in a single `NormalizedNpmUser` structure.
+- **Smart Detection**: Automatically detects TypeScript support, ESM/CJS module format, deprecation status, release frequency, and package categories from raw registry metadata.
 
 ---
 

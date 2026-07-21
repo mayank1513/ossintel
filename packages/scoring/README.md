@@ -23,7 +23,7 @@
 
 # @ossintel/scoring
 
-Deterministic OSS scoring engine.
+Deterministic OSS scoring engine with modular architecture.
 
 ## Purpose
 
@@ -31,33 +31,54 @@ Converts normalized repository and developer metrics into objective scores.
 
 ## Responsibilities
 
-Calculate:
+### Repository Scoring
 
-- Overall Score
-- Health Score
-- Impact Score
-- Activity Score
-- Community Score
-- Risk Score
+- Health, Impact, Activity, Community, Risk, and Overall scores
+
+### Identity Scoring (OSSIQ)
+
+Four-pillar reputation engine:
+
+- **Maintainer** — Repository health weighted by popularity (GitHub-only)
+- **Contributor** — Quality-weighted external PR scoring
+- **Organization** — Active org leadership evaluation
+- **Influence** — Downstream reach (stars, forks + additive npm/SO bonuses)
+
+### Capability Scoring
+
+- **Package Publishing** (`calculatePublishingScore`) — npm downloads, active packages, verified publisher (extensible to NuGet, PyPI, crates.io, Go)
+- **Knowledge Sharing** (`calculateKnowledgeScore`) — Stack Overflow reputation, answers, acceptance rate (extensible to Dev.to, Hashnode)
+
+### Supporting Modules
+
+- **Badges** — Achievement detection from cross-platform activity
+- **Skills** — Topic expertise radar aggregating GitHub, npm, and Stack Overflow signals
+- **Evidence & Factors** — Human-readable explanations for each pillar
 
 ## Philosophy
 
-Scores should always be reproducible.
+- Scores are **deterministic**: same inputs → same outputs
+- Scores are **monotonic**: linking additional providers can only increase reputation
+- GitHub defines the **core OSS reputation** (~80-85%)
+- Additional providers contribute **additive capability bonuses**
+- No AI participates in score calculation
 
-The same inputs should always produce the same outputs.
+## Module Architecture
 
-No AI should participate in score calculation.
-
-## Inputs
-
-Normalized domain models.
-
-## Outputs
-
-```ts
-{
-  overall, health, impact, activity, community, risk;
-}
+```text
+index.ts
+├── repository-scoring.ts      # Repo-level: health, impact, activity, community, risk
+├── identity-scoring.ts        # Orchestrator: computes overall OSSIQ score
+├── maintainer-scoring.ts      # Pillar: GitHub repo health weighted average
+├── contributor-scoring.ts     # Pillar: external PR quality weighting
+├── organization-scoring.ts    # Pillar: org leadership evaluation
+├── influence-scoring.ts       # Pillar: stars + forks + additive bonuses
+├── publishing-scoring.ts      # Capability: Package Publishing (npm)
+├── knowledge-scoring.ts       # Capability: Knowledge Sharing (Stack Overflow)
+├── badges.ts                  # Achievement detection
+├── skills.ts                  # Topic expertise aggregation
+├── evidence.ts                # Evidence & factors generation
+└── topic-mappings.ts          # Canonical topic → keyword mappings
 ```
 
 ## Non-goals
@@ -78,7 +99,9 @@ No external dependencies should affect score calculation.
 ## ✨ Why @ossintel/scoring?
 
 - **100% Deterministic & Transparent**: Zero network requests or probabilistic AI models; calculations are mathematical and fully reproducible.
-- **Detailed Sub-metrics**: Computes comprehensive scores for Activity, Impact, Health, Community, and Risk to give a multidimensional view.
+- **Modular Pillar Architecture**: Each scoring dimension (Maintainer, Contributor, Organization, Influence) is a self-contained module, easy to extend or override.
+- **Capability-Specific Scoring**: First-class `calculatePublishingScore` and `calculateKnowledgeScore` exports for direct use by consumers.
+- **Monotonic Guarantees**: Linking npm or Stack Overflow can only increase scores, never reduce them.
 - **Fully Tested**: Every score calculation is validated by comprehensive unit tests to prevent regression.
 
 ---

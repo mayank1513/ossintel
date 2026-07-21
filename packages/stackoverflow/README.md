@@ -19,14 +19,15 @@
   <img alt="license" src="https://img.shields.io/npm/l/@ossintel/stackoverflow" />
 </p>
 
-> @ossintel/stackoverflow: 
+> @ossintel/stackoverflow: Robust, typed utilities to fetch, normalize, and sanitize StackOverflow user profiles, reputation, badges, and top tag statistics from the StackExchange API.
 
 ---
 
 ## ✨ Why @ossintel/stackoverflow?
 
-- 
-- 
+- **Comprehensive Profile Normalization**: Fetches user reputation, badge counts (gold/silver/bronze), answer and question counts, acceptance rates, and top tags from the StackExchange API v2.3 into a clean `NormalizedStackOverflowUser` structure.
+- **Top Tag Expertise**: Extracts per-tag scores and answer counts so downstream consumers can map Stack Overflow expertise to unified topic/skill categories.
+- **API Key Support**: Optionally accepts a `STACKEXCHANGE_API_KEY` to increase the daily rate limit from 300 to 10,000 requests. See the [Stack Apps registration page](https://stackapps.com/apps/oauth/register) for details.
 
 ---
 

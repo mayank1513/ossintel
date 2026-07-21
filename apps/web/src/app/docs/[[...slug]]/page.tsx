@@ -19,8 +19,8 @@ import { formatLastUpdated } from "@/lib/utils";
 import { getMDXComponents } from "@/mdx-components";
 
 const GIT_CONFIG = {
-  user: "turboforge-dev",
-  repo: "turbo-forge",
+  user: "mayank1513",
+  repo: "ossintel",
   branch: "main",
 };
 

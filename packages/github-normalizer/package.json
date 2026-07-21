@@ -47,8 +47,8 @@
       "@ossintel/github",
       "github-normalizer"
     ],
-    "icon": "LibraryBig",
-    "description": ""
+    "icon": "GitBranch",
+    "description": "GitHub API data normalizer"
   },
   "funding": [
     {

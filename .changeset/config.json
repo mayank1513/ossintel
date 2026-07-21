@@ -3,7 +3,7 @@
   "changelog": [
     "@changesets/changelog-github",
     {
-      "repo": "mayank1513/ossintel"
+      "repo": "ossintel/ossintel"
     }
   ],
   "commit": false,

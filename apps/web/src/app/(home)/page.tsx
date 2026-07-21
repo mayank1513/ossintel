@@ -260,10 +260,10 @@ export default function HomePage() {
             </button>
             <button
               type="button"
-              onClick={() => handleQuickSearch("mayank1513/ossintel", "repo")}
+              onClick={() => handleQuickSearch("ossintel/ossintel", "repo")}
               className="px-3 py-1.5 bg-slate-900/60 hover:bg-slate-900 border border-slate-800/80 rounded-lg text-xs font-semibold text-slate-300 transition-colors"
             >
-              mayank1513/ossintel
+              ossintel/ossintel
             </button>
             <button
               type="button"
@@ -302,21 +302,21 @@ export default function HomePage() {
                 name: "@ossintel/scoring",
                 description: "Deterministic reputation metrics engine",
                 codeRepository:
-                  "https://github.com/mayank1513/ossintel/tree/main/packages/scoring",
+                  "https://github.com/ossintel/ossintel/tree/main/packages/scoring",
               },
               {
                 "@type": "SoftwareSourceCode",
                 name: "@ossintel/github-normalizer",
                 description: "GitHub API data normalizer",
                 codeRepository:
-                  "https://github.com/mayank1513/ossintel/tree/main/packages/github-normalizer",
+                  "https://github.com/ossintel/ossintel/tree/main/packages/github-normalizer",
               },
               {
                 "@type": "SoftwareSourceCode",
                 name: "@ossintel/insights",
                 description: "Rule-based audit insights engine",
                 codeRepository:
-                  "https://github.com/mayank1513/ossintel/tree/main/packages/insights",
+                  "https://github.com/ossintel/ossintel/tree/main/packages/insights",
               },
             ],
           }),

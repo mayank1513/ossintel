@@ -23,6 +23,7 @@ export function Header() {
         <div className="max-w-7xl mx-auto px-6 py-4 flex flex-wrap items-center justify-between gap-4">
           <div className="flex items-center gap-3">
             <div className="p-1 bg-slate-900 border border-slate-800 rounded-xl overflow-hidden shadow-lg shadow-slate-900/10">
+              {/* biome-ignore lint/performance/noImgElement: static logo */}
               <img
                 src={icon.src}
                 alt="OSSIntel Logo"
@@ -72,6 +73,7 @@ export function Header() {
         </button>
         <div className="flex items-center gap-2">
           <div className="p-0.5 bg-slate-900 border border-slate-800 rounded-lg overflow-hidden">
+            {/* biome-ignore lint/performance/noImgElement: static logo */}
             <img
               src={icon.src}
               alt="OSSIntel Logo"

@@ -23,11 +23,11 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/mayank1513/ossintel",
+    "url": "https://github.com/ossintel/ossintel",
     "directory": "packages/insights"
   },
-  "bugs": "https://github.com/mayank1513/ossintel/issues",
-  "homepage": "https://github.com/mayank1513/ossintel/blob/main/packages/insights/README.md",
+  "bugs": "https://github.com/ossintel/ossintel/issues",
+  "homepage": "https://github.com/ossintel/ossintel/blob/main/packages/insights/README.md",
   "sideEffects": false,
   "files": [
     "dist/**"

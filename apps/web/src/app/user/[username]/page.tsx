@@ -284,6 +284,42 @@ function UserDashboardContent() {
     );
   }, [linkedSO, userQuery.data]);
 
+  const npmStats = useMemo(() => {
+    if (!npmQuery.data) return null;
+    return {
+      totalDownloads: npmQuery.data.totalDownloads,
+      packageCount: npmQuery.data.packages.length,
+      topPackage: npmQuery.data.packages[0]?.name || undefined,
+    };
+  }, [npmQuery.data]);
+
+  const soStats = useMemo(() => {
+    if (!soQuery.data) return null;
+    return {
+      reputation: soQuery.data.reputation,
+      badgeCount: soQuery.data.badgeCounts,
+      topTags: soQuery.data.topTags.slice(0, 3).map((t) => t.name),
+    };
+  }, [soQuery.data]);
+
+  const impactStats = useMemo(() => {
+    if (!userQuery.data) return null;
+    const repos = userQuery.data.repositories || [];
+    const totalStars = repos.reduce(
+      (acc, r) => acc + (r.stargazersCount || 0),
+      0,
+    );
+    const totalForks = repos.reduce((acc, r) => acc + (r.forksCount || 0), 0);
+    const prsMerged = (userQuery.data.externalContributions || []).filter(
+      (c) => c.mergedAt !== null,
+    ).length;
+    return {
+      stars: totalStars,
+      forks: totalForks,
+      prsMerged,
+    };
+  }, [userQuery.data]);
+
   // Perform dynamic score calculations
   const clientIntel = useDeveloperScores({
     userRepos: userQuery.data?.repositories || [],
@@ -545,7 +581,12 @@ function UserDashboardContent() {
               <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                 {/* Left Column */}
                 <div className="lg:col-span-1 flex flex-col gap-6">
-                  <OverviewCard data={fullAnalysisData} />
+                  <OverviewCard
+                    data={fullAnalysisData}
+                    npmStats={npmStats}
+                    soStats={soStats}
+                    impactStats={impactStats}
+                  />
                   <DimensionBreakdown scores={clientIntel.scores} />
 
                   {/* Identity Resolution Links */}

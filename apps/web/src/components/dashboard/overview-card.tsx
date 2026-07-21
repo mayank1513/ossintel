@@ -5,9 +5,29 @@ import type { AnalysisData } from "@/lib/types";
 
 interface OverviewCardProps {
   data: AnalysisData;
+  npmStats?: {
+    totalDownloads: number;
+    packageCount: number;
+    topPackage?: string;
+  } | null;
+  soStats?: {
+    reputation: number;
+    badgeCount: { gold: number; silver: number; bronze: number };
+    topTags: string[];
+  } | null;
+  impactStats?: {
+    stars: number;
+    forks: number;
+    prsMerged: number;
+  } | null;
 }
 
-export const OverviewCard: React.FC<OverviewCardProps> = ({ data }) => {
+export const OverviewCard: React.FC<OverviewCardProps> = ({
+  data,
+  npmStats,
+  soStats,
+  impactStats,
+}) => {
   return (
     <div className="p-6 bg-slate-900/90 border border-slate-800 rounded-3xl flex flex-col items-center text-center gap-6 shadow-xl relative overflow-hidden">
       <div className="absolute top-0 right-0 w-32 h-32 bg-indigo-500/10 rounded-full filter blur-2xl pointer-events-none" />
@@ -96,52 +116,183 @@ export const OverviewCard: React.FC<OverviewCardProps> = ({ data }) => {
         </div>
       </div>
 
-      <div className="w-full border-t border-slate-800/80 pt-4 text-left space-y-3">
-        <span className="text-xs font-bold text-slate-500 uppercase tracking-wider block">
-          Metadata Breakdown
-        </span>
-        <div className="grid grid-cols-2 gap-3 text-xs">
-          {data.type === "repo" ? (
-            <>
-              <div className="bg-slate-950 p-2.5 rounded-xl border border-slate-800/50 space-y-1">
-                <span className="text-slate-500 font-medium block">
-                  Language
-                </span>
-                <span className="font-bold text-slate-200 flex items-center gap-1.5">
-                  <Languages className="h-3.5 w-3.5 text-indigo-400" />{" "}
-                  {data.metadata.language || "None"}
-                </span>
-              </div>
-              <div className="bg-slate-950 p-2.5 rounded-xl border border-slate-800/50 space-y-1">
-                <span className="text-slate-500 font-medium block">
-                  Default Branch
-                </span>
-                <span className="font-bold text-slate-200 font-mono">
-                  {data.metadata.defaultBranch}
-                </span>
-              </div>
-            </>
-          ) : (
-            <>
-              <div className="bg-slate-950 p-2.5 rounded-xl border border-slate-800/50 space-y-1">
-                <span className="text-slate-500 font-medium block">
-                  Public Repos
-                </span>
-                <span className="font-bold text-slate-200">
-                  {data.metadata.publicRepos}
-                </span>
-              </div>
-              <div className="bg-slate-950 p-2.5 rounded-xl border border-slate-800/50 space-y-1">
-                <span className="text-slate-500 font-medium block">
-                  Followers
-                </span>
-                <span className="font-bold text-slate-200">
-                  {data.metadata.followers}
-                </span>
-              </div>
-            </>
-          )}
+      <div className="w-full border-t border-slate-800/80 pt-4 text-left space-y-4">
+        {/* Core Metadata Breakdown */}
+        <div className="space-y-2">
+          <span className="text-xs font-bold text-slate-500 uppercase tracking-wider block">
+            Metadata Breakdown
+          </span>
+          <div className="grid grid-cols-2 gap-3 text-xs">
+            {data.type === "repo" ? (
+              <>
+                <div className="bg-slate-950 p-2.5 rounded-xl border border-slate-800/50 space-y-1">
+                  <span className="text-slate-500 font-medium block">
+                    Language
+                  </span>
+                  <span className="font-bold text-slate-200 flex items-center gap-1.5">
+                    <Languages className="h-3.5 w-3.5 text-indigo-400" />{" "}
+                    {data.metadata.language || "None"}
+                  </span>
+                </div>
+                <div className="bg-slate-950 p-2.5 rounded-xl border border-slate-800/50 space-y-1">
+                  <span className="text-slate-500 font-medium block">
+                    Default Branch
+                  </span>
+                  <span className="font-bold text-slate-200 font-mono">
+                    {data.metadata.defaultBranch}
+                  </span>
+                </div>
+              </>
+            ) : (
+              <>
+                <div className="bg-slate-950 p-2.5 rounded-xl border border-slate-800/50 space-y-1">
+                  <span className="text-slate-500 font-medium block">
+                    Public Repos
+                  </span>
+                  <span className="font-bold text-slate-200">
+                    {data.metadata.publicRepos}
+                  </span>
+                </div>
+                <div className="bg-slate-950 p-2.5 rounded-xl border border-slate-800/50 space-y-1">
+                  <span className="text-slate-500 font-medium block">
+                    Followers
+                  </span>
+                  <span className="font-bold text-slate-200">
+                    {data.metadata.followers}
+                  </span>
+                </div>
+              </>
+            )}
+          </div>
         </div>
+
+        {/* Open Source Impact Stats */}
+        {impactStats && (
+          <div className="space-y-2">
+            <span className="text-xs font-bold text-slate-500 uppercase tracking-wider block">
+              Open Source Impact
+            </span>
+            <div className="grid grid-cols-3 gap-2 text-xs">
+              <div className="bg-slate-950 p-2 rounded-xl border border-slate-800/50 text-center space-y-1">
+                <span className="text-slate-500 font-medium block text-[10px]">
+                  Stars
+                </span>
+                <span className="font-extrabold text-slate-200 text-sm">
+                  {impactStats.stars.toLocaleString()}
+                </span>
+              </div>
+              <div className="bg-slate-950 p-2 rounded-xl border border-slate-800/50 text-center space-y-1">
+                <span className="text-slate-500 font-medium block text-[10px]">
+                  Forks
+                </span>
+                <span className="font-extrabold text-slate-200 text-sm">
+                  {impactStats.forks.toLocaleString()}
+                </span>
+              </div>
+              <div className="bg-slate-950 p-2 rounded-xl border border-slate-800/50 text-center space-y-1">
+                <span className="text-slate-500 font-medium block text-[10px]">
+                  Merged PRs
+                </span>
+                <span className="font-extrabold text-indigo-400 text-sm">
+                  {impactStats.prsMerged}
+                </span>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* npm Stats */}
+        {npmStats && (
+          <div className="space-y-2">
+            <span className="text-xs font-bold text-red-400/80 uppercase tracking-wider block">
+              npm Packages
+            </span>
+            <div className="grid grid-cols-2 gap-2 text-xs">
+              <div className="bg-slate-950 p-2 rounded-xl border border-slate-800/50 text-center space-y-1">
+                <span className="text-slate-500 font-medium block text-[10px]">
+                  Total Downloads
+                </span>
+                <span className="font-extrabold text-emerald-400 text-sm">
+                  {npmStats.totalDownloads >= 1_000_000
+                    ? `${(npmStats.totalDownloads / 1_000_000).toFixed(1)}M`
+                    : npmStats.totalDownloads >= 1_000
+                      ? `${(npmStats.totalDownloads / 1_000).toFixed(1)}k`
+                      : npmStats.totalDownloads.toLocaleString()}
+                </span>
+              </div>
+              <div className="bg-slate-950 p-2 rounded-xl border border-slate-800/50 text-center space-y-1">
+                <span className="text-slate-500 font-medium block text-[10px]">
+                  Packages
+                </span>
+                <span className="font-extrabold text-slate-200 text-sm">
+                  {npmStats.packageCount}
+                </span>
+              </div>
+            </div>
+            {npmStats.topPackage && (
+              <div className="bg-slate-950 p-2 rounded-xl border border-slate-800/50 text-left text-[11px] font-semibold text-slate-400 flex items-center justify-between">
+                <span>Top Package:</span>
+                <span
+                  className="text-red-400 font-mono truncate max-w-[150px]"
+                  title={npmStats.topPackage}
+                >
+                  {npmStats.topPackage}
+                </span>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Stack Overflow Stats */}
+        {soStats && (
+          <div className="space-y-2">
+            <span className="text-xs font-bold text-orange-400/80 uppercase tracking-wider block">
+              Stack Overflow Reputation
+            </span>
+            <div className="grid grid-cols-2 gap-2 text-xs">
+              <div className="bg-slate-950 p-2 rounded-xl border border-slate-800/50 text-center space-y-1">
+                <span className="text-slate-500 font-medium block text-[10px]">
+                  Reputation
+                </span>
+                <span className="font-extrabold text-orange-400 text-sm">
+                  {soStats.reputation.toLocaleString()}
+                </span>
+              </div>
+              <div className="bg-slate-950 p-2 rounded-xl border border-slate-800/50 text-center space-y-1">
+                <span className="text-slate-500 font-medium block text-[10px]">
+                  Badges (G/S/B)
+                </span>
+                <span className="font-extrabold text-slate-200 text-xs flex items-center justify-center gap-1">
+                  <span className="text-yellow-400 font-bold">
+                    🥇{soStats.badgeCount.gold}
+                  </span>
+                  <span className="text-slate-400 font-bold">
+                    🥈{soStats.badgeCount.silver}
+                  </span>
+                  <span className="text-amber-600 font-bold">
+                    🥉{soStats.badgeCount.bronze}
+                  </span>
+                </span>
+              </div>
+            </div>
+            {soStats.topTags.length > 0 && (
+              <div className="bg-slate-950 p-2 rounded-xl border border-slate-800/50 text-left text-[11px] font-semibold text-slate-400 flex items-center justify-between">
+                <span>Top Tags:</span>
+                <div className="flex gap-1">
+                  {soStats.topTags.map((tag) => (
+                    <span
+                      key={tag}
+                      className="px-1.5 py-0.5 bg-slate-900 border border-slate-800 rounded-md font-mono text-[9px] text-slate-300"
+                    >
+                      {tag}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+
         {data.metadata.htmlUrl && (
           <a
             href={data.metadata.htmlUrl}

@@ -25,6 +25,7 @@ export interface UserResponse {
     organizations: NormalizedOrganization[];
     suggestions: LinkedIdentitySuggestions;
     readme: string;
+    socialLinks?: string[];
     twitterUsername?: string | null;
     email?: string | null;
   };

@@ -155,7 +155,23 @@ export async function fetchDeveloper(
     );
   }
 
-  return normalizeDeveloper(raw);
+  let socialLinks: string[] = [];
+  try {
+    const target = username || raw.login;
+    const socials = await githubFetch<Array<{ provider: string; url: string }>>(
+      `/users/${target}/social_accounts`,
+      options,
+    );
+    socialLinks = (socials || []).map((s) => s.url);
+  } catch {
+    // Ignore social accounts query failure
+  }
+
+  const dev = normalizeDeveloper(raw);
+  return {
+    ...dev,
+    socialLinks,
+  };
 }
 
 export async function fetchRepositories(
@@ -405,6 +421,7 @@ export function suggestLinkedIdentities(
     developer.blog,
     developer.bio,
     developer.company,
+    ...(developer.socialLinks || []),
   ].filter(Boolean) as string[];
   const soRegex = /stackoverflow\.com\/users\/(\d+)\/([a-zA-Z0-9_-]+)?/;
 

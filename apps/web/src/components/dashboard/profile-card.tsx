@@ -8,7 +8,10 @@ import {
   FaEnvelope,
   FaGithub,
   FaGlobe,
+  FaLinkedin,
   FaMapMarkerAlt,
+  FaNpm,
+  FaStackOverflow,
   FaTwitter,
 } from "react-icons/fa";
 import { Readme } from "./readme";
@@ -25,6 +28,9 @@ interface ProfileCardProps {
   twitterUsername?: string | null;
   blog?: string | null;
   readme?: string | null;
+  npmUrl?: string | null;
+  stackoverflowUrl?: string | null;
+  linkedinUrl?: string | null;
 }
 
 export const ProfileCard: React.FC<ProfileCardProps> = ({
@@ -39,6 +45,9 @@ export const ProfileCard: React.FC<ProfileCardProps> = ({
   twitterUsername,
   blog,
   readme,
+  npmUrl,
+  stackoverflowUrl,
+  linkedinUrl,
 }) => {
   const [isOpen, setIsOpen] = useState(false);
 
@@ -120,6 +129,43 @@ export const ProfileCard: React.FC<ProfileCardProps> = ({
             title="Website/Blog"
           >
             <FaGlobe className="h-4 w-4" />
+          </a>
+        )}
+        {linkedinUrl && (
+          <a
+            href={
+              linkedinUrl.startsWith("http")
+                ? linkedinUrl
+                : `https://${linkedinUrl}`
+            }
+            target="_blank"
+            rel="noopener noreferrer"
+            className="p-2 bg-slate-950 border border-slate-800 hover:border-indigo-500/40 text-slate-400 hover:text-indigo-400 rounded-xl transition-all"
+            title="LinkedIn Profile"
+          >
+            <FaLinkedin className="h-4 w-4" />
+          </a>
+        )}
+        {stackoverflowUrl && (
+          <a
+            href={stackoverflowUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="p-2 bg-slate-950 border border-slate-800 hover:border-indigo-500/40 text-slate-400 hover:text-indigo-400 rounded-xl transition-all"
+            title="Stack Overflow Profile"
+          >
+            <FaStackOverflow className="h-4 w-4" />
+          </a>
+        )}
+        {npmUrl && (
+          <a
+            href={npmUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="p-2 bg-slate-950 border border-slate-800 hover:border-indigo-500/40 text-slate-400 hover:text-indigo-400 rounded-xl transition-all"
+            title="npm Profile"
+          >
+            <FaNpm className="h-4 w-4" />
           </a>
         )}
       </div>

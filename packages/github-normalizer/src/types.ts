@@ -149,6 +149,7 @@ export interface NormalizedDeveloper {
   following: number;
   createdAt: string;
   updatedAt: string;
+  socialLinks?: string[];
 }
 
 export interface NormalizedRepository {

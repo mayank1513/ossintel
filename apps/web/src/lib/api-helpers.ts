@@ -90,6 +90,7 @@ export function formatUserResponse(
       following: developer.following,
       publicRepos: developer.publicRepos,
       createdAt: developer.createdAt,
+      socialLinks: developer.socialLinks,
       organizations,
       suggestions,
       readme,

@@ -27,6 +27,7 @@ export interface AnalysisData {
     following?: number;
     publicRepos?: number;
     createdAt?: string | null;
+    socialLinks?: string[];
     organizations?: Array<{
       login: string;
       name: string | null;

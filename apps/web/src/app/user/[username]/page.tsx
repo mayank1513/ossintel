@@ -75,12 +75,30 @@ function UserDashboardContent() {
   const [githubUsername, setGithubUsername] = useState<string>(
     entryPlatform === "github" ? username : "",
   );
-  const [linkedNpm, setLinkedNpm] = useState<string>(
-    entryPlatform === "npm" ? username : "",
-  );
-  const [linkedSO, setLinkedSO] = useState<string>(
-    entryPlatform === "stackoverflow" ? entryId || username : "",
-  );
+  const [linkedNpm, setLinkedNpm] = useState<string>("");
+  const [linkedSO, setLinkedSO] = useState<string>("");
+
+  const handleLinkNpm = (npmName: string) => {
+    setLinkedNpm(npmName);
+    if (githubUsername && typeof window !== "undefined") {
+      if (npmName) {
+        localStorage.setItem(`ossintel:npm:${githubUsername}`, npmName);
+      } else {
+        localStorage.removeItem(`ossintel:npm:${githubUsername}`);
+      }
+    }
+  };
+
+  const handleLinkSO = (soId: string) => {
+    setLinkedSO(soId);
+    if (githubUsername && typeof window !== "undefined") {
+      if (soId) {
+        localStorage.setItem(`ossintel:so:${githubUsername}`, soId);
+      } else {
+        localStorage.removeItem(`ossintel:so:${githubUsername}`);
+      }
+    }
+  };
 
   const [selectedOrgs, setSelectedOrgs] = useState<string[]>([]);
   const [includeUserRepos, setIncludeUserRepos] = useState<boolean>(true);
@@ -135,7 +153,7 @@ function UserDashboardContent() {
     return () => clearInterval(interval);
   }, [rateLimitReset, userQuery]);
 
-  // Load tokens from sessionStorage on mount
+  // Load tokens and linked identities from storage on mount
   useEffect(() => {
     if (typeof window !== "undefined") {
       const savedToken = sessionStorage.getItem("github_token");
@@ -143,8 +161,24 @@ function UserDashboardContent() {
 
       const savedSoKey = sessionStorage.getItem("stackoverflow_api_key");
       if (savedSoKey) setSoApiKeyInput(savedSoKey);
+
+      // Load linked identities
+      let initialNpm = entryPlatform === "npm" ? username : "";
+      let initialSO =
+        entryPlatform === "stackoverflow" ? entryId || username : "";
+
+      if (githubUsername) {
+        const savedNpm = localStorage.getItem(`ossintel:npm:${githubUsername}`);
+        if (savedNpm) initialNpm = savedNpm;
+
+        const savedSO = localStorage.getItem(`ossintel:so:${githubUsername}`);
+        if (savedSO) initialSO = savedSO;
+      }
+
+      if (initialNpm) setLinkedNpm(initialNpm);
+      if (initialSO) setLinkedSO(initialSO);
     }
-  }, []);
+  }, [githubUsername, entryPlatform, entryId, username]);
 
   // Auto-select all organizations by default on initial load
   useEffect(() => {
@@ -226,6 +260,29 @@ function UserDashboardContent() {
     setCooldown("");
     handleRefresh();
   };
+
+  // Extract social links (LinkedIn and Stack Overflow) from user metadata if available
+  const linkedinUrl = useMemo(() => {
+    const metadata = userQuery.data?.metadata as
+      | Record<string, unknown>
+      | undefined;
+    const socialLinks = metadata?.socialLinks as string[] | undefined;
+    return (
+      socialLinks?.find((url: string) => url.includes("linkedin.com")) || null
+    );
+  }, [userQuery.data]);
+
+  const stackoverflowUrl = useMemo(() => {
+    if (linkedSO) return `https://stackoverflow.com/users/${linkedSO}`;
+    const metadata = userQuery.data?.metadata as
+      | Record<string, unknown>
+      | undefined;
+    const socialLinks = metadata?.socialLinks as string[] | undefined;
+    return (
+      socialLinks?.find((url: string) => url.includes("stackoverflow.com")) ||
+      null
+    );
+  }, [linkedSO, userQuery.data]);
 
   // Perform dynamic score calculations
   const clientIntel = useDeveloperScores({
@@ -527,7 +584,7 @@ function UserDashboardContent() {
                             </span>
                             <button
                               type="button"
-                              onClick={() => setLinkedNpm("")}
+                              onClick={() => handleLinkNpm("")}
                               className="text-[10px] text-red-500 hover:underline"
                             >
                               Unlink
@@ -538,7 +595,7 @@ function UserDashboardContent() {
                             type="button"
                             onClick={() => {
                               const val = prompt("Enter npm username:");
-                              if (val) setLinkedNpm(val);
+                              if (val) handleLinkNpm(val);
                             }}
                             className="text-[10px] text-indigo-400 hover:underline font-bold"
                           >
@@ -564,7 +621,7 @@ function UserDashboardContent() {
                             </span>
                             <button
                               type="button"
-                              onClick={() => setLinkedSO("")}
+                              onClick={() => handleLinkSO("")}
                               className="text-[10px] text-red-500 hover:underline"
                             >
                               Unlink
@@ -577,7 +634,7 @@ function UserDashboardContent() {
                               const val = prompt(
                                 "Enter Stack Overflow User ID:",
                               );
-                              if (val) setLinkedSO(val);
+                              if (val) handleLinkSO(val);
                             }}
                             className="text-[10px] text-indigo-400 hover:underline font-bold"
                           >
@@ -631,6 +688,11 @@ function UserDashboardContent() {
                     twitterUsername={userQuery.data?.metadata?.twitterUsername}
                     blog={userQuery.data?.metadata?.blog}
                     readme={userQuery.data?.metadata?.readme}
+                    npmUrl={
+                      linkedNpm ? `https://www.npmjs.com/~${linkedNpm}` : null
+                    }
+                    stackoverflowUrl={stackoverflowUrl}
+                    linkedinUrl={linkedinUrl}
                   />
 
                   {/* Skill Radar */}
@@ -717,7 +779,7 @@ function UserDashboardContent() {
                 title="Suggested npm Identity"
                 message={`Link npm account @${userQuery.data.metadata.suggestions.npm.username} to aggregate package download metrics?`}
                 onConfirm={() =>
-                  setLinkedNpm(
+                  handleLinkNpm(
                     userQuery.data.metadata.suggestions?.npm?.username || "",
                   )
                 }
@@ -725,7 +787,7 @@ function UserDashboardContent() {
                   const userOverride = prompt(
                     "Enter custom npm username to override:",
                   );
-                  if (userOverride) setLinkedNpm(userOverride);
+                  if (userOverride) handleLinkNpm(userOverride);
                 }}
                 onDismiss={() => setDismissedNpm(true)}
               />
@@ -739,7 +801,7 @@ function UserDashboardContent() {
                 title="Suggested Stack Overflow Profile"
                 message={`Link Stack Overflow profile ID ${userQuery.data.metadata.suggestions.stackoverflow.profileId} (${userQuery.data.metadata.suggestions.stackoverflow.displayName})?`}
                 onConfirm={() =>
-                  setLinkedSO(
+                  handleLinkSO(
                     userQuery.data.metadata.suggestions?.stackoverflow
                       ?.profileId || "",
                   )
@@ -748,7 +810,7 @@ function UserDashboardContent() {
                   const soOverride = prompt(
                     "Enter custom Stack Overflow Profile ID to override:",
                   );
-                  if (soOverride) setLinkedSO(soOverride);
+                  if (soOverride) handleLinkSO(soOverride);
                 }}
                 onDismiss={() => setDismissedSO(true)}
               />

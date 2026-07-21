@@ -1,4 +1,4 @@
 {
-  "title": "Version 0.0.0",
-  "description": "Deterministic scoring engine for calculating OSS health, impact, risk, activity, and community metrics from normalized repository and ecosystem data."
+  "title": "Version 0.1.0",
+  "description": "Mathematical, deterministic metrics calculator to evaluate open-source software health, impact, activity, community adoption, and risk profiles."
 }

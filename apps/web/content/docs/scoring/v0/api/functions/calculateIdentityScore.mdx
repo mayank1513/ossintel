@@ -1,0 +1,31 @@
+[**@ossintel/scoring**](../index.md)
+
+***
+
+[@ossintel/scoring](../index.md) / calculateIdentityScore
+
+# Function: calculateIdentityScore()
+
+> **calculateIdentityScore**(`inputs`): [`IdentityScores`](../interfaces/IdentityScores.md)
+
+Defined in: [identity-scoring.ts:21](https://github.com/mayank1513/ossintel/blob/main/packages/scoring/src/identity-scoring.ts#L21)
+
+Calculate the unified OSS identity score.
+
+GitHub is the primary identity (~80-85% weight). npm (Package Publishing)
+and Stack Overflow (Knowledge Sharing) provide additive evidence bonuses
+that can never reduce the score.
+
+## Parameters
+
+### inputs
+
+[`IdentityScoringInputs`](../interfaces/IdentityScoringInputs.md)
+
+## Returns
+
+[`IdentityScores`](../interfaces/IdentityScores.md)
+
+## See
+
+file://docs/domain-model.md for scoring philosophy.

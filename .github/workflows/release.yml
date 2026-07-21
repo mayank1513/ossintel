@@ -23,7 +23,7 @@ jobs:
           fetch-depth: 0
 
       - uses: pnpm/action-setup@v6
-      
+
       - uses: actions/setup-node@v7
         with:
           node-version: 24
@@ -71,6 +71,7 @@ jobs:
           git checkout $GITHUB_REF_NAME
           git checkout -- .
           git clean -fd
+          git status
           pnpm docs
           git add apps/web/content/docs
           if ! git diff --staged --quiet; then

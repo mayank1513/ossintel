@@ -1,0 +1,26 @@
+[**@ossintel/scoring**](../index.md)
+
+***
+
+[@ossintel/scoring](../index.md) / calculateContributorScore
+
+# Function: calculateContributorScore()
+
+> **calculateContributorScore**(`externalContributions`): [`ContributorResult`](../interfaces/ContributorResult.md)
+
+Defined in: [contributor-scoring.ts:16](https://github.com/mayank1513/ossintel/blob/main/packages/scoring/src/contributor-scoring.ts#L16)
+
+Calculate the contributor pillar score from external (upstream) PRs.
+
+Quality-weighted scoring: PR type (code/docs/test/chore) and target
+repository importance (star count) determine point allocation.
+
+## Parameters
+
+### externalContributions
+
+`NormalizedContribution`[]
+
+## Returns
+
+[`ContributorResult`](../interfaces/ContributorResult.md)

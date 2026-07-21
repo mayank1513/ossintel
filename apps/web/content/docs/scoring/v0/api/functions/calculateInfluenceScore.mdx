@@ -1,0 +1,38 @@
+[**@ossintel/scoring**](../index.md)
+
+***
+
+[@ossintel/scoring](../index.md) / calculateInfluenceScore
+
+# Function: calculateInfluenceScore()
+
+> **calculateInfluenceScore**(`totalStarsCount`, `totalForksCount`, `totalNpmDownloads`, `soReputation`): [`InfluenceResult`](../interfaces/InfluenceResult.md)
+
+Defined in: [influence-scoring.ts:18](https://github.com/mayank1513/ossintel/blob/main/packages/scoring/src/influence-scoring.ts#L18)
+
+Calculate the influence pillar score.
+
+GitHub stars and forks form the base. npm downloads and
+Stack Overflow reputation provide bounded additive bonuses.
+
+## Parameters
+
+### totalStarsCount
+
+`number`
+
+### totalForksCount
+
+`number`
+
+### totalNpmDownloads
+
+`number`
+
+### soReputation
+
+`number`
+
+## Returns
+
+[`InfluenceResult`](../interfaces/InfluenceResult.md)

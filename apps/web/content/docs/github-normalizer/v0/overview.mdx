@@ -82,8 +82,9 @@ Never expose raw GitHub responses.
 
 ## ✨ Why @ossintel/github-normalizer?
 
--
--
+- **Consistent Domain Model**: Normalizes disparate GitHub REST and GraphQL responses into a single, clean TypeScript interface.
+- **Auto Pagination & Rate Limit Handling**: Simplifies fetching multi-page repository lists and respects API rate limits transparently.
+- **Zero Ecosystem Pollution**: Keeps business logic, scoring, and UI code out of the network fetching layer.
 
 ---
 

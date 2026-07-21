@@ -1,0 +1,47 @@
+[**@ossintel/scoring**](../index.md)
+
+***
+
+[@ossintel/scoring](../index.md) / PublishingScore
+
+# Interface: PublishingScore
+
+Defined in: [publishing-scoring.ts:3](https://github.com/mayank1513/ossintel/blob/main/packages/scoring/src/publishing-scoring.ts#L3)
+
+## Properties
+
+### breakdown
+
+> **breakdown**: `object`
+
+Defined in: [publishing-scoring.ts:7](https://github.com/mayank1513/ossintel/blob/main/packages/scoring/src/publishing-scoring.ts#L7)
+
+Breakdown of sub-scores contributing to the overall.
+
+#### downloads
+
+> **downloads**: `number`
+
+Score based on total download volume (0-100).
+
+#### packages
+
+> **packages**: `number`
+
+Score based on active package count (0-100).
+
+#### verified
+
+> **verified**: `number`
+
+Score based on verified publisher status (0 or 100).
+
+***
+
+### score
+
+> **score**: `number`
+
+Defined in: [publishing-scoring.ts:5](https://github.com/mayank1513/ossintel/blob/main/packages/scoring/src/publishing-scoring.ts#L5)
+
+Overall publishing reputation score (0-100).

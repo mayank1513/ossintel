@@ -1,0 +1,31 @@
+[**@ossintel/scoring**](../index.md)
+
+***
+
+[@ossintel/scoring](../index.md) / calculateMaintainerScore
+
+# Function: calculateMaintainerScore()
+
+> **calculateMaintainerScore**(`repositories`, `totalNpmDownloads`): [`MaintainerResult`](../interfaces/MaintainerResult.md)
+
+Defined in: [maintainer-scoring.ts:22](https://github.com/mayank1513/ossintel/blob/main/packages/scoring/src/maintainer-scoring.ts#L22)
+
+Calculate the maintainer pillar score.
+
+GitHub repo health is the primary signal. npm download volume
+provides a small additive bonus (capped at 10 points) that can
+never reduce the score.
+
+## Parameters
+
+### repositories
+
+`NormalizedRepository`[]
+
+### totalNpmDownloads
+
+`number`
+
+## Returns
+
+[`MaintainerResult`](../interfaces/MaintainerResult.md)

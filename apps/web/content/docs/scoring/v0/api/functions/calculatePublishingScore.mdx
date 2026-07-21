@@ -1,0 +1,29 @@
+[**@ossintel/scoring**](../index.md)
+
+***
+
+[@ossintel/scoring](../index.md) / calculatePublishingScore
+
+# Function: calculatePublishingScore()
+
+> **calculatePublishingScore**(`npmUser?`): [`PublishingScore`](../interfaces/PublishingScore.md) \| `null`
+
+Defined in: [publishing-scoring.ts:26](https://github.com/mayank1513/ossintel/blob/main/packages/scoring/src/publishing-scoring.ts#L26)
+
+Calculate a Package Publishing capability score.
+
+Currently evaluates npm presence only. Designed to be extended
+with additional registries (NuGet, PyPI, crates.io, Go, etc.)
+by adding optional parameters without breaking existing callers.
+
+## Parameters
+
+### npmUser?
+
+`NormalizedNpmUser` \| `null`
+
+## Returns
+
+[`PublishingScore`](../interfaces/PublishingScore.md) \| `null`
+
+A score (0-100) with breakdown, or null if no data is available.

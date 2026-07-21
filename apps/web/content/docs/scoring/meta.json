@@ -1,9 +1,9 @@
 {
   "title": "@ossintel/scoring",
-  "description": "Deterministic scoring engine for calculating OSS health, impact, risk, activity, and community metrics from normalized repository and ecosystem data.",
-  "tagLine": "Deterministic scoring engine for calculating OSS health, impact, risk, activity, and community metrics from normalized repository and ecosystem data.",
-  "lastModified": "2026-07-18T09:49:29.806Z",
-  "version": "0.0.0",
+  "description": "Mathematical, deterministic metrics calculator to evaluate open-source software health, impact, activity, community adoption, and risk profiles.",
+  "tagLine": "Mathematical, deterministic metrics calculator to evaluate open-source software health, impact, activity, community adoption, and risk profiles.",
+  "lastModified": "2026-07-21T14:43:29.812Z",
+  "version": "0.1.0",
   "root": true,
   "icon": "LibraryBig",
   "pages": [

@@ -45,6 +45,20 @@ Unlike GitHub, which primarily shows activity, OSSIntel helps answer questions s
              Next.js Dashboard
 ```
 
+## Tech Stack
+
+| Layer | Technology |
+|-------|------------|
+| Monorepo | pnpm workspaces + Turborepo |
+| Language | TypeScript (strict) |
+| Web | Next.js 15 (App Router) |
+| Styling | Tailwind CSS v4 + shadcn/ui |
+| Testing | Vitest |
+| Docs | Fumadocs + Typedoc |
+| Linting | Biome |
+| Release | Changesets |
+| CI | GitHub Actions |
+
 ## Packages
 
 ### @ossintel/github-normalizer
@@ -53,11 +67,26 @@ Fetches and normalizes GitHub data into a stable domain model.
 
 ### @ossintel/scoring
 
-Deterministically calculates OSS metrics and scores.
+Deterministically calculates OSS metrics and scores. Depends on `github-normalizer` for input types.
 
 ### @ossintel/insights
 
-Transforms metrics into findings, recommendations, and AI-ready summaries.
+Transforms metrics into findings, recommendations, and AI-ready summaries. Depends on `scoring` and `github-normalizer`.
+
+### @app/web
+
+Next.js dashboard — the presentation layer. Business logic lives in the packages above.
+
+Dependency chain: `github-normalizer` → `scoring` → `insights` → `web`
+
+## Web Dashboard
+
+| Route | Purpose |
+|-------|---------|
+| `/` | Landing page with search |
+| `/user/[username]` | Developer intelligence |
+| `/repo/[owner]/[name]` | Repository intelligence |
+| `/docs/...` | Documentation |
 
 ## Principles
 
@@ -110,3 +139,7 @@ The development workflow includes:
 - GitHub App
 - CLI
 - VS Code Extension
+
+## For AI Models
+
+See [CONTEXT.md](./CONTEXT.md) for a structured project reference optimized for AI consumption.

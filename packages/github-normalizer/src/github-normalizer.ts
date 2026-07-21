@@ -396,12 +396,34 @@ export async function fetchExternalContributions(
   options?: GitHubFetchOptions,
 ): Promise<NormalizedContribution[]> {
   try {
-    const searchRes = await githubFetch<{ items: RawGitHubSearchIssue[] }>(
-      `/search/issues?q=type:pr+author:${username}+-user:${username}+is:merged&per_page=100`,
-      options,
-    );
+    const items: RawGitHubSearchIssue[] = [];
+    let page = 1;
+    let hasNextPage = true;
 
-    const items = searchRes.items || [];
+    while (hasNextPage) {
+      const searchRes = await githubFetch<{ items: RawGitHubSearchIssue[] }>(
+        `/search/issues?q=type:pr+author:${username}+-user:${username}+is:merged&per_page=100&page=${page}`,
+        options,
+      );
+
+      const pageItems = searchRes.items || [];
+      if (pageItems.length === 0) {
+        hasNextPage = false;
+      } else {
+        items.push(...pageItems);
+        if (pageItems.length < 100) {
+          hasNextPage = false;
+        } else {
+          page++;
+        }
+      }
+
+      // Safeguard page limit
+      if (page > 10) {
+        hasNextPage = false;
+      }
+    }
+
     const repoStarsMap = new Map<string, number>();
     const uniqueRepos = Array.from(
       new Set(

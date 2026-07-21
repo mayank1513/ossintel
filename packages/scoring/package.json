@@ -51,8 +51,8 @@
     "aliases": [
       "ossintel"
     ],
-    "icon": "LibraryBig",
-    "description": ""
+    "icon": "Gauge",
+    "description": "Deterministic reputation metrics engine"
   },
   "funding": [
     {

@@ -1,5 +1,10 @@
 #!/bin/sh
 
+if [ "$CI" = "true" ]; then
+  echo "CI environment detected. Skipping script execution."
+  exit 0
+fi
+
 pnpm typecheck
 
 cd apps/web && pnpm types:check

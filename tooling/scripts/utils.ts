@@ -305,8 +305,10 @@ const color = {
  */
 export const prompt = async (question: string, defaultValue?: string) => {
   const rl = readline.createInterface({
-    input: input,
-    output: output,
+    // biome-ignore lint/suspicious/noExplicitAny: required
+    input: input as any,
+    // biome-ignore lint/suspicious/noExplicitAny: required
+    output: output as any,
   });
 
   const q = `${color.cyan}${question}${color.reset}`;

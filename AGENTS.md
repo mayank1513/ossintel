@@ -135,6 +135,8 @@ Business logic belongs inside reusable packages whenever practical.
 - Avoid unnecessary abstractions.
 - Add or update tests when business logic changes.
 - Run `pnpm.cmd lint:fix` to lint
+- typecheck: For typechecking the web app, run `pnpm.cmd type:check` inside apps/web
+- For packages typecheck run `pnpm.cmd typecheck` in root
 
 ---
 

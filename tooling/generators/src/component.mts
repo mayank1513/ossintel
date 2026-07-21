@@ -1,6 +1,6 @@
 import fs from "node:fs";
 import path from "node:path";
-import type { ActionType, PlopGeneratorConfig } from "plop";
+import type { ActionConfig, ActionType, PlopGeneratorConfig } from "plop";
 import { plopUtilsRef } from "./index.mts";
 import { cwd, getPackageDirs, TEMPLATE_DIR } from "./utils.mts";
 
@@ -261,7 +261,7 @@ const getActions = (data: InquirerDataType): ActionType[] => {
       pattern: /(?<insertion> component exports)/,
       path: path.resolve(packagesDir, `${parentDir}index.ts`),
       template: 'export * from "./{{kebabCase name}}";',
-    } as any,
+    } as ActionConfig,
   ]);
 };
 

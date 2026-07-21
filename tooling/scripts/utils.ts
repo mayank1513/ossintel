@@ -305,8 +305,8 @@ const color = {
  */
 export const prompt = async (question: string, defaultValue?: string) => {
   const rl = readline.createInterface({
-    input: input as any,
-    output: output as any,
+    input: input,
+    output: output,
   });
 
   const q = `${color.cyan}${question}${color.reset}`;

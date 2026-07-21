@@ -19,6 +19,7 @@ import { SuggestionToast } from "@/components/ui/suggestion-toast";
 import { useDeveloperScores } from "@/hooks/use-developer-scores";
 import { useGithubOrgs } from "@/hooks/use-github-orgs";
 import { useGithubUser } from "@/hooks/use-github-user";
+import { savePatCookie } from "@/lib/api-client";
 
 const STEPS = [
   "Establishing connection to GitHub APIs...",
@@ -111,10 +112,8 @@ export default function UserPage() {
     await orgsQuery.refreshAll();
   };
 
-  const handleSavePat = () => {
-    if (typeof window !== "undefined") {
-      sessionStorage.setItem("github_token", patInput);
-    }
+  const handleSavePat = async () => {
+    await savePatCookie(patInput);
     setShowPatConfig(false);
     setRateLimitReset(null);
     setCooldown("");

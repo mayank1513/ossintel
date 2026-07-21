@@ -14,6 +14,7 @@ import { ErrorAlert } from "@/components/ui/error-alert";
 import { LoadingOverlay } from "@/components/ui/loading-overlay";
 import { RateLimitWarning } from "@/components/ui/rate-limit-warning";
 import { useGithubRepo } from "@/hooks/use-github-orgs";
+import { savePatCookie } from "@/lib/api-client";
 import { getCacheTimestamp } from "@/lib/cache";
 
 const STEPS = [
@@ -92,10 +93,8 @@ export default function RepoPage() {
     refresh();
   };
 
-  const handleSavePat = () => {
-    if (typeof window !== "undefined") {
-      sessionStorage.setItem("github_token", patInput);
-    }
+  const handleSavePat = async () => {
+    await savePatCookie(patInput);
     setShowPatConfig(false);
     setRateLimitReset(null);
     setCooldown("");

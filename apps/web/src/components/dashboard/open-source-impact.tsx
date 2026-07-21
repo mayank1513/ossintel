@@ -15,6 +15,7 @@ import {
   Zap,
 } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
+import { savePatCookie } from "@/lib/api-client";
 
 interface OpenSourceImpactProps {
   contributions: NormalizedContribution[];
@@ -47,9 +48,9 @@ export const OpenSourceImpact: React.FC<OpenSourceImpactProps> = ({
     }
   }, []);
 
-  const handleSavePat = () => {
+  const handleSavePat = async () => {
     if (typeof window !== "undefined" && patInput.trim()) {
-      sessionStorage.setItem("github_token", patInput.trim());
+      await savePatCookie(patInput.trim());
       setHasToken(true);
       setPatInput("");
       onRefresh();

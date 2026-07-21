@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import type React from "react";
 import { useState } from "react";
 import { GithubIcon } from "@/components/icons";
+import { savePatCookie } from "@/lib/api-client";
 
 export default function HomePage() {
   const router = useRouter();
@@ -19,56 +20,51 @@ export default function HomePage() {
     if (!query.trim()) return;
     setError(null);
 
-    if (token) {
-      sessionStorage.setItem("github_token", token);
-    } else {
-      sessionStorage.removeItem("github_token");
-    }
+    const performAnalyze = async () => {
+      await savePatCookie(token);
 
-    try {
-      const detection = detectInput(query);
-      const externalBase = process.env.NEXT_PUBLIC_EXTERNAL_DASHBOARD_URL;
-      let targetPath = "";
+      try {
+        const detection = detectInput(query);
+        const externalBase = process.env.NEXT_PUBLIC_EXTERNAL_DASHBOARD_URL;
+        let targetPath = "";
 
-      if (detection.platform === "github") {
-        if (detection.type === "repo") {
-          targetPath = `/repo/${detection.owner}/${detection.repo}`;
+        if (detection.platform === "github") {
+          if (detection.type === "repo") {
+            targetPath = `/repo/${detection.owner}/${detection.repo}`;
+          } else {
+            targetPath = `/user/${detection.owner}`;
+          }
+        } else if (detection.platform === "npm") {
+          if (detection.type === "package") {
+            targetPath = `/repo/npm/${detection.name}`;
+          } else {
+            targetPath = `/user/${detection.name}`;
+          }
         } else {
-          targetPath = `/user/${detection.owner}`;
+          const cleaned = query.trim();
+          if (cleaned.includes("/")) {
+            targetPath = `/repo/${cleaned}`;
+          } else {
+            targetPath = `/user/${cleaned}`;
+          }
         }
-      } else if (detection.platform === "npm") {
-        if (detection.type === "package") {
-          targetPath = `/repo/npm/${detection.name}`;
+
+        if (externalBase) {
+          window.location.href = `${externalBase}${targetPath}`;
         } else {
-          targetPath = `/user/${detection.name}`;
+          router.push(targetPath);
         }
-      } else {
-        const cleaned = query.trim();
-        if (cleaned.includes("/")) {
-          targetPath = `/repo/${cleaned}`;
-        } else {
-          targetPath = `/user/${cleaned}`;
-        }
+      } catch (err: unknown) {
+        const message =
+          err instanceof Error ? err.message : "Invalid search query";
+        setError(message);
       }
-
-      if (externalBase) {
-        window.location.href = `${externalBase}${targetPath}`;
-      } else {
-        router.push(targetPath);
-      }
-    } catch (err: unknown) {
-      const message =
-        err instanceof Error ? err.message : "Invalid search query";
-      setError(message);
-    }
+    };
+    performAnalyze();
   };
 
-  const handleQuickSearch = (q: string, searchType: "repo" | "user") => {
-    if (token) {
-      sessionStorage.setItem("github_token", token);
-    } else {
-      sessionStorage.removeItem("github_token");
-    }
+  const handleQuickSearch = async (q: string, searchType: "repo" | "user") => {
+    await savePatCookie(token);
 
     const externalBase = process.env.NEXT_PUBLIC_EXTERNAL_DASHBOARD_URL;
     let targetPath = "";

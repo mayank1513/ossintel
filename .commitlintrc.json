@@ -8,7 +8,9 @@
         "@app/web",
         "@ossintel/github-normalizer",
         "@ossintel/insights",
+        "@ossintel/npm",
         "@ossintel/scoring",
+        "@ossintel/stackoverflow",
         "@tool/scripts",
         "@tool/tsconfig"
       ]

@@ -6,10 +6,9 @@ import type {
   NormalizedRepository,
 } from "@ossintel/github-normalizer";
 import { generateIdentityInsights } from "@ossintel/insights";
-import {
-  calculateIdentityScore,
-  type NpmPackageStats,
-} from "@ossintel/scoring";
+import type { NormalizedNpmUser } from "@ossintel/npm";
+import { calculateIdentityScore } from "@ossintel/scoring";
+import type { NormalizedStackOverflowUser } from "@ossintel/stackoverflow";
 import { useMemo } from "react";
 import { mapRepositoryScores } from "../lib/audit";
 
@@ -17,8 +16,8 @@ interface DeveloperScoresProps {
   userRepos: NormalizedRepository[];
   orgsQueries: Array<{ data?: { repositories: NormalizedRepository[] } }>;
   includeUserRepos: boolean;
-  linkedNpm: string;
-  linkedSO: string;
+  npmUser: NormalizedNpmUser | null;
+  stackoverflowUser: NormalizedStackOverflowUser | null;
   userLogin: string;
   userName: string;
   externalContributions?: NormalizedContribution[];
@@ -29,8 +28,8 @@ export const useDeveloperScores = ({
   userRepos,
   orgsQueries,
   includeUserRepos,
-  linkedNpm,
-  linkedSO,
+  npmUser,
+  stackoverflowUser,
   userLogin,
   userName,
   externalContributions,
@@ -43,17 +42,10 @@ export const useDeveloperScores = ({
 
     const combinedRepos = [...(includeUserRepos ? userRepos : []), ...orgRepos];
 
-    let npmPackages: NpmPackageStats[] = [];
-    if (linkedNpm) {
-      npmPackages = [
-        { name: `${linkedNpm}-helper`, downloads: 45000, stars: 12 },
-        { name: `react-${linkedNpm}`, downloads: 125000, stars: 45 },
-      ];
-    }
-
     const scores = calculateIdentityScore({
       repositories: combinedRepos,
-      npmPackages,
+      npmUser,
+      stackoverflowUser,
       externalContributions,
       organizations,
     });
@@ -62,7 +54,12 @@ export const useDeveloperScores = ({
       type: "user",
       login: userLogin,
       name: userName,
-      linkedIdentities: { npm: linkedNpm, stackoverflow: linkedSO },
+      linkedIdentities: {
+        npm: npmUser?.username || undefined,
+        stackoverflow: stackoverflowUser?.userId || undefined,
+      },
+      npmUser,
+      stackoverflowUser,
     });
 
     const repoScores = mapRepositoryScores(combinedRepos);
@@ -97,8 +94,8 @@ export const useDeveloperScores = ({
     userRepos,
     orgsQueries,
     includeUserRepos,
-    linkedNpm,
-    linkedSO,
+    npmUser,
+    stackoverflowUser,
     userLogin,
     userName,
     externalContributions,

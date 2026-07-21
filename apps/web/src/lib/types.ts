@@ -1,7 +1,7 @@
 export interface AnalysisData {
   type: "repo" | "user" | "org";
   metadata: {
-    name?: string;
+    name?: string | null;
     fullName?: string;
     description?: string | null;
     stars?: number;

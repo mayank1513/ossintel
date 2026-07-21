@@ -4,11 +4,12 @@ import type {
   NormalizedRepository,
 } from "@ossintel/github-normalizer";
 import { generateIdentityInsights } from "@ossintel/insights";
+import type { NormalizedNpmUser } from "@ossintel/npm";
 import {
   calculateIdentityScore,
   calculateRepositoryScore,
-  type NpmPackageStats,
 } from "@ossintel/scoring";
+import type { NormalizedStackOverflowUser } from "@ossintel/stackoverflow";
 
 export const mapRepositoryScores = (repositories: NormalizedRepository[]) => {
   return repositories.map((r) => {
@@ -29,13 +30,16 @@ export const mapRepositoryScores = (repositories: NormalizedRepository[]) => {
 export const auditDeveloper = (
   developer: NormalizedDeveloper,
   repositories: NormalizedRepository[],
-  _organizations: NormalizedOrganization[],
+  organizations: NormalizedOrganization[],
   linkedIdentities?: { npm?: string; stackoverflow?: string },
-  npmPackages?: NpmPackageStats[],
+  npmUser?: NormalizedNpmUser | null,
+  stackoverflowUser?: NormalizedStackOverflowUser | null,
 ) => {
   const scores = calculateIdentityScore({
     repositories,
-    npmPackages,
+    npmUser,
+    stackoverflowUser,
+    organizations,
   });
 
   const insightsResult = generateIdentityInsights(repositories, scores, {
@@ -43,6 +47,8 @@ export const auditDeveloper = (
     login: developer.login,
     name: developer.name,
     linkedIdentities,
+    npmUser,
+    stackoverflowUser,
   });
 
   const repoScores = mapRepositoryScores(repositories);

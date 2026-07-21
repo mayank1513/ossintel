@@ -22,6 +22,8 @@
     "@mayank1513/fork-me": "^2.1.3",
     "@ossintel/github-normalizer": "workspace:*",
     "@ossintel/insights": "workspace:*",
+    "@ossintel/npm": "workspace:*",
+    "@ossintel/stackoverflow": "workspace:*",
     "@ossintel/scoring": "workspace:*",
     "@promptshield/tiptap": "latest",
     "@radix-ui/react-slot": "^1.3.0",

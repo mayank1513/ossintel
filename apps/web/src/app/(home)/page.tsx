@@ -38,8 +38,10 @@ export default function HomePage() {
           if (detection.type === "package") {
             targetPath = `/repo/npm/${detection.name}`;
           } else {
-            targetPath = `/user/${detection.name}`;
+            targetPath = `/user/${detection.name}?platform=npm`;
           }
+        } else if (detection.platform === "stackoverflow") {
+          targetPath = `/user/${detection.profileId}?platform=stackoverflow&id=${detection.profileId}`;
         } else {
           const cleaned = query.trim();
           if (cleaned.includes("/")) {
@@ -200,14 +202,29 @@ export default function HomePage() {
               >
                 GitHub Personal Access Token (PAT)
               </label>
-              <input
-                id="github-pat-input"
-                type="password"
-                placeholder="ghp_..."
-                value={token}
-                onChange={(e) => setToken(e.target.value)}
-                className="bg-slate-950 border border-slate-800 outline-none rounded-lg p-2.5 w-full text-slate-200 text-xs font-mono"
-              />
+              <div className="flex gap-2">
+                <input
+                  id="github-pat-input"
+                  type="password"
+                  placeholder="ghp_..."
+                  value={token}
+                  onChange={(e) => setToken(e.target.value)}
+                  className="bg-slate-950 border border-slate-800 outline-none rounded-lg p-2.5 flex-1 text-slate-200 text-xs font-mono animate-fade-in"
+                />
+                <button
+                  type="button"
+                  onClick={async () => {
+                    await savePatCookie(token);
+                    if (typeof window !== "undefined") {
+                      sessionStorage.setItem("github_token", token);
+                    }
+                    setShowSettings(false);
+                  }}
+                  className="px-4 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-xs font-bold transition-all shrink-0 hover:scale-[1.02] active:scale-[0.98]"
+                >
+                  Save & Apply
+                </button>
+              </div>
               <p className="text-[10px] text-slate-500 leading-normal">
                 Avoid rate limit exhaustion on busy public IP networks. The
                 token remains in local session storage and is used only for

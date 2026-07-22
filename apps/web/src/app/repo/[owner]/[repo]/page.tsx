@@ -32,8 +32,10 @@ export default function RepoPage() {
   const repo = params.repo as string;
 
   const cacheKeyStr = `repo:${owner}:${repo}`;
-  const { data, error, isLoading, refetch, isFetching, refresh } =
-    useGithubRepo(owner, repo);
+  const { data, error, isLoading, isFetching, refresh } = useGithubRepo(
+    owner,
+    repo,
+  );
 
   // Cached state indicator
   const [cachedTime, setCachedTime] = useState<string | null>(null);

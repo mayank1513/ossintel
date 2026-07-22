@@ -104,7 +104,6 @@ function UserDashboardContent() {
   // Toast/Alert dismiss states
   const [dismissedNpm, setDismissedNpm] = useState<boolean>(false);
   const [dismissedSO, setDismissedSO] = useState<boolean>(false);
-  const [dismissedRateLimit, setDismissedRateLimit] = useState<boolean>(false);
   const [dismissedError, setDismissedError] = useState<boolean>(false);
 
   // 1. Fetch GitHub data if Github account is linked
@@ -225,7 +224,6 @@ function UserDashboardContent() {
   const handleRefresh = async () => {
     setDismissedNpm(false);
     setDismissedSO(false);
-    setDismissedRateLimit(false);
     setDismissedError(false);
     if (githubUsername) {
       await userQuery.refresh();

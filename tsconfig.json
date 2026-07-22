@@ -30,6 +30,10 @@
         "./packages/github-normalizer/src",
         "./packages/github-normalizer/dist"
       ],
+      "@ossintel/input-parser": [
+        "./packages/input-parser/src",
+        "./packages/input-parser/dist"
+      ],
       "@ossintel/insights": [
         "./packages/insights/src",
         "./packages/insights/dist"

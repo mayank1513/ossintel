@@ -12,6 +12,7 @@
   "conventionalCommits.scopes": [
     "@app/web",
     "@ossintel/github-normalizer",
+    "@ossintel/input-parser",
     "@ossintel/insights",
     "@ossintel/npm",
     "@ossintel/scoring",

@@ -1,0 +1,12 @@
+{
+  "title": "@ossintel/input-parser",
+  "description": "Extensible input query parser",
+  "tagLine": "Lightweight and extensible input query parser for resolving developer, repository, organization, and package paths across multiple ecosystems (GitHub, NPM, StackOverflow, VS Code).",
+  "lastModified": "2026-07-22T16:43:18.189Z",
+  "version": "0.1.0",
+  "root": true,
+  "icon": "LibraryBig",
+  "pages": [
+    "v0"
+  ]
+}

@@ -2,8 +2,8 @@
   "title": "@ossintel/insights",
   "description": "Rule-based audit insights engine",
   "tagLine": "Rule-based insight generation engine for open-source software audit, producing findings, risk mitigation plans, and prompt contexts.",
-  "lastModified": "2026-07-22T02:25:32.459Z",
-  "version": "0.1.0",
+  "lastModified": "2026-07-22T16:43:23.073Z",
+  "version": "0.1.1",
   "root": true,
   "icon": "Sparkles",
   "pages": [

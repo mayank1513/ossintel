@@ -1,0 +1,41 @@
+[**@ossintel/input-parser**](../index.md)
+
+***
+
+[@ossintel/input-parser](../index.md) / detectInput
+
+# Function: detectInput()
+
+> **detectInput**(`input`): [`InputDetectionResult`](../interfaces/InputDetectionResult.md)
+
+Defined in: [input-parser.ts:58](https://github.com/ossintel/ossintel/blob/main/packages/input-parser/src/input-parser.ts#L58)
+
+Parses and resolves search query strings into platform and type targets.
+Supporting URLs, prefixes, and fallback shorthands.
+
+## Parameters
+
+### input
+
+`string`
+
+The raw search query entered by the user
+
+## Returns
+
+[`InputDetectionResult`](../interfaces/InputDetectionResult.md)
+
+An object containing the platform, target type, parsed identifiers, and the raw input.
+
+## Example
+
+```ts
+detectInput("react18-tools/kosha")
+// => { platform: "github", type: "repo", owner: "react18-tools", repo: "kosha", rawInput: "react18-tools/kosha" }
+
+detectInput("org:react18-tools")
+// => { platform: "github", type: "org", owner: "react18-tools", rawInput: "org:react18-tools" }
+
+detectInput("npm:kosha")
+// => { platform: "npm", type: "package", name: "kosha", rawInput: "npm:kosha" }
+```

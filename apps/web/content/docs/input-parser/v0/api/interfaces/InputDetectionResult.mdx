@@ -1,0 +1,79 @@
+[**@ossintel/input-parser**](../index.md)
+
+***
+
+[@ossintel/input-parser](../index.md) / InputDetectionResult
+
+# Interface: InputDetectionResult
+
+Defined in: [input-parser.ts:1](https://github.com/ossintel/ossintel/blob/main/packages/input-parser/src/input-parser.ts#L1)
+
+## Properties
+
+### name?
+
+> `optional` **name?**: `string`
+
+Defined in: [input-parser.ts:28](https://github.com/ossintel/ossintel/blob/main/packages/input-parser/src/input-parser.ts#L28)
+
+NPM package or user name
+
+***
+
+### owner?
+
+> `optional` **owner?**: `string`
+
+Defined in: [input-parser.ts:20](https://github.com/ossintel/ossintel/blob/main/packages/input-parser/src/input-parser.ts#L20)
+
+GitHub owner/username or organization login
+
+***
+
+### platform
+
+> **platform**: `"github"` \| `"npm"` \| `"stackoverflow"` \| `"vscode"` \| `"medium"` \| `"leetcode"` \| `"unknown"`
+
+Defined in: [input-parser.ts:5](https://github.com/ossintel/ossintel/blob/main/packages/input-parser/src/input-parser.ts#L5)
+
+Target platform: "github" | "npm" | "stackoverflow" | "vscode" | "medium" | "leetcode" | "unknown"
+
+***
+
+### profileId?
+
+> `optional` **profileId?**: `string`
+
+Defined in: [input-parser.ts:32](https://github.com/ossintel/ossintel/blob/main/packages/input-parser/src/input-parser.ts#L32)
+
+StackOverflow user profile ID
+
+***
+
+### rawInput
+
+> **rawInput**: `string`
+
+Defined in: [input-parser.ts:36](https://github.com/ossintel/ossintel/blob/main/packages/input-parser/src/input-parser.ts#L36)
+
+Raw input search query
+
+***
+
+### repo?
+
+> `optional` **repo?**: `string`
+
+Defined in: [input-parser.ts:24](https://github.com/ossintel/ossintel/blob/main/packages/input-parser/src/input-parser.ts#L24)
+
+GitHub repository name
+
+***
+
+### type
+
+> **type**: `"unknown"` \| `"user"` \| `"org"` \| `"repo"` \| `"package"`
+
+Defined in: [input-parser.ts:16](https://github.com/ossintel/ossintel/blob/main/packages/input-parser/src/input-parser.ts#L16)
+
+Target type: "user" | "org" | "repo" | "package" | "unknown"

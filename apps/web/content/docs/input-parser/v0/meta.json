@@ -1,0 +1,4 @@
+{
+  "title": "Version 0.1.0",
+  "description": "Lightweight and extensible input query parser for resolving developer, repository, organization, and package paths across multiple ecosystems (GitHub, NPM, StackOverflow, VS Code)."
+}

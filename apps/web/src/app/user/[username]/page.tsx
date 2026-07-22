@@ -434,6 +434,50 @@ function UserDashboardContent() {
 
                   <div className="space-y-3 text-left">
                     <div>
+                      <span className="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-2">
+                        GitHub Authentication (OAuth)
+                      </span>
+                      {hasGithubPat ? (
+                        <div className="flex items-center justify-between p-3 bg-slate-950 border border-slate-800 rounded-xl">
+                          <span className="text-xs text-emerald-450 font-bold flex items-center gap-1.5">
+                            <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />{" "}
+                            Connected to GitHub
+                          </span>
+                          <button
+                            type="button"
+                            onClick={async () => {
+                              await saveSecureToken("", "github");
+                              setHasGithubPat(false);
+                              handleRefresh();
+                            }}
+                            className="px-3 py-1.5 bg-rose-950/40 hover:bg-rose-950/60 border border-rose-900/30 text-rose-300 rounded-lg text-xs font-bold transition-all"
+                          >
+                            Disconnect
+                          </button>
+                        </div>
+                      ) : (
+                        <a
+                          href="/api/auth/github"
+                          className="flex items-center justify-center gap-2 w-full p-3 bg-indigo-650 hover:bg-indigo-700 text-white rounded-xl text-xs font-bold transition-all shadow-md"
+                        >
+                          <GithubIcon className="h-4 w-4" /> Sign in with GitHub
+                        </a>
+                      )}
+                      <p className="text-[10px] text-slate-500 mt-1.5">
+                        Authorizing increases your GitHub API rate limit
+                        dynamically to 5,000 req/hr.
+                      </p>
+                    </div>
+
+                    <div className="relative flex py-2 items-center">
+                      <div className="flex-grow border-t border-slate-800" />
+                      <span className="flex-shrink mx-3 text-[10px] text-slate-550 font-bold uppercase tracking-wider">
+                        or use manual PAT
+                      </span>
+                      <div className="flex-grow border-t border-slate-800" />
+                    </div>
+
+                    <div>
                       <label
                         htmlFor="github-token-input"
                         className="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-1"

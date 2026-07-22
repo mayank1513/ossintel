@@ -72,7 +72,7 @@ jobs:
           git checkout -- .
           git clean -fd
           git status
-          pnpm docs
+          pnpm run docs
           git add apps/web/content/docs
           if ! git diff --staged --quiet; then
             git commit -m "docs: updated documentation [skip ci]"

@@ -74,7 +74,7 @@ export default function HomePage() {
           }
         } else if (detection.platform === "npm") {
           if (detection.type === "package") {
-            targetPath = `/repo/npm/${detection.name}`;
+            targetPath = `/package/npm/${detection.name}`;
           } else {
             targetPath = `/user/${detection.name}?platform=npm`;
           }
@@ -165,7 +165,8 @@ export default function HomePage() {
             <div className="flex gap-2 justify-center">
               <button
                 type="submit"
-                className="px-6 py-3.5 bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white rounded-xl text-sm font-semibold shadow-lg shadow-indigo-500/20 hover:shadow-indigo-500/30 transition-all flex items-center justify-center gap-2 whitespace-nowrap animate-fade-in"
+                disabled={!query.trim()}
+                className="px-6 py-3.5 bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white rounded-xl text-sm font-semibold shadow-lg shadow-indigo-500/20 hover:shadow-indigo-500/30 transition-all flex items-center justify-center gap-2 whitespace-nowrap animate-fade-in disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 Analyze <ArrowRight className="h-4 w-4" />
               </button>
@@ -180,15 +181,34 @@ export default function HomePage() {
               </span>
               <ul className="space-y-0.5 list-none pl-0">
                 <li>
-                  • repo: <span className="text-indigo-400/90">owner/repo</span>
+                  • repo:{" "}
+                  <button
+                    type="button"
+                    onClick={() => setQuery("react18-tools/kosha")}
+                    className="text-indigo-400/90 cursor-pointer hover:underline bg-transparent border-0 p-0 text-left font-mono"
+                  >
+                    react18-tools/kosha
+                  </button>
                 </li>
                 <li>
                   • org:{" "}
-                  <span className="text-indigo-400/90">org:react18-tools</span>
+                  <button
+                    type="button"
+                    onClick={() => setQuery("org:react18-tools")}
+                    className="text-indigo-400/90 cursor-pointer hover:underline bg-transparent border-0 p-0 text-left font-mono"
+                  >
+                    org:react18-tools
+                  </button>
                 </li>
                 <li>
                   • user:{" "}
-                  <span className="text-indigo-400/90">user:octocat</span>
+                  <button
+                    type="button"
+                    onClick={() => setQuery("user:mayank1513")}
+                    className="text-indigo-400/90 cursor-pointer hover:underline bg-transparent border-0 p-0 text-left font-mono"
+                  >
+                    user:mayank1513
+                  </button>
                 </li>
               </ul>
             </div>
@@ -198,15 +218,34 @@ export default function HomePage() {
               </span>
               <ul className="space-y-0.5 list-none pl-0">
                 <li>
-                  • pkg: <span className="text-indigo-400/90">npm:lodash</span>
+                  • pkg:{" "}
+                  <button
+                    type="button"
+                    onClick={() => setQuery("npm:@ossintel/scoring")}
+                    className="text-indigo-400/90 cursor-pointer hover:underline bg-transparent border-0 p-0 text-left font-mono"
+                  >
+                    npm:@ossintel/scoring
+                  </button>
                 </li>
                 <li>
                   • scoped:{" "}
-                  <span className="text-indigo-400/90">@babel/core</span>
+                  <button
+                    type="button"
+                    onClick={() => setQuery("@ossintel/scoring")}
+                    className="text-indigo-400/90 cursor-pointer hover:underline bg-transparent border-0 p-0 text-left font-mono"
+                  >
+                    @ossintel/scoring
+                  </button>
                 </li>
                 <li>
                   • user:{" "}
-                  <span className="text-indigo-400/90">npm:~isaacs</span>
+                  <button
+                    type="button"
+                    onClick={() => setQuery("npm:~mayank1513")}
+                    className="text-indigo-400/90 cursor-pointer hover:underline bg-transparent border-0 p-0 text-left font-mono"
+                  >
+                    npm:~mayank1513
+                  </button>
                 </li>
               </ul>
             </div>
@@ -217,15 +256,33 @@ export default function HomePage() {
               <ul className="space-y-0.5 list-none pl-0">
                 <li>
                   • stackoverflow:{" "}
-                  <span className="text-indigo-400/90">so:12345</span>
+                  <button
+                    type="button"
+                    onClick={() => setQuery("so:12345")}
+                    className="text-indigo-400/90 cursor-pointer hover:underline bg-transparent border-0 p-0 text-left font-mono"
+                  >
+                    so:12345
+                  </button>
                 </li>
                 <li>
                   • medium:{" "}
-                  <span className="text-indigo-400/90">medium:@username</span>
+                  <button
+                    type="button"
+                    onClick={() => setQuery("medium:@mayank1513")}
+                    className="text-indigo-400/90 cursor-pointer hover:underline bg-transparent border-0 p-0 text-left font-mono"
+                  >
+                    medium:@mayank1513
+                  </button>
                 </li>
                 <li>
                   • leetcode:{" "}
-                  <span className="text-indigo-400/90">leetcode:user</span>
+                  <button
+                    type="button"
+                    onClick={() => setQuery("leetcode:mayank1513")}
+                    className="text-indigo-400/90 cursor-pointer hover:underline bg-transparent border-0 p-0 text-left font-mono"
+                  >
+                    leetcode:mayank1513
+                  </button>
                 </li>
               </ul>
             </div>

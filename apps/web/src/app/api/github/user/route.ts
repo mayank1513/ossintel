@@ -1,21 +1,19 @@
-import {
-  fetchDeveloper,
-  fetchExternalContributions,
-  fetchOrganizations,
-  fetchRepositories,
-  GitHubRateLimitError,
-  type NormalizedContribution,
-  suggestLinkedIdentities,
-} from "@ossintel/github-normalizer";
+import { GitHubRateLimitError } from "@ossintel/github-normalizer";
 import { NextResponse } from "next/server";
-import { formatUserResponse, getFriendlyErrorMessage } from "@/lib/api-helpers";
+import { getFriendlyErrorMessage } from "@/lib/api-helpers";
 import { getDecryptedToken } from "@/lib/cookie-token";
+import { getCachedDeveloperData } from "@/lib/server-cache";
 
 export const dynamic = "force-dynamic";
 
 export async function POST(request: Request) {
   try {
-    const { query, token: reqToken, limit } = await request.json();
+    const {
+      query,
+      token: reqToken,
+      limit,
+      forceRefresh,
+    } = await request.json();
     const token = await getDecryptedToken(reqToken);
     const options = { token };
 
@@ -23,56 +21,13 @@ export async function POST(request: Request) {
     const contribLimit =
       limit === null || limit === undefined ? Infinity : Number(limit);
 
-    const developer = await fetchDeveloper(login, options);
-    const personalRepos = await fetchRepositories(login, {
-      ...options,
-      allPages: true,
-      perPage: 100,
-    });
-    const organizations = await fetchOrganizations(login, options);
-    let externalContributions: NormalizedContribution[] = [];
-    try {
-      externalContributions = await fetchExternalContributions(
-        login,
-        contribLimit,
-        options,
-      );
-    } catch (e) {
-      console.error("Failed to fetch external contributions", e);
-    }
-
-    // Fetch user profile README
-    let readme = "";
-    try {
-      const readmeRes = await fetch(
-        `https://api.github.com/repos/${login}/${login}/readme`,
-        {
-          headers: token ? { Authorization: `token ${token}` } : {},
-        },
-      );
-      if (readmeRes.ok) {
-        const readmeData = await readmeRes.json();
-        if (readmeData.content && readmeData.encoding === "base64") {
-          readme = Buffer.from(readmeData.content, "base64").toString("utf-8");
-        }
-      }
-    } catch (e) {
-      console.error("Failed to fetch README", e);
-    }
-
-    // Suggestions
-    const suggestions = suggestLinkedIdentities(developer, personalRepos);
-
-    return NextResponse.json(
-      formatUserResponse(
-        developer,
-        personalRepos,
-        organizations,
-        externalContributions,
-        suggestions,
-        readme,
-      ),
+    const result = await getCachedDeveloperData(
+      login,
+      contribLimit,
+      options,
+      forceRefresh,
     );
+    return NextResponse.json(result);
   } catch (error: unknown) {
     console.error("User API failed", error);
     if (

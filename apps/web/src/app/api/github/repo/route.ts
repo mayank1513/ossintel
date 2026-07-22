@@ -1,57 +1,27 @@
-import {
-  fetchContributors,
-  fetchLanguages,
-  fetchReleases,
-  fetchRepository,
-  GitHubRateLimitError,
-  type NormalizedContributor,
-  type NormalizedLanguage,
-  type NormalizedRelease,
-} from "@ossintel/github-normalizer";
+import { GitHubRateLimitError } from "@ossintel/github-normalizer";
 import { NextResponse } from "next/server";
 import { getFriendlyErrorMessage } from "@/lib/api-helpers";
 import { getDecryptedToken } from "@/lib/cookie-token";
+import { getCachedRepositoryData } from "@/lib/server-cache";
 
 export const dynamic = "force-dynamic";
 
 export async function POST(request: Request) {
   try {
-    const { owner, repo, token: reqToken } = await request.json();
+    const { owner, repo, token: reqToken, forceRefresh } = await request.json();
     const token = await getDecryptedToken(reqToken);
     const options = { token };
 
     const ownerName = owner || "";
     const repoName = repo || "";
 
-    const repository = await fetchRepository(ownerName, repoName, options);
-    let contributors: NormalizedContributor[] = [];
-    let releases: NormalizedRelease[] = [];
-    let languages: NormalizedLanguage[] = [];
-
-    try {
-      contributors = await fetchContributors(ownerName, repoName, options);
-    } catch (e) {
-      console.error("Failed to fetch contributors", e);
-    }
-
-    try {
-      releases = await fetchReleases(ownerName, repoName, options);
-    } catch (e) {
-      console.error("Failed to fetch releases", e);
-    }
-
-    try {
-      languages = await fetchLanguages(ownerName, repoName, options);
-    } catch (e) {
-      console.error("Failed to fetch languages", e);
-    }
-
-    return NextResponse.json({
-      repository,
-      contributors,
-      releases,
-      languages,
-    });
+    const result = await getCachedRepositoryData(
+      ownerName,
+      repoName,
+      options,
+      forceRefresh,
+    );
+    return NextResponse.json(result);
   } catch (error: unknown) {
     console.error("Repository API failed", error);
     if (

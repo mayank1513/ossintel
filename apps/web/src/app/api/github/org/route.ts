@@ -1,30 +1,25 @@
-import {
-  fetchOrganization,
-  fetchRepositories,
-  GitHubRateLimitError,
-} from "@ossintel/github-normalizer";
+import { GitHubRateLimitError } from "@ossintel/github-normalizer";
 import { NextResponse } from "next/server";
-import { formatOrgResponse, getFriendlyErrorMessage } from "@/lib/api-helpers";
+import { getFriendlyErrorMessage } from "@/lib/api-helpers";
 import { getDecryptedToken } from "@/lib/cookie-token";
+import { getCachedOrganizationData } from "@/lib/server-cache";
 
 export const dynamic = "force-dynamic";
 
 export async function POST(request: Request) {
   try {
-    const { query, token: reqToken } = await request.json();
+    const { query, token: reqToken, forceRefresh } = await request.json();
     const token = await getDecryptedToken(reqToken);
     const options = { token };
 
     const login = query || "";
 
-    const org = await fetchOrganization(login, options);
-    const repositories = await fetchRepositories(login, {
-      ...options,
-      allPages: true,
-      perPage: 100,
-    });
-
-    return NextResponse.json(formatOrgResponse(org, repositories));
+    const result = await getCachedOrganizationData(
+      login,
+      options,
+      forceRefresh,
+    );
+    return NextResponse.json(result);
   } catch (error: unknown) {
     console.error("Organization API failed", error);
     if (

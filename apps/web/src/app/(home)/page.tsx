@@ -1,6 +1,6 @@
 "use client";
 
-import { detectInput } from "@ossintel/github-normalizer";
+import { detectInput } from "@ossintel/input-parser";
 import {
   AlertTriangle,
   ArrowRight,
@@ -54,9 +54,21 @@ export default function HomePage() {
         const externalBase = process.env.NEXT_PUBLIC_EXTERNAL_DASHBOARD_URL;
         let targetPath = "";
 
+        if (
+          detection.platform === "vscode" ||
+          detection.platform === "medium" ||
+          detection.platform === "leetcode"
+        ) {
+          throw new Error(
+            `Platform ${detection.platform} intelligence is coming soon!`,
+          );
+        }
+
         if (detection.platform === "github") {
           if (detection.type === "repo") {
             targetPath = `/repo/${detection.owner}/${detection.repo}`;
+          } else if (detection.type === "org") {
+            targetPath = `/org/${detection.owner}`;
           } else {
             targetPath = `/user/${detection.owner}`;
           }
@@ -143,7 +155,7 @@ export default function HomePage() {
               <Search className="h-5 w-5 text-slate-500 shrink-0" />
               <input
                 type="text"
-                placeholder="Enter GitHub user, organization, repository, or npm package URL..."
+                placeholder="Enter GitHub/NPM user, org, repo, package URL, or prefix..."
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
                 className="bg-transparent border-0 outline-none w-full py-3.5 text-slate-200 placeholder:text-slate-600 text-sm font-medium"
@@ -159,6 +171,65 @@ export default function HomePage() {
               </button>
             </div>
           </form>
+
+          {/* Query Syntax Cheat Sheet */}
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-left max-w-2xl mx-auto w-full mt-2 text-[10px] text-slate-500 font-mono leading-normal bg-slate-950/20 border border-slate-900/30 p-3.5 rounded-2xl">
+            <div>
+              <span className="text-slate-400 font-bold block mb-1">
+                GitHub
+              </span>
+              <ul className="space-y-0.5 list-none pl-0">
+                <li>
+                  • repo: <span className="text-indigo-400/90">owner/repo</span>
+                </li>
+                <li>
+                  • org:{" "}
+                  <span className="text-indigo-400/90">org:react18-tools</span>
+                </li>
+                <li>
+                  • user:{" "}
+                  <span className="text-indigo-400/90">user:octocat</span>
+                </li>
+              </ul>
+            </div>
+            <div>
+              <span className="text-slate-400 font-bold block mb-1">
+                NPM Registry
+              </span>
+              <ul className="space-y-0.5 list-none pl-0">
+                <li>
+                  • pkg: <span className="text-indigo-400/90">npm:lodash</span>
+                </li>
+                <li>
+                  • scoped:{" "}
+                  <span className="text-indigo-400/90">@babel/core</span>
+                </li>
+                <li>
+                  • user:{" "}
+                  <span className="text-indigo-400/90">npm:~isaacs</span>
+                </li>
+              </ul>
+            </div>
+            <div>
+              <span className="text-slate-400 font-bold block mb-1">
+                Others
+              </span>
+              <ul className="space-y-0.5 list-none pl-0">
+                <li>
+                  • stackoverflow:{" "}
+                  <span className="text-indigo-400/90">so:12345</span>
+                </li>
+                <li>
+                  • medium:{" "}
+                  <span className="text-indigo-400/90">medium:@username</span>
+                </li>
+                <li>
+                  • leetcode:{" "}
+                  <span className="text-indigo-400/90">leetcode:user</span>
+                </li>
+              </ul>
+            </div>
+          </div>
 
           {/* GitHub Connection Banner */}
           {hasGithubPat ? (

@@ -18,6 +18,12 @@ Read project documentation before implementing anything. Priority:
 - Do **not** modify auto-generated badges or installation sections (HTML used for docs pipeline).
 - Update remaining sections only when required.
 
+## Commit Rules
+
+- Follow conventional commits
+- Do not add gitmoji
+- ensure scopes are valid - refer .commitlintrc.json
+
 ## Turbo Forge
 
 Follow conventions in `turbo-forge.md` — generators, docs pipeline, naming, lint, test, release.

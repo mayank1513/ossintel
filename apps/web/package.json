@@ -21,6 +21,7 @@
   "dependencies": {
     "@mayank1513/fork-me": "^2.1.3",
     "@ossintel/github-normalizer": "workspace:*",
+    "@ossintel/input-parser": "workspace:*",
     "@ossintel/insights": "workspace:*",
     "@ossintel/npm": "workspace:*",
     "@ossintel/scoring": "workspace:*",

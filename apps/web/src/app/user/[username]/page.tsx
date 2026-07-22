@@ -8,7 +8,7 @@ import {
   Settings,
   User,
 } from "lucide-react";
-import { useParams, useSearchParams } from "next/navigation";
+import { useParams, useRouter, useSearchParams } from "next/navigation";
 import { Suspense, useEffect, useMemo, useRef, useState } from "react";
 import { AINarrator } from "@/components/dashboard/ai-narrator";
 import { DimensionBreakdown } from "@/components/dashboard/dimension-breakdown";
@@ -63,8 +63,9 @@ export default function UserPage() {
 
 function UserDashboardContent() {
   const params = useParams();
+  const router = useRouter();
   const searchParams = useSearchParams();
-  const username = params.username as string;
+  const username = (params.username || params.orgname) as string;
 
   const entryPlatform = searchParams.get("platform") || "github";
   const entryId = searchParams.get("id") || "";
@@ -191,6 +192,15 @@ function UserDashboardContent() {
       isInitialLoad.current = false;
     }
   }, [userQuery.data]);
+
+  // Redirect between /user/ and /org/ based on loaded profile type
+  useEffect(() => {
+    if (userQuery.data?.type === "org" && params.username) {
+      router.replace(`/org/${username}${window.location.search}`);
+    } else if (userQuery.data?.type === "user" && params.orgname) {
+      router.replace(`/user/${username}${window.location.search}`);
+    }
+  }, [userQuery.data, username, params, router]);
 
   // Auto-suggest linking GitHub from NPM packages
   useEffect(() => {

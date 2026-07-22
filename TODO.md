@@ -3,12 +3,12 @@
 ## Active
 
 - [x] Support npm package intelligence
-- [ ] Add next-themes for dark mode
+- [ ] Add next-themes for dark mode toggle (already present on docs - make it gloabl and fix the light theme)
 - [x] Enhance ecosystem distribution — show details as sortable/filterable tables
 
 ## Backlog
 
-- [ ] Fix doc generation (Fumadoc)
+- [x] Fix doc generation (Fumadoc)
 - [ ] Organization Intelligence
 - [ ] GitHub App integration
 - [ ] CLI tool

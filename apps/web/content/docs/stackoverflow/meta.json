@@ -1,11 +1,11 @@
 {
   "title": "@ossintel/stackoverflow",
-  "description": "Robust, typed utilities to fetch, normalize, and sanitize StackOverflow user profiles, reputation, badges, and top tag statistics from the StackExchange API.",
+  "description": "StackOverflow profile statistics fetcher",
   "tagLine": "Robust, typed utilities to fetch, normalize, and sanitize StackOverflow user profiles, reputation, badges, and top tag statistics from the StackExchange API.",
-  "lastModified": "2026-07-21T14:43:32.985Z",
+  "lastModified": "2026-07-22T02:25:46.505Z",
   "version": "0.0.1",
   "root": true,
-  "icon": "LibraryBig",
+  "icon": "MessageSquare",
   "pages": [
     "v0"
   ]

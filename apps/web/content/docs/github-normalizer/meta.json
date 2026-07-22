@@ -1,11 +1,11 @@
 {
   "title": "@ossintel/github-normalizer",
-  "description": "Robust, typed utilities to fetch, normalize, and sanitize raw GitHub REST and GraphQL API responses into consistent domain structures for open-source analytics.",
+  "description": "GitHub API data normalizer",
   "tagLine": "Robust, typed utilities to fetch, normalize, and sanitize raw GitHub REST and GraphQL API responses into consistent domain structures for open-source analytics.",
-  "lastModified": "2026-07-21T14:43:18.850Z",
+  "lastModified": "2026-07-22T02:25:26.018Z",
   "version": "0.1.0",
   "root": true,
-  "icon": "LibraryBig",
+  "icon": "GitBranch",
   "pages": [
     "v0"
   ]

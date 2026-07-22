@@ -1,11 +1,11 @@
 {
   "title": "@ossintel/npm",
-  "description": "Robust, typed utilities to fetch, normalize, and sanitize raw npm Registry and download statistics API responses into consistent domain structures for open-source analytics.",
+  "description": "NPM registry statistics fetcher",
   "tagLine": "Robust, typed utilities to fetch, normalize, and sanitize raw npm Registry and download statistics API responses into consistent domain structures for open-source analytics.",
-  "lastModified": "2026-07-21T14:43:26.391Z",
+  "lastModified": "2026-07-22T02:25:38.683Z",
   "version": "0.0.1",
   "root": true,
-  "icon": "LibraryBig",
+  "icon": "Package",
   "pages": [
     "v0"
   ]

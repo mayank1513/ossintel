@@ -1,11 +1,11 @@
 # @ossintel/github-normalizer <img src="https://raw.githubusercontent.com/mayank1513/mayank1513/main/popper.png" style="height: 40px"/>
 
 <p className="flex gap-2">
-  <a href="https://github.com/mayank1513/ossintel/actions/workflows/ci.yml" rel="noopener noreferrer">
-    <img alt="CI" src="https://github.com/mayank1513/ossintel/actions/workflows/ci.yml/badge.svg" />
+  <a href="https://github.com/ossintel/ossintel/actions/workflows/ci.yml" rel="noopener noreferrer">
+    <img alt="CI" src="https://github.com/ossintel/ossintel/actions/workflows/ci.yml/badge.svg" />
   </a>
-  <a href="https://codecov.io/gh/mayank1513/ossintel/tree/main/packages/@ossintel/github-normalizer" rel="noopener noreferrer">
-    <img alt="codecov" src="https://codecov.io/gh/mayank1513/ossintel/graph/badge.svg?flag=@ossintel/github-normalizer" />
+  <a href="https://codecov.io/gh/ossintel/ossintel/tree/main/packages/@ossintel/github-normalizer" rel="noopener noreferrer">
+    <img alt="codecov" src="https://codecov.io/gh/ossintel/ossintel/graph/badge.svg?flag=@ossintel/github-normalizer" />
   </a> 
   <a href="https://npmjs.com/package/@ossintel/github-normalizer" rel="noopener noreferrer">
     <img alt="npm version" src="https://img.shields.io/npm/v/@ossintel/github-normalizer" />

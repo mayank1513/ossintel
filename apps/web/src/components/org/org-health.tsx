@@ -4,21 +4,7 @@ import { Activity, AlertTriangle, ShieldCheck } from "lucide-react";
 import type React from "react";
 import { useMemo } from "react";
 
-interface EnrichedRepo {
-  repoName: string;
-  fullName: string;
-  scores: { overall: number; risk: number };
-  stars: number;
-  forks: number;
-  isArchived: boolean;
-  isFork: boolean;
-  createdAt: string;
-  pushedAt: string;
-  language: string | null;
-  topics: string[];
-  description: string | null;
-  openIssuesCount: number;
-}
+import type { EnrichedRepo } from "@/lib/org-portfolio";
 
 interface OrgHealthProps {
   repositories: EnrichedRepo[];

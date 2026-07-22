@@ -107,6 +107,7 @@ function OrgDashboardContent() {
   const enrichedRepos = useMemo(() => {
     const rawRepos = userQuery.data?.repositories || [];
     const scoredRepos = clientIntel.repositories || [];
+    const pinnedNames = new Set(userQuery.data?.pinnedRepositories || []);
     const rawMap = new Map(rawRepos.map((r) => [r.fullName, r]));
     return scoredRepos.map((sr) => {
       const raw = rawMap.get(sr.fullName);
@@ -120,9 +121,16 @@ function OrgDashboardContent() {
         topics: raw?.topics ?? [],
         description: raw?.description ?? null,
         openIssuesCount: raw?.openIssuesCount ?? 0,
+        isPinned:
+          pinnedNames.has(sr.repoName) ||
+          (raw?.topics?.includes("pinned") ?? false),
       };
     });
-  }, [userQuery.data?.repositories, clientIntel.repositories]);
+  }, [
+    userQuery.data?.repositories,
+    clientIntel.repositories,
+    userQuery.data?.pinnedRepositories,
+  ]);
 
   const fullAnalysisData = useMemo(() => {
     if (!userQuery.data) return null;
@@ -210,7 +218,10 @@ function OrgDashboardContent() {
               {/* Right Column */}
               <div className="lg:col-span-2 flex flex-col gap-8">
                 <TechLandscape repositories={enrichedRepos} />
-                <RepositoryPortfolio repositories={enrichedRepos} />
+                <RepositoryPortfolio
+                  repositories={enrichedRepos}
+                  pinnedRepositories={userQuery.data?.pinnedRepositories || []}
+                />
                 <MaintainerNetwork repositories={enrichedRepos} />
                 <PackageEcosystem
                   repositories={enrichedRepos}

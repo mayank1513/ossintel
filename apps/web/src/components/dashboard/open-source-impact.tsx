@@ -22,7 +22,6 @@ interface OpenSourceImpactProps {
   contributions: NormalizedContribution[];
   limit: number;
   onLimitChange: (limit: number) => void;
-  onRefresh: () => void;
   badges?: string[];
 }
 
@@ -30,7 +29,6 @@ export const OpenSourceImpact: React.FC<OpenSourceImpactProps> = ({
   contributions,
   limit,
   onLimitChange,
-  onRefresh,
   badges = [],
 }) => {
   const [hasToken, setHasToken] = useState(false);

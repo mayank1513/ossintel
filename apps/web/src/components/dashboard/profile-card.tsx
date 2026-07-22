@@ -31,6 +31,7 @@ interface ProfileCardProps {
   npmUrl?: string | null;
   stackoverflowUrl?: string | null;
   linkedinUrl?: string | null;
+  type?: "user" | "org";
 }
 
 export const ProfileCard: React.FC<ProfileCardProps> = ({
@@ -48,13 +49,15 @@ export const ProfileCard: React.FC<ProfileCardProps> = ({
   npmUrl,
   stackoverflowUrl,
   linkedinUrl,
+  type = "user",
 }) => {
   const [isOpen, setIsOpen] = useState(false);
 
   return (
     <div className="p-6 bg-slate-900/90 border border-slate-800 rounded-3xl flex flex-col gap-4 shadow-xl">
       <h3 className="text-base font-bold flex items-center gap-2 text-indigo-400">
-        <FaGithub className="h-5 w-5" /> GitHub Profile
+        <FaGithub className="h-5 w-5" />{" "}
+        {type === "org" ? "GitHub Organization" : "GitHub Profile"}
       </h3>
       <div className="flex items-center gap-4">
         {/* eslint-disable-next-line @next/next/no-img-element */}

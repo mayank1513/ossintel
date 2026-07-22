@@ -20,8 +20,10 @@ Read project documentation before implementing anything. Priority:
 
 ## Commit Rules
 
+- Do not run commit commands, instead provide a copy paste bash script
+- Ensure pnpm.cmd lint:fix before providing batched commit bash script
 - Follow conventional commits
-- Do not add gitmoji
+- Do not add gitmoji (auto added)
 - ensure scopes are valid - refer .commitlintrc.json
 
 ## Turbo Forge

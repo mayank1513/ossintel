@@ -171,12 +171,16 @@ export const OverviewCard: React.FC<OverviewCardProps> = ({
         {impactStats && (
           <div className="space-y-2">
             <span className="text-xs font-bold text-slate-500 uppercase tracking-wider block">
-              Open Source Impact
+              {data.type === "org"
+                ? "Organization Metrics"
+                : "Open Source Impact"}
             </span>
-            <div className="grid grid-cols-3 gap-2 text-xs">
+            <div
+              className={`grid gap-2 text-xs ${data.type === "org" ? "grid-cols-2" : "grid-cols-3"}`}
+            >
               <div className="bg-slate-950 p-2 rounded-xl border border-slate-800/50 text-center space-y-1">
                 <span className="text-slate-500 font-medium block text-[10px]">
-                  Stars
+                  {data.type === "org" ? "Total Stars" : "Stars"}
                 </span>
                 <span className="font-extrabold text-slate-200 text-sm">
                   {impactStats.stars.toLocaleString()}
@@ -184,20 +188,22 @@ export const OverviewCard: React.FC<OverviewCardProps> = ({
               </div>
               <div className="bg-slate-950 p-2 rounded-xl border border-slate-800/50 text-center space-y-1">
                 <span className="text-slate-500 font-medium block text-[10px]">
-                  Forks
+                  {data.type === "org" ? "Total Forks" : "Forks"}
                 </span>
                 <span className="font-extrabold text-slate-200 text-sm">
                   {impactStats.forks.toLocaleString()}
                 </span>
               </div>
-              <div className="bg-slate-950 p-2 rounded-xl border border-slate-800/50 text-center space-y-1">
-                <span className="text-slate-500 font-medium block text-[10px]">
-                  Merged PRs
-                </span>
-                <span className="font-extrabold text-indigo-400 text-sm">
-                  {impactStats.prsMerged}
-                </span>
-              </div>
+              {data.type !== "org" && (
+                <div className="bg-slate-950 p-2 rounded-xl border border-slate-800/50 text-center space-y-1">
+                  <span className="text-slate-500 font-medium block text-[10px]">
+                    Merged PRs
+                  </span>
+                  <span className="font-extrabold text-indigo-400 text-sm">
+                    {impactStats.prsMerged}
+                  </span>
+                </div>
+              )}
             </div>
           </div>
         )}

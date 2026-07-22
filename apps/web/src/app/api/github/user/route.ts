@@ -70,7 +70,7 @@ export async function POST(request: Request) {
             createdAt: "",
             socialLinks: [],
             organizations: [],
-            suggestions: { github: [], stackoverflow: [], npm: [] },
+            suggestions: {},
             readme: "",
           },
           repositories: orgData.repositories || [],

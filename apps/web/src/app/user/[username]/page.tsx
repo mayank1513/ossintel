@@ -3,7 +3,6 @@
 import {
   AlertTriangle,
   Database,
-  ExternalLink,
   RefreshCw,
   Settings,
   User,
@@ -735,6 +734,7 @@ function UserDashboardContent() {
                     }
                     stackoverflowUrl={stackoverflowUrl}
                     linkedinUrl={linkedinUrl}
+                    type={userQuery.data?.type}
                   />
 
                   {/* Skill Radar */}
@@ -757,15 +757,15 @@ function UserDashboardContent() {
 
                   <AINarrator promptContext={clientIntel.promptContext} />
 
-                  {userQuery.data?.externalContributions && (
-                    <OpenSourceImpact
-                      contributions={userQuery.data.externalContributions}
-                      limit={contribLimit}
-                      onLimitChange={setContribLimit}
-                      onRefresh={handleRefresh}
-                      badges={clientIntel.scores.badges}
-                    />
-                  )}
+                  {userQuery.data?.type !== "org" &&
+                    userQuery.data?.externalContributions && (
+                      <OpenSourceImpact
+                        contributions={userQuery.data.externalContributions}
+                        limit={contribLimit}
+                        onLimitChange={setContribLimit}
+                        badges={clientIntel.scores.badges}
+                      />
+                    )}
 
                   <FindingsList findings={clientIntel.findings} />
 

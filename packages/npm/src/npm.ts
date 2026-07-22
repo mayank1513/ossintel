@@ -12,7 +12,7 @@ import type {
  */
 function escapePackageName(name: string): string {
   if (name.startsWith("@")) {
-    return `@${encodeURIComponent(name.slice(1))}`;
+    return `@${name.slice(1).split("/").map(encodeURIComponent).join("/")}`;
   }
   return encodeURIComponent(name);
 }

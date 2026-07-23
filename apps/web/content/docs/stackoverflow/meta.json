@@ -2,8 +2,8 @@
   "title": "@ossintel/stackoverflow",
   "description": "StackOverflow profile statistics fetcher",
   "tagLine": "Robust, typed utilities to fetch, normalize, and sanitize StackOverflow user profiles, reputation, badges, and top tag statistics from the StackExchange API.",
-  "lastModified": "2026-07-23T14:00:12.596Z",
-  "version": "0.0.1",
+  "lastModified": "2026-07-23T18:02:11.040Z",
+  "version": "0.0.2",
   "root": true,
   "icon": "MessageSquare",
   "pages": [

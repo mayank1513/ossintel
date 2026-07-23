@@ -1,4 +1,4 @@
 {
-  "title": "Version 0.0.1",
+  "title": "Version 0.0.2",
   "description": "Robust, typed utilities to fetch, normalize, and sanitize StackOverflow user profiles, reputation, badges, and top tag statistics from the StackExchange API."
 }

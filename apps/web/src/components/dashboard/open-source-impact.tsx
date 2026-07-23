@@ -14,7 +14,8 @@ import {
   Users,
   Zap,
 } from "lucide-react";
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
+import { useAuthStatus } from "@/hooks/use-auth-status";
 import { formatCompactNumber } from "@/lib/format";
 import { GithubIcon } from "../icons";
 
@@ -31,7 +32,8 @@ export const OpenSourceImpact: React.FC<OpenSourceImpactProps> = ({
   onLimitChange,
   badges = [],
 }) => {
-  const [hasToken, setHasToken] = useState(false);
+  const { data: authData, isLoading: loadingToken } = useAuthStatus();
+  const hasToken = !!authData?.hasGithubPat;
   const [ecosystemExpanded, setEcosystemExpanded] = useState<boolean>(true);
   const [expandedYears, setExpandedYears] = useState<Record<number, boolean>>(
     {},
@@ -39,19 +41,6 @@ export const OpenSourceImpact: React.FC<OpenSourceImpactProps> = ({
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [sortBy, setSortBy] = useState<"repo" | "count" | "stars">("count");
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("desc");
-
-  useEffect(() => {
-    if (typeof window !== "undefined") {
-      fetch("/api/auth/status", { credentials: "same-origin" })
-        .then((r) => r.json())
-        .then((data) => {
-          setHasToken(!!data.hasGithubPat);
-        })
-        .catch(() => {
-          setHasToken(false);
-        });
-    }
-  }, []);
 
   // 1. Group statistics
   const totalPRs = contributions.length;
@@ -248,7 +237,7 @@ export const OpenSourceImpact: React.FC<OpenSourceImpactProps> = ({
       </div>
 
       {/* Warning Card for rate limits */}
-      {limit > 10 && !hasToken && (
+      {limit > 10 && !hasToken && !loadingToken && (
         <div className="p-5 bg-amber-500/10 border border-amber-500/20 rounded-2xl flex flex-col md:flex-row justify-between items-start md:items-center gap-4 text-left">
           <div className="space-y-1">
             <h4 className="text-xs font-bold text-amber-600 uppercase tracking-wider flex items-center gap-1.5">

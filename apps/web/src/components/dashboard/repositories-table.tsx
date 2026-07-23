@@ -1,6 +1,13 @@
 "use client";
 
-import { ArrowRight, ArrowUpDown, Compass, Filter } from "lucide-react";
+import {
+  ArrowRight,
+  ArrowUpDown,
+  ChevronDown,
+  ChevronUp,
+  Compass,
+  Filter,
+} from "lucide-react";
 import { useRouter } from "next/navigation";
 import type React from "react";
 import { useEffect, useMemo, useRef, useState } from "react";
@@ -343,10 +350,18 @@ export const RepositoriesTable: React.FC<RepositoriesTableProps> = ({
                 <button
                   type="button"
                   onClick={() => toggleSort("stars")}
-                  className="inline-flex items-center gap-1 hover:text-foreground uppercase tracking-wider"
+                  className="inline-flex items-center gap-1.5 hover:text-foreground uppercase tracking-wider cursor-pointer font-bold select-none group/btn mx-auto"
                 >
-                  Stars{" "}
-                  {sortField === "stars" && (sortOrder === "asc" ? "▲" : "▼")}
+                  <span>Stars</span>
+                  {sortField === "stars" ? (
+                    sortOrder === "asc" ? (
+                      <ChevronUp className="h-3.5 w-3.5 text-primary shrink-0 animate-fade-in" />
+                    ) : (
+                      <ChevronDown className="h-3.5 w-3.5 text-primary shrink-0 animate-fade-in" />
+                    )
+                  ) : (
+                    <ArrowUpDown className="h-3 w-3 text-muted-foreground/30 group-hover/btn:text-muted-foreground/60 transition-colors shrink-0" />
+                  )}
                 </button>
               </th>
 
@@ -355,24 +370,39 @@ export const RepositoriesTable: React.FC<RepositoriesTableProps> = ({
                 <button
                   type="button"
                   onClick={() => toggleSort("forks")}
-                  className="inline-flex items-center gap-1 hover:text-foreground uppercase tracking-wider"
+                  className="inline-flex items-center gap-1.5 hover:text-foreground uppercase tracking-wider cursor-pointer font-bold select-none group/btn mx-auto"
                 >
-                  Forks{" "}
-                  {sortField === "forks" && (sortOrder === "asc" ? "▲" : "▼")}
+                  <span>Forks</span>
+                  {sortField === "forks" ? (
+                    sortOrder === "asc" ? (
+                      <ChevronUp className="h-3.5 w-3.5 text-primary shrink-0 animate-fade-in" />
+                    ) : (
+                      <ChevronDown className="h-3.5 w-3.5 text-primary shrink-0 animate-fade-in" />
+                    )
+                  ) : (
+                    <ArrowUpDown className="h-3 w-3 text-muted-foreground/30 group-hover/btn:text-muted-foreground/60 transition-colors shrink-0" />
+                  )}
                 </button>
               </th>
 
               {/* Overall score Column */}
               <th className="py-3.5 px-3 relative text-center">
-                <div className="inline-flex items-center gap-1 justify-center">
+                <div className="inline-flex items-center gap-1.5 justify-center">
                   <button
                     type="button"
                     onClick={() => toggleSort("overall")}
-                    className="hover:text-foreground uppercase tracking-wider"
+                    className="inline-flex items-center gap-1.5 hover:text-foreground uppercase tracking-wider cursor-pointer font-bold select-none group/btn"
                   >
-                    Overall{" "}
-                    {sortField === "overall" &&
-                      (sortOrder === "asc" ? "▲" : "▼")}
+                    <span>Overall</span>
+                    {sortField === "overall" ? (
+                      sortOrder === "asc" ? (
+                        <ChevronUp className="h-3.5 w-3.5 text-primary shrink-0 animate-fade-in" />
+                      ) : (
+                        <ChevronDown className="h-3.5 w-3.5 text-primary shrink-0 animate-fade-in" />
+                      )
+                    ) : (
+                      <ArrowUpDown className="h-3 w-3 text-muted-foreground/30 group-hover/btn:text-muted-foreground/60 transition-colors shrink-0" />
+                    )}
                   </button>
                   <button
                     type="button"
@@ -430,14 +460,22 @@ export const RepositoriesTable: React.FC<RepositoriesTableProps> = ({
 
               {/* Risk Column */}
               <th className="py-3.5 px-3 relative text-center">
-                <div className="inline-flex items-center gap-1 justify-center">
+                <div className="inline-flex items-center gap-1.5 justify-center">
                   <button
                     type="button"
                     onClick={() => toggleSort("risk")}
-                    className="hover:text-foreground uppercase tracking-wider"
+                    className="inline-flex items-center gap-1.5 hover:text-foreground uppercase tracking-wider cursor-pointer font-bold select-none group/btn"
                   >
-                    Risk{" "}
-                    {sortField === "risk" && (sortOrder === "asc" ? "▲" : "▼")}
+                    <span>Risk</span>
+                    {sortField === "risk" ? (
+                      sortOrder === "asc" ? (
+                        <ChevronUp className="h-3.5 w-3.5 text-primary shrink-0 animate-fade-in" />
+                      ) : (
+                        <ChevronDown className="h-3.5 w-3.5 text-primary shrink-0 animate-fade-in" />
+                      )
+                    ) : (
+                      <ArrowUpDown className="h-3 w-3 text-muted-foreground/30 group-hover/btn:text-muted-foreground/60 transition-colors shrink-0" />
+                    )}
                   </button>
                   <button
                     type="button"

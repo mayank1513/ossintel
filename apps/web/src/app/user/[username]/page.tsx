@@ -1,5 +1,6 @@
 "use client";
 
+import { useQueryClient } from "@tanstack/react-query";
 import {
   AlertTriangle,
   Database,
@@ -26,6 +27,7 @@ import { ErrorAlert } from "@/components/ui/error-alert";
 import { GitHubAppBanner } from "@/components/ui/github-app-banner";
 import { LoadingOverlay } from "@/components/ui/loading-overlay";
 import { SuggestionToast } from "@/components/ui/suggestion-toast";
+import { useAuthStatus } from "@/hooks/use-auth-status";
 import { useDeveloperScores } from "@/hooks/use-developer-scores";
 import { useGithubOrgs } from "@/hooks/use-github-orgs";
 import { useGithubUser } from "@/hooks/use-github-user";
@@ -135,7 +137,9 @@ function UserDashboardContent() {
 
   // API Key configurations state
   const [showTokensConfig, setShowTokensConfig] = useState(false);
-  const [hasGithubPat, setHasGithubPat] = useState(false);
+  const queryClient = useQueryClient();
+  const { data: authData, isLoading: loadingAuth } = useAuthStatus();
+  const hasGithubPat = !!authData?.hasGithubPat;
 
   // Client cache settings state
   const [quotaInput, setQuotaInput] = useState(100);
@@ -143,19 +147,9 @@ function UserDashboardContent() {
 
   const isInitialLoad = useRef(true);
 
-  // Load tokens and linked identities from storage on mount
+  // Load cache settings from storage on mount
   useEffect(() => {
     if (typeof window !== "undefined") {
-      fetch("/api/auth/status", { credentials: "same-origin" })
-        .then((r) => r.json())
-        .then((data) => {
-          setHasGithubPat(!!data.hasGithubPat);
-        })
-        .catch(() => {
-          setHasGithubPat(false);
-        });
-
-      // Load cache settings
       const settings = getCacheSettings();
       setQuotaInput(settings.quotaMb);
       setStaleInput(settings.staleDays);
@@ -450,7 +444,12 @@ function UserDashboardContent() {
                       <span className="text-xs font-bold text-muted-foreground uppercase tracking-wider block mb-2">
                         GitHub Connection
                       </span>
-                      {hasGithubPat ? (
+                      {loadingAuth ? (
+                        <div className="flex items-center justify-center gap-2 p-3 bg-muted/40 border border-border rounded-xl text-xs text-muted-foreground font-semibold h-[46px]">
+                          <span className="h-3.5 w-3.5 border-2 border-primary border-t-transparent rounded-full animate-spin" />
+                          <span>Checking status...</span>
+                        </div>
+                      ) : hasGithubPat ? (
                         <div className="flex items-center justify-between p-3 bg-muted/40 border border-border rounded-xl">
                           <span className="text-xs text-emerald-600 font-bold flex items-center gap-1.5">
                             <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />{" "}
@@ -462,7 +461,9 @@ function UserDashboardContent() {
                               await fetch("/api/auth/logout", {
                                 method: "POST",
                               });
-                              setHasGithubPat(false);
+                              queryClient.invalidateQueries({
+                                queryKey: ["auth-status"],
+                              });
                               handleRefresh();
                             }}
                             className="px-3 py-1.5 bg-destructive/10 hover:bg-destructive/20 border border-destructive/20 text-destructive rounded-lg text-xs font-bold transition-all"

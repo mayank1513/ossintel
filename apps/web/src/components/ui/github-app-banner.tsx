@@ -8,8 +8,8 @@ import {
   ShieldCheck,
   Sparkles,
 } from "lucide-react";
-import type React from "react";
-import { useEffect, useState } from "react";
+import { useMemo } from "react";
+import { useAuthStatus } from "@/hooks/use-auth-status";
 import { GithubIcon } from "../icons";
 
 interface GitHubAppBannerProps {
@@ -25,49 +25,28 @@ export const GitHubAppBanner: React.FC<GitHubAppBannerProps> = ({
   uninstalledOrgs = [],
   isAppInstalled = false,
 }) => {
-  const [shouldShow, setShouldShow] = useState(false);
-  const [loading, setLoading] = useState(true);
+  const { data: authData, isLoading: loading } = useAuthStatus();
 
-  useEffect(() => {
-    // Cache-busting to prevent Edge browser caching the GET request
-    fetch(`/api/auth/status?t=${Date.now()}`, { credentials: "same-origin" })
-      .then((res) => {
-        if (!res.ok) return null;
-        return res.json();
-      })
-      .then((data) => {
-        if (!data) return;
+  const shouldShow = useMemo(() => {
+    if (!authData) return false;
 
-        const viewerLogin = data.login;
-        const viewerOrgs: string[] = Array.isArray(data.organizations)
-          ? data.organizations
-          : [];
+    const viewerLogin = authData.login;
+    const viewerOrgs: string[] = Array.isArray(authData.organizations)
+      ? authData.organizations
+      : [];
 
-        if (type === "user") {
-          // Only show banner on user's own profile page
-          if (
-            viewerLogin &&
-            viewerLogin.toLowerCase() === profileLogin.toLowerCase()
-          ) {
-            setShouldShow(true);
-          }
-        } else if (type === "org") {
-          // Show on org pages only if the organization belongs to the logged-in user
-          const belongsToViewer = viewerOrgs.includes(
-            profileLogin.toLowerCase(),
-          );
-          if (viewerLogin && belongsToViewer) {
-            setShouldShow(true);
-          }
-        }
-      })
-      .catch((err) => {
-        console.error("Failed to check auth status for GitHub App banner", err);
-      })
-      .finally(() => {
-        setLoading(false);
-      });
-  }, [profileLogin, type]);
+    if (type === "user") {
+      // Only show banner on user's own profile page
+      return !!(viewerLogin?.toLowerCase() === profileLogin.toLowerCase());
+    } else if (type === "org") {
+      // Show on org pages only if the organization belongs to the logged-in user
+      const belongsToViewer = viewerOrgs.some(
+        (org) => org.toLowerCase() === profileLogin.toLowerCase(),
+      );
+      return !!(viewerLogin && belongsToViewer);
+    }
+    return false;
+  }, [authData, profileLogin, type]);
 
   if (loading || !shouldShow) return null;
 

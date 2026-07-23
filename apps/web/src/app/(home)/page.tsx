@@ -1,6 +1,7 @@
 "use client";
 
 import { detectInput } from "@ossintel/input-parser";
+import { useQueryClient } from "@tanstack/react-query";
 import {
   Activity,
   AlertTriangle,
@@ -19,26 +20,20 @@ import type React from "react";
 import { useEffect, useRef, useState } from "react";
 import { Footer } from "@/components/footer";
 import { GithubIcon } from "@/components/icons";
+import { useAuthStatus } from "@/hooks/use-auth-status";
 
 export default function HomePage() {
   const router = useRouter();
   const [query, setQuery] = useState("");
   const [error, setError] = useState<string | null>(null);
-  const [hasGithubPat, setHasGithubPat] = useState(false);
+  const queryClient = useQueryClient();
+  const { data: authData, isLoading: loadingAuth } = useAuthStatus();
+  const hasGithubPat = !!authData?.hasGithubPat;
   const inputRef = useRef<HTMLInputElement>(null);
 
-  // Check token status on mount
+  // Check auth error params on mount
   useEffect(() => {
     if (typeof window !== "undefined") {
-      fetch("/api/auth/status", { credentials: "same-origin" })
-        .then((r) => r.json())
-        .then((data) => {
-          setHasGithubPat(!!data.hasGithubPat);
-        })
-        .catch(() => {
-          setHasGithubPat(false);
-        });
-
       const params = new URLSearchParams(window.location.search);
       const authError = params.get("auth_error");
       if (authError) {
@@ -292,7 +287,12 @@ export default function HomePage() {
           </div>
 
           {/* GitHub Connection Banner */}
-          {hasGithubPat ? (
+          {loadingAuth ? (
+            <div className="p-4.5 bg-card border border-border/50 rounded-2xl max-w-xl mx-auto w-full flex items-center justify-center gap-2 mt-2 animate-fade-in text-xs font-semibold text-muted-foreground shadow-sm shadow-shadow h-[68px]">
+              <span className="h-4 w-4 border-2 border-primary border-t-transparent rounded-full animate-spin" />
+              <span>Verifying GitHub connection...</span>
+            </div>
+          ) : hasGithubPat ? (
             <div className="p-4.5 bg-card border border-border/50 rounded-2xl max-w-xl mx-auto w-full flex items-center justify-between gap-4 mt-2 animate-fade-in-up text-left shadow-sm shadow-shadow">
               <div className="space-y-1">
                 <h4 className="text-xs font-bold text-foreground uppercase tracking-wider flex items-center gap-2">
@@ -308,7 +308,7 @@ export default function HomePage() {
                 type="button"
                 onClick={async () => {
                   await fetch("/api/auth/logout", { method: "POST" });
-                  setHasGithubPat(false);
+                  queryClient.invalidateQueries({ queryKey: ["auth-status"] });
                 }}
                 className="px-3 py-1.5 bg-destructive/10 hover:bg-destructive/15 text-destructive rounded-xl text-xs font-semibold transition-all duration-200 shrink-0"
               >

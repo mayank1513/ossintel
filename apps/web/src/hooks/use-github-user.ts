@@ -21,6 +21,7 @@ export interface UserResponse {
   cachedAt?: number;
   pinnedRepositories?: string[];
   isAppInstalled?: boolean;
+  uninstalledOrgs?: string[];
 }
 
 export const useGithubUser = (username: string, limit = 10) => {

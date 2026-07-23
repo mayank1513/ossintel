@@ -13,9 +13,21 @@ export async function POST(request: Request) {
     const login = query || "";
 
     // Resolve token: App installation token first, fall back to Cookie PAT
+    const isAppConfigured = !!(
+      process.env.GITHUB_APP_ID && process.env.GITHUB_APP_PRIVATE_KEY
+    );
     let token = await getInstallationToken(login);
-    const isAppInstalled = !!token || !!(await getInstallationId(login));
-    if (!token) {
+    const isAppInstalled = isAppConfigured
+      ? !!token || !!(await getInstallationId(login))
+      : true; // Suppress banner if app is not configured on this environment
+    if (token) {
+      console.log(
+        `[Org API] Resolved GitHub App installation token for: ${login}`,
+      );
+    } else {
+      console.log(
+        `[Org API] No GitHub App installation found for: ${login}. Falling back to Cookie PAT or anonymous.`,
+      );
       token = await getDecryptedToken(reqToken);
     }
     const options = { token };

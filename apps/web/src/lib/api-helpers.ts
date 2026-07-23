@@ -52,6 +52,7 @@ export function formatOrgResponse(
   return {
     type: "org" as const,
     metadata: {
+      id: org.id,
       login: org.login,
       name: org.name,
       avatarUrl: org.avatarUrl,
@@ -78,6 +79,7 @@ export function formatUserResponse(
   return {
     type: "user" as const,
     metadata: {
+      id: developer.id,
       login: developer.login,
       name: developer.name,
       avatarUrl: developer.avatarUrl,

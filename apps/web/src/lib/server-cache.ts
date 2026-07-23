@@ -18,7 +18,7 @@ import { revalidateTag, unstable_cache } from "next/cache";
 import { formatOrgResponse, formatUserResponse } from "./api-helpers";
 
 // Cache version
-const BACKEND_CACHE_VERSION = 3;
+const BACKEND_CACHE_VERSION = 4;
 
 // Auto-update threshold: 7 days
 const AUTO_UPDATE_THRESHOLD_MS = 7 * 24 * 60 * 60 * 1000;
@@ -124,6 +124,18 @@ export async function getCachedDeveloperData(
 
   // Read from cache
   const cached = await wrapped();
+  const isWrongVersion = cached.version !== BACKEND_CACHE_VERSION;
+
+  if (isWrongVersion) {
+    const fresh = await fetchDeveloperDataRaw(username, limit, options);
+    revalidateTag(cacheTag, { expire: 0 });
+    await wrapped();
+    return {
+      ...fresh,
+      cachedAt: Date.now(),
+    };
+  }
+
   const isStale = Date.now() - cached.fetchedAt > AUTO_UPDATE_THRESHOLD_MS;
 
   if (isStale) {
@@ -196,6 +208,18 @@ export async function getCachedOrganizationData(
   }
 
   const cached = await wrapped();
+  const isWrongVersion = cached.version !== BACKEND_CACHE_VERSION;
+
+  if (isWrongVersion) {
+    const fresh = await fetchOrganizationDataRaw(login, options);
+    revalidateTag(cacheTag, { expire: 0 });
+    await wrapped();
+    return {
+      ...fresh,
+      cachedAt: Date.now(),
+    };
+  }
+
   const isStale = Date.now() - cached.fetchedAt > AUTO_UPDATE_THRESHOLD_MS;
 
   if (isStale) {

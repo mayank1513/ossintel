@@ -1,5 +1,6 @@
 "use client";
 
+import { ThemeSwitch } from "fumadocs-ui/layouts/shared/slots/theme-switch";
 import { ArrowLeft, BookOpen } from "lucide-react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
@@ -19,10 +20,10 @@ export function Header() {
 
   if (isHome) {
     return (
-      <header className="relative border-b border-slate-900 bg-slate-950/20 backdrop-blur-sm z-10">
+      <header className="sticky top-0 border-b border-border bg-background/70 backdrop-blur-md z-50 transition-colors duration-200">
         <div className="max-w-7xl mx-auto px-6 py-4 flex flex-wrap items-center justify-between gap-4">
           <div className="flex items-center gap-3">
-            <div className="p-1 bg-slate-900 border border-slate-800 rounded-xl overflow-hidden shadow-lg shadow-slate-900/10">
+            <div className="p-1 bg-muted border border-border rounded-xl overflow-hidden shadow-sm shrink-0">
               {/* biome-ignore lint/performance/noImgElement: static logo */}
               <img
                 src={icon.src}
@@ -31,10 +32,10 @@ export function Header() {
               />
             </div>
             <div>
-              <h1 className="text-xl font-bold tracking-tight bg-gradient-to-r from-white via-slate-200 to-indigo-400 bg-clip-text text-transparent">
-                OSS<span className="text-green-700">Intel</span>
+              <h1 className="text-xl font-bold tracking-tight bg-gradient-to-r from-foreground to-muted-foreground bg-clip-text text-transparent">
+                OSS<span className="text-emerald-600">Intel</span>
               </h1>
-              <p className="text-xs text-slate-400 font-medium">
+              <p className="text-xs text-muted-foreground font-medium">
                 Open Source Intelligence Platform
               </p>
             </div>
@@ -42,7 +43,7 @@ export function Header() {
           <div className="flex items-center gap-6">
             <Link
               href="/docs"
-              className="text-sm font-medium text-slate-400 hover:text-white flex items-center gap-1.5 transition-colors"
+              className="text-sm font-medium text-muted-foreground hover:text-foreground flex items-center gap-1.5 transition-colors"
             >
               <BookOpen className="h-4 w-4" /> Docs
             </Link>
@@ -50,10 +51,11 @@ export function Header() {
               href="https://github.com/mayank1513/ossintel"
               target="_blank"
               rel="noreferrer"
-              className="text-sm font-medium text-slate-400 hover:text-white flex items-center gap-1.5 transition-colors"
+              className="text-sm font-medium text-muted-foreground hover:text-foreground flex items-center gap-1.5 transition-colors"
             >
               <GithubIcon className="h-4 w-4" /> GitHub
             </a>
+            <ThemeSwitch className="text-muted-foreground hover:text-foreground transition-colors" />
           </div>
         </div>
       </header>
@@ -62,25 +64,28 @@ export function Header() {
 
   // Dashboard, Repo, and User page headers
   return (
-    <header className="relative border-b border-slate-800 bg-slate-900/80 backdrop-blur-md z-10">
+    <header className="sticky top-0 border-b border-border bg-background/70 backdrop-blur-md z-50 transition-colors duration-200">
       <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
         <button
           type="button"
           onClick={() => router.push("/")}
-          className="flex items-center gap-2 text-sm font-semibold text-slate-400 hover:text-white transition-colors"
+          className="flex items-center gap-2 text-sm font-semibold text-muted-foreground hover:text-foreground transition-colors"
         >
           <ArrowLeft className="h-4 w-4" /> Back to Search
         </button>
-        <div className="flex items-center gap-2">
-          <div className="p-0.5 bg-slate-900 border border-slate-800 rounded-lg overflow-hidden">
-            {/* biome-ignore lint/performance/noImgElement: static logo */}
-            <img
-              src={icon.src}
-              alt="OSSIntel Logo"
-              className="h-6 w-6 object-contain"
-            />
+        <div className="flex items-center gap-4">
+          <div className="flex items-center gap-2">
+            <div className="p-0.5 bg-muted border border-border rounded-lg overflow-hidden shrink-0">
+              {/* biome-ignore lint/performance/noImgElement: static logo */}
+              <img
+                src={icon.src}
+                alt="OSSIntel Logo"
+                className="h-6 w-6 object-contain"
+              />
+            </div>
+            <span className="text-sm font-bold text-foreground">OSSIntel</span>
           </div>
-          <span className="text-sm font-bold">OSSIntel</span>
+          <ThemeSwitch className="text-muted-foreground hover:text-foreground transition-colors" />
         </div>
       </div>
     </header>

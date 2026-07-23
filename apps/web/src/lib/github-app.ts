@@ -2,6 +2,8 @@ import { unstable_cache } from "next/cache";
 import { App } from "octokit";
 import {
   GITHUB_APP_CACHE_TTL,
+  GITHUB_APP_INSTALLATIONS_CACHE_KEY,
+  GITHUB_APP_INSTALLATIONS_CACHE_TAG,
   GITHUB_APP_PAGE_SIZE,
 } from "./constants-backend";
 
@@ -61,10 +63,10 @@ const getCachedInstallationsList = unstable_cache(
     );
     return fetchInstallationsRaw();
   },
-  ["github-app-installations"],
+  [GITHUB_APP_INSTALLATIONS_CACHE_KEY],
   {
     revalidate: GITHUB_APP_CACHE_TTL,
-    tags: ["github-app-installations"],
+    tags: [GITHUB_APP_INSTALLATIONS_CACHE_TAG],
   },
 );
 

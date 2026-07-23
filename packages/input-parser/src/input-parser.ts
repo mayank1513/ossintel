@@ -1,3 +1,20 @@
+import {
+  PREFIX_GITHUB_LEN,
+  PREFIX_GITHUB_ORG_LEN,
+  PREFIX_GITHUB_REPO_LEN,
+  PREFIX_GITHUB_USER_LEN,
+  PREFIX_LEETCODE_LEN,
+  PREFIX_MEDIUM_LEN,
+  PREFIX_NPM_LEN,
+  PREFIX_NPM_PKG_LEN,
+  PREFIX_ORG_LEN,
+  PREFIX_SO_LEN,
+  PREFIX_STACKOVERFLOW_LEN,
+  PREFIX_USER_LEN,
+  PREFIX_USER_OR_TILD_LEN,
+  PREFIX_VSCODE_LEN,
+} from "./constants";
+
 export interface InputDetectionResult {
   /**
    * Target platform: "github" | "npm" | "stackoverflow" | "vscode" | "medium" | "leetcode" | "unknown"
@@ -55,7 +72,7 @@ export interface InputDetectionResult {
  * // => { platform: "npm", type: "package", name: "kosha", rawInput: "npm:kosha" }
  * ```
  */
-export function detectInput(input: string): InputDetectionResult {
+export const detectInput = (input: string): InputDetectionResult => {
   const trimmed = input.trim();
 
   // 1. Prefix Shortcuts
@@ -63,18 +80,18 @@ export function detectInput(input: string): InputDetectionResult {
     return {
       platform: "npm",
       type: "package",
-      name: trimmed.slice(8),
+      name: trimmed.slice(PREFIX_NPM_PKG_LEN),
       rawInput: trimmed,
     };
   }
 
   if (trimmed.startsWith("npm:")) {
-    const namePart = trimmed.slice(4);
+    const namePart = trimmed.slice(PREFIX_NPM_LEN);
     if (namePart.startsWith("~")) {
       return {
         platform: "npm",
         type: "user",
-        name: namePart.slice(1),
+        name: namePart.slice(PREFIX_USER_OR_TILD_LEN),
         rawInput: trimmed,
       };
     }
@@ -90,13 +107,15 @@ export function detectInput(input: string): InputDetectionResult {
     return {
       platform: "npm",
       type: "user",
-      name: trimmed.slice(1),
+      name: trimmed.slice(PREFIX_USER_OR_TILD_LEN),
       rawInput: trimmed,
     };
   }
 
   if (trimmed.startsWith("so:") || trimmed.startsWith("stackoverflow:")) {
-    const prefixLen = trimmed.startsWith("so:") ? 3 : 14;
+    const prefixLen = trimmed.startsWith("so:")
+      ? PREFIX_SO_LEN
+      : PREFIX_STACKOVERFLOW_LEN;
     return {
       platform: "stackoverflow",
       type: "user",
@@ -106,7 +125,9 @@ export function detectInput(input: string): InputDetectionResult {
   }
 
   if (trimmed.startsWith("org:") || trimmed.startsWith("github:org:")) {
-    const prefixLen = trimmed.startsWith("org:") ? 4 : 11;
+    const prefixLen = trimmed.startsWith("org:")
+      ? PREFIX_ORG_LEN
+      : PREFIX_GITHUB_ORG_LEN;
     return {
       platform: "github",
       type: "org",
@@ -116,7 +137,9 @@ export function detectInput(input: string): InputDetectionResult {
   }
 
   if (trimmed.startsWith("user:") || trimmed.startsWith("github:user:")) {
-    const prefixLen = trimmed.startsWith("user:") ? 5 : 12;
+    const prefixLen = trimmed.startsWith("user:")
+      ? PREFIX_USER_LEN
+      : PREFIX_GITHUB_USER_LEN;
     return {
       platform: "github",
       type: "user",
@@ -126,7 +149,7 @@ export function detectInput(input: string): InputDetectionResult {
   }
 
   if (trimmed.startsWith("github:repo:")) {
-    const parts = trimmed.slice(12).split("/");
+    const parts = trimmed.slice(PREFIX_GITHUB_REPO_LEN).split("/");
     return {
       platform: "github",
       type: "repo",
@@ -137,7 +160,7 @@ export function detectInput(input: string): InputDetectionResult {
   }
 
   if (trimmed.startsWith("github:")) {
-    const parts = trimmed.slice(7).split("/");
+    const parts = trimmed.slice(PREFIX_GITHUB_LEN).split("/");
     if (parts.length >= 2) {
       return {
         platform: "github",
@@ -157,7 +180,7 @@ export function detectInput(input: string): InputDetectionResult {
 
   // VSCode market place preview placeholders
   if (trimmed.startsWith("vscode:")) {
-    const parts = trimmed.slice(7).split("/");
+    const parts = trimmed.slice(PREFIX_VSCODE_LEN).split("/");
     return {
       platform: "vscode",
       type: parts.length >= 2 ? "package" : "user",
@@ -171,7 +194,7 @@ export function detectInput(input: string): InputDetectionResult {
     return {
       platform: "medium",
       type: "user",
-      profileId: trimmed.slice(7),
+      profileId: trimmed.slice(PREFIX_MEDIUM_LEN),
       rawInput: trimmed,
     };
   }
@@ -181,7 +204,7 @@ export function detectInput(input: string): InputDetectionResult {
     return {
       platform: "leetcode",
       type: "user",
-      profileId: trimmed.slice(9),
+      profileId: trimmed.slice(PREFIX_LEETCODE_LEN),
       rawInput: trimmed,
     };
   }
@@ -228,7 +251,7 @@ export function detectInput(input: string): InputDetectionResult {
         return {
           platform: "npm",
           type: "package",
-          name: parts.slice(1).join("/"),
+          name: parts.slice(PREFIX_USER_OR_TILD_LEN).join("/"),
           rawInput: trimmed,
         };
       }
@@ -236,7 +259,7 @@ export function detectInput(input: string): InputDetectionResult {
         return {
           platform: "npm",
           type: "user",
-          name: parts[0].slice(1),
+          name: parts[0].slice(PREFIX_USER_OR_TILD_LEN),
           rawInput: trimmed,
         };
       }
@@ -273,7 +296,9 @@ export function detectInput(input: string): InputDetectionResult {
 
     if (hostname.includes("medium.com")) {
       const parts = url.pathname.split("/").filter(Boolean);
-      const userPart = parts[0]?.startsWith("@") ? parts[0].slice(1) : parts[0];
+      const userPart = parts[0]?.startsWith("@")
+        ? parts[0].slice(PREFIX_USER_OR_TILD_LEN)
+        : parts[0];
       if (userPart) {
         return {
           platform: "medium",
@@ -325,4 +350,4 @@ export function detectInput(input: string): InputDetectionResult {
     owner: trimmed,
     rawInput: trimmed,
   };
-}
+};

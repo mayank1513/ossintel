@@ -1,0 +1,14 @@
+export const PREFIX_NPM_PKG_LEN = 8;
+export const PREFIX_NPM_LEN = 4;
+export const PREFIX_USER_OR_TILD_LEN = 1;
+export const PREFIX_SO_LEN = 3;
+export const PREFIX_STACKOVERFLOW_LEN = 14;
+export const PREFIX_ORG_LEN = 4;
+export const PREFIX_GITHUB_ORG_LEN = 11;
+export const PREFIX_USER_LEN = 5;
+export const PREFIX_GITHUB_USER_LEN = 12;
+export const PREFIX_GITHUB_REPO_LEN = 12;
+export const PREFIX_GITHUB_LEN = 7;
+export const PREFIX_VSCODE_LEN = 7;
+export const PREFIX_MEDIUM_LEN = 7;
+export const PREFIX_LEETCODE_LEN = 9;

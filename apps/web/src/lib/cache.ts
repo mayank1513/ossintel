@@ -115,6 +115,15 @@ const evictToQuota = async (
   await tx.done;
 };
 
+const getWriteContext = async () => {
+  const db = await getDB();
+  const tx = db.transaction(STORE_NAME, "readwrite");
+  const store = tx.objectStore(STORE_NAME);
+  const now = Date.now();
+  const settings = getCacheSettings();
+  return { db, tx, store, now, settings };
+};
+
 export const getCacheItem = async <T>(key: string): Promise<T | null> => {
   try {
     const db = await getDB();
@@ -199,12 +208,8 @@ export const getMany = async <T>(
   keys: string[],
 ): Promise<Record<string, T>> => {
   try {
-    const db = await getDB();
-    const tx = db.transaction(STORE_NAME, "readwrite");
-    const store = tx.objectStore(STORE_NAME);
+    const { store, tx, now, settings } = await getWriteContext();
     const results: Record<string, T> = {};
-    const now = Date.now();
-    const settings = getCacheSettings();
 
     await Promise.all(
       keys.map(async (key) => {
@@ -235,11 +240,7 @@ export const putMany = async (
   entries: { key: string; data: unknown }[],
 ): Promise<void> => {
   try {
-    const db = await getDB();
-    const tx = db.transaction(STORE_NAME, "readwrite");
-    const store = tx.objectStore(STORE_NAME);
-    const now = Date.now();
-    const settings = getCacheSettings();
+    const { db, store, tx, now, settings } = await getWriteContext();
     const expiresAt = now + settings.staleDays * 24 * 60 * 60 * 1000;
 
     let incomingSize = 0;
@@ -272,9 +273,7 @@ export const putMany = async (
 
 export const deleteMany = async (keys: string[]): Promise<void> => {
   try {
-    const db = await getDB();
-    const tx = db.transaction(STORE_NAME, "readwrite");
-    const store = tx.objectStore(STORE_NAME);
+    const { store, tx } = await getWriteContext();
 
     for (const key of keys) {
       await store.delete(key);
@@ -298,11 +297,7 @@ export const clearCache = async (): Promise<void> => {
 
 export const cleanExpiredEntries = async (): Promise<void> => {
   try {
-    const db = await getDB();
-    const tx = db.transaction(STORE_NAME, "readwrite");
-    const store = tx.objectStore(STORE_NAME);
-    const now = Date.now();
-    const settings = getCacheSettings();
+    const { store, tx, now, settings } = await getWriteContext();
 
     let cursor = await store.openCursor();
     while (cursor) {

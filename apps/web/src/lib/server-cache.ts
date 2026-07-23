@@ -27,6 +27,63 @@ interface FetchOptions {
   token?: string;
 }
 
+interface CacheContainer<T> {
+  data: T;
+  fetchedAt: number;
+  version: number;
+}
+
+/** Generic Cache-Aside with Stale-While-Revalidate resolution helper */
+const resolveCachedData = async <T>(
+  cacheTag: string,
+  forceRefresh: boolean,
+  fetchRaw: () => Promise<T>,
+  wrapped: () => Promise<CacheContainer<T>>,
+  logError: (err: unknown) => void,
+): Promise<T & { cachedAt: number }> => {
+  if (forceRefresh) {
+    const fresh = await fetchRaw();
+    revalidateTag(cacheTag, { expire: 0 });
+    await wrapped();
+    return {
+      ...fresh,
+      cachedAt: Date.now(),
+    };
+  }
+
+  const cached = await wrapped();
+  const isWrongVersion = cached.version !== BACKEND_CACHE_VERSION;
+
+  if (isWrongVersion) {
+    const fresh = await fetchRaw();
+    revalidateTag(cacheTag, { expire: 0 });
+    await wrapped();
+    return {
+      ...fresh,
+      cachedAt: Date.now(),
+    };
+  }
+
+  const isStale = Date.now() - cached.fetchedAt > AUTO_UPDATE_THRESHOLD_MS;
+
+  if (isStale) {
+    (async () => {
+      try {
+        await fetchRaw();
+        revalidateTag(cacheTag, { expire: 0 });
+        await wrapped();
+      } catch (err) {
+        logError(err);
+      }
+    })();
+  }
+
+  return {
+    ...cached.data,
+    cachedAt: cached.fetchedAt,
+  };
+};
+
 // ----------------------------------------------------
 // 1. DEVELOPER DATA CACHE
 // ----------------------------------------------------
@@ -109,55 +166,17 @@ export const getCachedDeveloperData = async (
     },
   );
 
-  if (forceRefresh) {
-    // 1. Fetch fresh data first to verify it succeeds
-    const fresh = await fetchDeveloperDataRaw(username, limit, options);
-    // 2. If it succeeds, invalidate and write to cache
-    revalidateTag(cacheTag, { expire: 0 });
-    // Trigger write by executing the cached query
-    await wrapped();
-    return {
-      ...fresh,
-      cachedAt: Date.now(),
-    };
-  }
-
-  // Read from cache
-  const cached = await wrapped();
-  const isWrongVersion = cached.version !== BACKEND_CACHE_VERSION;
-
-  if (isWrongVersion) {
-    const fresh = await fetchDeveloperDataRaw(username, limit, options);
-    revalidateTag(cacheTag, { expire: 0 });
-    await wrapped();
-    return {
-      ...fresh,
-      cachedAt: Date.now(),
-    };
-  }
-
-  const isStale = Date.now() - cached.fetchedAt > AUTO_UPDATE_THRESHOLD_MS;
-
-  if (isStale) {
-    // Trigger background refresh
-    (async () => {
-      try {
-        await fetchDeveloperDataRaw(username, limit, options);
-        revalidateTag(cacheTag, { expire: 0 });
-        await wrapped();
-      } catch (err) {
-        console.error(
-          `Auto-update failed for user ${username}, serving stale cache`,
-          err,
-        );
-      }
-    })();
-  }
-
-  return {
-    ...cached.data,
-    cachedAt: cached.fetchedAt,
-  };
+  return resolveCachedData(
+    cacheTag,
+    forceRefresh,
+    () => fetchDeveloperDataRaw(username, limit, options),
+    wrapped,
+    (err) =>
+      console.error(
+        `Auto-update failed for user ${username}, serving stale cache`,
+        err,
+      ),
+  );
 };
 
 // ----------------------------------------------------
@@ -200,50 +219,17 @@ export const getCachedOrganizationData = async (
     },
   );
 
-  if (forceRefresh) {
-    const fresh = await fetchOrganizationDataRaw(login, options);
-    revalidateTag(cacheTag, { expire: 0 });
-    await wrapped();
-    return {
-      ...fresh,
-      cachedAt: Date.now(),
-    };
-  }
-
-  const cached = await wrapped();
-  const isWrongVersion = cached.version !== BACKEND_CACHE_VERSION;
-
-  if (isWrongVersion) {
-    const fresh = await fetchOrganizationDataRaw(login, options);
-    revalidateTag(cacheTag, { expire: 0 });
-    await wrapped();
-    return {
-      ...fresh,
-      cachedAt: Date.now(),
-    };
-  }
-
-  const isStale = Date.now() - cached.fetchedAt > AUTO_UPDATE_THRESHOLD_MS;
-
-  if (isStale) {
-    (async () => {
-      try {
-        await fetchOrganizationDataRaw(login, options);
-        revalidateTag(cacheTag, { expire: 0 });
-        await wrapped();
-      } catch (err) {
-        console.error(
-          `Auto-update failed for org ${login}, serving stale cache`,
-          err,
-        );
-      }
-    })();
-  }
-
-  return {
-    ...cached.data,
-    cachedAt: cached.fetchedAt,
-  };
+  return resolveCachedData(
+    cacheTag,
+    forceRefresh,
+    () => fetchOrganizationDataRaw(login, options),
+    wrapped,
+    (err) =>
+      console.error(
+        `Auto-update failed for org ${login}, serving stale cache`,
+        err,
+      ),
+  );
 };
 
 // ----------------------------------------------------
@@ -311,48 +297,15 @@ export const getCachedRepositoryData = async (
     },
   );
 
-  if (forceRefresh) {
-    const fresh = await fetchRepositoryDataRaw(owner, repo, options);
-    revalidateTag(cacheTag, { expire: 0 });
-    await wrapped();
-    return {
-      ...fresh,
-      cachedAt: Date.now(),
-    };
-  }
-
-  const cached = await wrapped();
-  const isWrongVersion = cached.version !== BACKEND_CACHE_VERSION;
-
-  if (isWrongVersion) {
-    const fresh = await fetchRepositoryDataRaw(owner, repo, options);
-    revalidateTag(cacheTag, { expire: 0 });
-    await wrapped();
-    return {
-      ...fresh,
-      cachedAt: Date.now(),
-    };
-  }
-
-  const isStale = Date.now() - cached.fetchedAt > AUTO_UPDATE_THRESHOLD_MS;
-
-  if (isStale) {
-    (async () => {
-      try {
-        await fetchRepositoryDataRaw(owner, repo, options);
-        revalidateTag(cacheTag, { expire: 0 });
-        await wrapped();
-      } catch (err) {
-        console.error(
-          `Auto-update failed for repo ${key}, serving stale cache`,
-          err,
-        );
-      }
-    })();
-  }
-
-  return {
-    ...cached.data,
-    cachedAt: cached.fetchedAt,
-  };
+  return resolveCachedData(
+    cacheTag,
+    forceRefresh,
+    () => fetchRepositoryDataRaw(owner, repo, options),
+    wrapped,
+    (err) =>
+      console.error(
+        `Auto-update failed for repo ${key}, serving stale cache`,
+        err,
+      ),
+  );
 };

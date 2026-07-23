@@ -47,26 +47,32 @@ export interface RepoResponse {
   contributorsCount: number;
 }
 
+const fetchOrgData = async (
+  orgName: string,
+  isRefreshing: boolean,
+  onFinish: () => void,
+) => {
+  try {
+    return await fetchWithCache<OrgResponse>(
+      `org:${orgName.toLowerCase()}`,
+      "/api/github/org",
+      {
+        query: orgName,
+      },
+      isRefreshing,
+    );
+  } finally {
+    onFinish();
+  }
+};
+
 export const useGithubOrg = (orgName: string) => {
   const [isRefreshing, setIsRefreshing] = useState(false);
 
   const query = useQuery({
     queryKey: ["org", orgName?.toLowerCase()],
-    queryFn: async () => {
-      try {
-        const data = await fetchWithCache<OrgResponse>(
-          `org:${orgName.toLowerCase()}`,
-          "/api/github/org",
-          {
-            query: orgName,
-          },
-          isRefreshing,
-        );
-        return data;
-      } finally {
-        setIsRefreshing(false);
-      }
-    },
+    queryFn: () =>
+      fetchOrgData(orgName, isRefreshing, () => setIsRefreshing(false)),
     enabled: !!orgName,
     retry: false,
   });
@@ -85,21 +91,8 @@ export const useGithubOrgs = (orgNames: string[]) => {
   const queries = useQueries({
     queries: orgNames.map((orgName) => ({
       queryKey: ["org", orgName.toLowerCase()],
-      queryFn: async () => {
-        try {
-          const data = await fetchWithCache<OrgResponse>(
-            `org:${orgName.toLowerCase()}`,
-            "/api/github/org",
-            {
-              query: orgName,
-            },
-            isRefreshing,
-          );
-          return data;
-        } finally {
-          setIsRefreshing(false);
-        }
-      },
+      queryFn: () =>
+        fetchOrgData(orgName, isRefreshing, () => setIsRefreshing(false)),
       enabled: !!orgName,
       retry: false,
     })),

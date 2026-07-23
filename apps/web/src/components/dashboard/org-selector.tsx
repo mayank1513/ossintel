@@ -29,11 +29,11 @@ export const OrgSelector: React.FC<OrgSelectorProps> = ({
   };
 
   return (
-    <div className="p-6 bg-slate-900/90 border border-slate-800 rounded-3xl space-y-4 shadow-xl">
-      <h4 className="text-sm font-bold text-slate-200">
+    <div className="p-6 bg-card border border-border rounded-2xl space-y-4 shadow-sm">
+      <h4 className="text-sm font-bold text-foreground">
         Include Organization Repositories
       </h4>
-      <p className="text-xs text-slate-400">
+      <p className="text-xs text-muted-foreground">
         Select which organizations' repositories should contribute to score
         calculations.
       </p>
@@ -41,7 +41,7 @@ export const OrgSelector: React.FC<OrgSelectorProps> = ({
         {organizations.map((org) => (
           <label
             key={org.login}
-            className="flex items-center gap-3 p-2.5 bg-slate-950/50 border border-slate-800/80 rounded-xl cursor-pointer hover:border-slate-700 transition-colors"
+            className="flex items-center gap-3 p-2.5 bg-muted/40 border border-border/80 rounded-xl cursor-pointer hover:border-border transition-colors"
           >
             <input
               type="checkbox"
@@ -49,16 +49,16 @@ export const OrgSelector: React.FC<OrgSelectorProps> = ({
               onChange={(e) =>
                 handleCheckboxChange(org.login, e.target.checked)
               }
-              className="rounded border-slate-800 text-indigo-600 focus:ring-indigo-600 focus:ring-offset-slate-950 bg-slate-950"
+              className="rounded border-border text-primary focus:ring-primary focus:ring-offset-background bg-muted"
             />
             {/* eslint-disable-next-line @next/next/no-img-element */}
             {/* biome-ignore lint/performance/noImgElement: avatar is loaded dynamically from external github domain */}
             <img
               src={org.avatarUrl}
               alt={org.login}
-              className="h-6 w-6 rounded-md object-cover border border-slate-800"
+              className="h-6 w-6 rounded-md object-cover border border-border"
             />
-            <span className="text-xs font-semibold text-slate-200">
+            <span className="text-xs font-semibold text-foreground">
               @{org.login}
             </span>
           </label>

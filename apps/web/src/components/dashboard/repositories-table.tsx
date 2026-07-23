@@ -214,25 +214,25 @@ export const RepositoriesTable: React.FC<RepositoriesTableProps> = ({
 
   return (
     <div
-      className="p-6 bg-slate-900/90 border border-slate-800 rounded-3xl flex flex-col gap-6 shadow-xl relative"
+      className="p-6 bg-card border border-border rounded-2xl flex flex-col gap-6 shadow-sm relative"
       ref={dropdownRef}
     >
       {/* Header toolbar */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <h3 className="text-base font-bold flex items-center gap-2">
-          <Compass className="h-5 w-5 text-indigo-400" /> Monitored Repositories
-          & Scores
+          <Compass className="h-5 w-5 text-primary" /> Monitored Repositories &
+          Scores
         </h3>
 
         {/* View Mode Toggle */}
-        <div className="flex items-center bg-slate-950 p-1 rounded-xl border border-slate-800/80 max-w-max">
+        <div className="flex items-center bg-muted/40 p-1 rounded-xl border border-border/80 max-w-max">
           <button
             type="button"
             onClick={() => setViewMode("tabs")}
             className={`px-3 py-1.5 text-xs font-semibold rounded-lg transition-all ${
               viewMode === "tabs"
-                ? "bg-indigo-600 text-white shadow"
-                : "text-slate-400 hover:text-slate-200"
+                ? "bg-primary text-primary-foreground shadow-sm"
+                : "text-muted-foreground hover:text-foreground"
             }`}
           >
             Tabbed View
@@ -242,8 +242,8 @@ export const RepositoriesTable: React.FC<RepositoriesTableProps> = ({
             onClick={() => setViewMode("single")}
             className={`px-3 py-1.5 text-xs font-semibold rounded-lg transition-all ${
               viewMode === "single"
-                ? "bg-indigo-600 text-white shadow"
-                : "text-slate-400 hover:text-slate-200"
+                ? "bg-primary text-primary-foreground shadow-sm"
+                : "text-muted-foreground hover:text-foreground"
             }`}
           >
             Single List View
@@ -253,7 +253,7 @@ export const RepositoriesTable: React.FC<RepositoriesTableProps> = ({
 
       {/* Tabs list (if tabbed mode enabled) */}
       {viewMode === "tabs" && groupedTabs.length > 1 && (
-        <div className="flex items-center gap-2 overflow-x-auto pb-1 border-b border-slate-800/60">
+        <div className="flex items-center gap-2 overflow-x-auto pb-1 border-b border-border/60">
           {groupedTabs.map((tab) => (
             <button
               key={tab}
@@ -261,8 +261,8 @@ export const RepositoriesTable: React.FC<RepositoriesTableProps> = ({
               onClick={() => setActiveTab(tab)}
               className={`px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all border shrink-0 ${
                 activeTab === tab
-                  ? "bg-indigo-500/10 border-indigo-500/30 text-indigo-400 shadow-sm shadow-indigo-500/5"
-                  : "bg-slate-950/40 border-slate-800/80 text-slate-400 hover:text-slate-200"
+                  ? "bg-primary/5 border border-primary/10 text-primary shadow-sm"
+                  : "bg-muted/40 border border-border text-muted-foreground hover:text-foreground"
               }`}
             >
               {tab === "personal"
@@ -276,10 +276,10 @@ export const RepositoriesTable: React.FC<RepositoriesTableProps> = ({
       )}
 
       {/* Table view */}
-      <div className="overflow-x-auto rounded-xl border border-slate-800 bg-slate-950/20">
-        <table className="w-full text-left text-xs font-semibold text-slate-300 min-w-[500px]">
+      <div className="overflow-x-auto rounded-xl border border-border bg-muted/40">
+        <table className="w-full text-left text-xs font-semibold text-foreground/90 min-w-[500px]">
           <thead>
-            <tr className="border-b border-slate-800 text-slate-500 font-bold uppercase tracking-wider bg-slate-900/40">
+            <tr className="border-b border-border text-muted-foreground font-bold uppercase tracking-wider bg-muted">
               {/* Repository Column */}
               <th className="py-3.5 px-3 relative">
                 <div className="flex items-center gap-1">
@@ -291,13 +291,13 @@ export const RepositoriesTable: React.FC<RepositoriesTableProps> = ({
                         activeDropdown === "repo" ? null : "repo",
                       )
                     }
-                    className="p-1 text-slate-500 hover:text-slate-200 hover:bg-slate-800 rounded transition-colors"
+                    className="p-1 text-muted-foreground/80 hover:text-foreground hover:bg-muted rounded transition-colors"
                   >
                     <Filter className="h-3.5 w-3.5" />
                   </button>
                 </div>
                 {activeDropdown === "repo" && (
-                  <div className="absolute left-3 top-10 z-20 bg-slate-900 border border-slate-800 shadow-xl rounded-xl p-3 w-56 text-left normal-case text-slate-200 font-medium space-y-3">
+                  <div className="absolute left-3 top-10 z-20 bg-card border border-border shadow-sm rounded-xl p-3 w-56 text-left normal-case text-foreground font-medium space-y-3">
                     <div className="space-y-1">
                       <button
                         type="button"
@@ -306,7 +306,7 @@ export const RepositoriesTable: React.FC<RepositoriesTableProps> = ({
                           setSortOrder("asc");
                           setActiveDropdown(null);
                         }}
-                        className="w-full py-1 px-2 hover:bg-slate-800 rounded text-xs font-bold text-left flex items-center gap-1.5"
+                        className="w-full py-1 px-2 hover:bg-muted rounded text-xs font-bold text-left flex items-center gap-1.5"
                       >
                         <ArrowUpDown className="h-3.5 w-3.5" /> Sort A to Z
                       </button>
@@ -317,12 +317,12 @@ export const RepositoriesTable: React.FC<RepositoriesTableProps> = ({
                           setSortOrder("desc");
                           setActiveDropdown(null);
                         }}
-                        className="w-full py-1 px-2 hover:bg-slate-800 rounded text-xs font-bold text-left flex items-center gap-1.5"
+                        className="w-full py-1 px-2 hover:bg-muted rounded text-xs font-bold text-left flex items-center gap-1.5"
                       >
                         <ArrowUpDown className="h-3.5 w-3.5" /> Sort Z to A
                       </button>
                     </div>
-                    <div className="border-t border-slate-800 pt-2">
+                    <div className="border-t border-border pt-2">
                       <Label className="text-[10px] mb-1">
                         Search Repository
                       </Label>
@@ -343,7 +343,7 @@ export const RepositoriesTable: React.FC<RepositoriesTableProps> = ({
                 <button
                   type="button"
                   onClick={() => toggleSort("stars")}
-                  className="inline-flex items-center gap-1 hover:text-slate-200 uppercase tracking-wider"
+                  className="inline-flex items-center gap-1 hover:text-foreground uppercase tracking-wider"
                 >
                   Stars{" "}
                   {sortField === "stars" && (sortOrder === "asc" ? "▲" : "▼")}
@@ -355,7 +355,7 @@ export const RepositoriesTable: React.FC<RepositoriesTableProps> = ({
                 <button
                   type="button"
                   onClick={() => toggleSort("forks")}
-                  className="inline-flex items-center gap-1 hover:text-slate-200 uppercase tracking-wider"
+                  className="inline-flex items-center gap-1 hover:text-foreground uppercase tracking-wider"
                 >
                   Forks{" "}
                   {sortField === "forks" && (sortOrder === "asc" ? "▲" : "▼")}
@@ -368,7 +368,7 @@ export const RepositoriesTable: React.FC<RepositoriesTableProps> = ({
                   <button
                     type="button"
                     onClick={() => toggleSort("overall")}
-                    className="hover:text-slate-200 uppercase tracking-wider"
+                    className="hover:text-foreground uppercase tracking-wider"
                   >
                     Overall{" "}
                     {sortField === "overall" &&
@@ -381,13 +381,13 @@ export const RepositoriesTable: React.FC<RepositoriesTableProps> = ({
                         activeDropdown === "overall" ? null : "overall",
                       )
                     }
-                    className="p-0.5 text-slate-500 hover:text-slate-200 hover:bg-slate-800 rounded transition-colors"
+                    className="p-0.5 text-muted-foreground/80 hover:text-foreground hover:bg-muted rounded transition-colors"
                   >
                     <Filter className="h-3 w-3" />
                   </button>
                 </div>
                 {activeDropdown === "overall" && (
-                  <div className="absolute right-0 md:left-3 top-10 z-20 bg-slate-900 border border-slate-800 shadow-xl rounded-xl p-3 w-52 text-left normal-case text-slate-200 font-medium space-y-2">
+                  <div className="absolute right-0 md:left-3 top-10 z-20 bg-card border border-border shadow-sm rounded-xl p-3 w-52 text-left normal-case text-foreground font-medium space-y-2">
                     <Label className="text-[10px] mb-1">
                       Filter Overall score
                     </Label>
@@ -399,7 +399,7 @@ export const RepositoriesTable: React.FC<RepositoriesTableProps> = ({
                       ].map((range) => (
                         <label
                           key={range.key}
-                          className="flex items-center gap-2 py-1 hover:bg-slate-800 rounded px-1.5 cursor-pointer text-xs"
+                          className="flex items-center gap-2 py-1 hover:bg-muted rounded px-1.5 cursor-pointer text-xs"
                         >
                           <input
                             type="checkbox"
@@ -418,7 +418,7 @@ export const RepositoriesTable: React.FC<RepositoriesTableProps> = ({
                                 );
                               }
                             }}
-                            className="rounded border-slate-800 text-indigo-600 focus:ring-indigo-500 bg-slate-950"
+                            className="rounded border-border text-primary focus:ring-primary bg-muted"
                           />
                           <span>{range.label}</span>
                         </label>
@@ -434,7 +434,7 @@ export const RepositoriesTable: React.FC<RepositoriesTableProps> = ({
                   <button
                     type="button"
                     onClick={() => toggleSort("risk")}
-                    className="hover:text-slate-200 uppercase tracking-wider"
+                    className="hover:text-foreground uppercase tracking-wider"
                   >
                     Risk{" "}
                     {sortField === "risk" && (sortOrder === "asc" ? "▲" : "▼")}
@@ -446,13 +446,13 @@ export const RepositoriesTable: React.FC<RepositoriesTableProps> = ({
                         activeDropdown === "risk" ? null : "risk",
                       )
                     }
-                    className="p-0.5 text-slate-500 hover:text-slate-200 hover:bg-slate-800 rounded transition-colors"
+                    className="p-0.5 text-muted-foreground/80 hover:text-foreground hover:bg-muted rounded transition-colors"
                   >
                     <Filter className="h-3 w-3" />
                   </button>
                 </div>
                 {activeDropdown === "risk" && (
-                  <div className="absolute right-3 top-10 z-20 bg-slate-900 border border-slate-800 shadow-xl rounded-xl p-3 w-52 text-left normal-case text-slate-200 font-medium space-y-2">
+                  <div className="absolute right-3 top-10 z-20 bg-card border border-border shadow-sm rounded-xl p-3 w-52 text-left normal-case text-foreground font-medium space-y-2">
                     <Label className="text-[10px] mb-1">Filter Risk</Label>
                     <div className="space-y-1">
                       {[
@@ -462,7 +462,7 @@ export const RepositoriesTable: React.FC<RepositoriesTableProps> = ({
                       ].map((range) => (
                         <label
                           key={range.key}
-                          className="flex items-center gap-2 py-1 hover:bg-slate-800 rounded px-1.5 cursor-pointer text-xs"
+                          className="flex items-center gap-2 py-1 hover:bg-muted rounded px-1.5 cursor-pointer text-xs"
                         >
                           <input
                             type="checkbox"
@@ -481,7 +481,7 @@ export const RepositoriesTable: React.FC<RepositoriesTableProps> = ({
                                 );
                               }
                             }}
-                            className="rounded border-slate-800 text-indigo-600 focus:ring-indigo-500 bg-slate-950"
+                            className="rounded border-border text-primary focus:ring-primary bg-muted"
                           />
                           <span>{range.label}</span>
                         </label>
@@ -497,17 +497,17 @@ export const RepositoriesTable: React.FC<RepositoriesTableProps> = ({
               </th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-slate-800/40">
+          <tbody className="divide-y divide-border/40">
             {processedRepos.map((repo) => (
               <tr
                 key={repo.repoName}
                 onClick={() => handleRowClick(repo.fullName)}
-                className="hover:bg-slate-900/30 cursor-pointer transition-colors group"
+                className="hover:bg-muted/30 cursor-pointer transition-colors group"
               >
-                <td className="py-3.5 px-3 font-bold text-slate-200">
+                <td className="py-3.5 px-3 font-bold text-foreground">
                   <div className="flex flex-col gap-0.5">
                     <span>{repo.repoName}</span>
-                    <span className="text-[10px] text-slate-500 font-medium">
+                    <span className="text-[10px] text-muted-foreground font-medium">
                       {repo.fullName}
                     </span>
                   </div>
@@ -522,10 +522,10 @@ export const RepositoriesTable: React.FC<RepositoriesTableProps> = ({
                   <span
                     className={`px-2 py-1 rounded-lg ${
                       repo.scores.overall >= 80
-                        ? "text-emerald-400 bg-emerald-500/5 border border-emerald-500/10"
+                        ? "text-emerald-600 dark:text-emerald-400 bg-emerald-500/5 border border-emerald-500/10"
                         : repo.scores.overall >= 40
-                          ? "text-amber-400 bg-amber-500/5 border border-amber-500/10"
-                          : "text-rose-400 bg-rose-500/5 border border-rose-500/10"
+                          ? "text-amber-600 dark:text-amber-400 bg-amber-500/5 border border-amber-500/10"
+                          : "text-destructive bg-destructive/5 border border-destructive/10"
                     }`}
                   >
                     {repo.scores.overall}
@@ -535,10 +535,10 @@ export const RepositoriesTable: React.FC<RepositoriesTableProps> = ({
                   <span
                     className={
                       repo.scores.risk > 50
-                        ? "text-rose-400"
+                        ? "text-destructive"
                         : repo.scores.risk >= 20
-                          ? "text-amber-400"
-                          : "text-emerald-400"
+                          ? "text-amber-600"
+                          : "text-emerald-600"
                     }
                   >
                     {repo.scores.risk}%
@@ -551,7 +551,7 @@ export const RepositoriesTable: React.FC<RepositoriesTableProps> = ({
                       e.stopPropagation();
                       handleRowClick(repo.fullName);
                     }}
-                    className="p-1.5 bg-slate-900/80 border border-slate-800 group-hover:border-indigo-500/30 group-hover:text-indigo-400 rounded-lg transition-all"
+                    className="p-1.5 bg-muted/40 border border-border group-hover:border-primary/30 group-hover:text-primary rounded-lg transition-all"
                   >
                     <ArrowRight className="h-3.5 w-3.5" />
                   </button>
@@ -562,7 +562,7 @@ export const RepositoriesTable: React.FC<RepositoriesTableProps> = ({
               <tr>
                 <td
                   colSpan={6}
-                  className="py-8 text-center text-slate-500 italic"
+                  className="py-8 text-center text-muted-foreground italic"
                 >
                   No repositories match the active column filters.
                 </td>

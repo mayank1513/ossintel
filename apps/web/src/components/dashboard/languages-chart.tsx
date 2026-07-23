@@ -31,12 +31,12 @@ export const LanguagesChart: React.FC<LanguagesChartProps> = ({
   ];
 
   return (
-    <div className="p-6 bg-slate-900/90 border border-slate-800 rounded-3xl flex flex-col gap-4 shadow-xl">
-      <h4 className="text-xs font-bold text-slate-500 uppercase tracking-widest">
+    <div className="p-6 bg-card border border-border rounded-2xl flex flex-col gap-4 shadow-sm">
+      <h4 className="text-xs font-bold text-muted-foreground/80 uppercase tracking-widest">
         Language Breakdown
       </h4>
       <div className="space-y-3">
-        <div className="h-3.5 rounded-full overflow-hidden flex bg-slate-950">
+        <div className="h-3.5 rounded-full overflow-hidden flex bg-muted">
           {languages.slice(0, 5).map((lang, i) => {
             const pct = (lang.bytes / (totalBytes || 1)) * 100;
             return (
@@ -55,7 +55,7 @@ export const LanguagesChart: React.FC<LanguagesChartProps> = ({
             return (
               <div
                 key={lang.name}
-                className="flex items-center gap-1.5 text-slate-400 font-semibold"
+                className="flex items-center gap-1.5 text-muted-foreground font-semibold"
               >
                 <span
                   className={`w-2.5 h-2.5 rounded-full ${bulletColors[i % bulletColors.length]}`}

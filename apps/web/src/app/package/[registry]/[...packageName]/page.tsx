@@ -32,20 +32,20 @@ export default function PackagePage() {
   // If not npm, show placeholder coming soon
   if (registry !== "npm") {
     return (
-      <div className="min-h-screen bg-slate-950 text-slate-100 flex items-center justify-center font-sans">
-        <div className="text-center space-y-4 max-w-md p-6 bg-slate-900 border border-slate-800 rounded-3xl shadow-xl">
-          <Terminal className="h-10 w-10 text-indigo-400 mx-auto" />
+      <div className="min-h-screen bg-background text-foreground flex items-center justify-center font-sans">
+        <div className="text-center space-y-4 max-w-md p-6 bg-card border border-border rounded-2xl shadow-md">
+          <Terminal className="h-10 w-10 text-primary/80 mx-auto" />
           <h1 className="text-xl font-extrabold tracking-tight">
             {registry.toUpperCase()} Registry Support Coming Soon
           </h1>
-          <p className="text-xs text-slate-400 leading-relaxed">
+          <p className="text-xs text-muted-foreground leading-relaxed">
             Support for auditing {registry} packages is in our backlog. Check
             back soon!
           </p>
           <button
             type="button"
             onClick={() => router.push("/")}
-            className="px-4 py-2 bg-slate-950 hover:bg-slate-900 border border-slate-800 text-xs font-bold rounded-xl transition-all"
+            className="px-4 py-2 bg-muted/40 hover:bg-muted border border-border text-muted-foreground hover:text-foreground text-xs font-bold rounded-xl transition-all"
           >
             Go Home
           </button>
@@ -156,8 +156,8 @@ function NpmPackageDashboard({ packageName }: { packageName: string }) {
     : [];
 
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-100 font-sans antialiased selection:bg-indigo-500/30">
-      <div className="absolute inset-0 bg-[linear-gradient(to_right,#0f172a_1px,transparent_1px),linear-gradient(to_bottom,#0f172a_1px,transparent_1px)] bg-size-[4rem_4rem] mask-[radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)] pointer-events-none opacity-50" />
+    <div className="min-h-screen bg-background text-foreground font-sans antialiased selection:bg-primary/30">
+      <div className="absolute inset-0 bg-[linear-gradient(to_right,var(--grid-line-color)_1px,transparent_1px),linear-gradient(to_bottom,var(--grid-line-color)_1px,transparent_1px)] bg-size-[4rem_4rem] mask-[radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)] pointer-events-none" />
 
       <main className="relative max-w-7xl mx-auto px-6 py-12 z-10 flex flex-col gap-10">
         <LoadingOverlay
@@ -179,15 +179,15 @@ function NpmPackageDashboard({ packageName }: { packageName: string }) {
         {data && !isLoading && !isFetching && (
           <div className="space-y-8 animate-fade-in">
             {/* Backlinks */}
-            <div className="flex flex-wrap items-center justify-between gap-4 p-4 bg-slate-900/60 border border-slate-800 rounded-2xl shadow-md">
+            <div className="flex flex-wrap items-center justify-between gap-4 p-4 bg-card/60 border border-border/80 rounded-2xl shadow-sm">
               <div className="flex flex-wrap items-center gap-3">
-                <span className="text-xs text-slate-500 font-bold uppercase tracking-wider">
+                <span className="text-xs text-muted-foreground/80 font-bold uppercase tracking-wider">
                   Backlinks:
                 </span>
                 <button
                   type="button"
                   onClick={() => router.push("/")}
-                  className="px-3 py-1 bg-slate-950 hover:bg-slate-900 border border-slate-800 text-slate-300 hover:text-white text-xs font-bold rounded-lg transition-all"
+                  className="px-3 py-1 bg-muted/40 hover:bg-muted border border-border text-muted-foreground hover:text-foreground text-xs font-bold rounded-lg transition-all"
                 >
                   Home
                 </button>
@@ -197,7 +197,7 @@ function NpmPackageDashboard({ packageName }: { packageName: string }) {
                 <button
                   type="button"
                   onClick={refresh}
-                  className="p-2 bg-slate-950 hover:bg-slate-900 border border-slate-800 text-slate-400 hover:text-white rounded-lg transition-all"
+                  className="p-2 bg-muted/40 hover:bg-muted border border-border text-muted-foreground hover:text-foreground rounded-lg transition-all"
                   title="Force Refresh Data"
                 >
                   <RefreshCw className="h-4 w-4" />
@@ -212,11 +212,11 @@ function NpmPackageDashboard({ packageName }: { packageName: string }) {
                 <h1 className="text-3xl font-extrabold tracking-tight bg-gradient-to-r from-red-400 to-amber-400 bg-clip-text text-transparent animate-fade-in">
                   {data.name}
                 </h1>
-                <span className="text-xs px-2.5 py-0.5 bg-slate-900 border border-slate-800 text-slate-400 font-semibold rounded-full">
+                <span className="text-xs px-2.5 py-0.5 bg-muted border border-border text-muted-foreground font-semibold rounded-full">
                   npm package
                 </span>
               </div>
-              <p className="text-slate-400 text-sm max-w-2xl">
+              <p className="text-muted-foreground text-sm max-w-2xl">
                 {data.description || "No description provided."}
               </p>
             </div>
@@ -226,9 +226,9 @@ function NpmPackageDashboard({ packageName }: { packageName: string }) {
               {/* Left Column: Overall Score & Metrics */}
               <div className="space-y-8 lg:col-span-1">
                 {/* Score Panel */}
-                <div className="p-6 bg-slate-900/80 border border-slate-800 rounded-2xl flex flex-col items-center justify-center text-center shadow-lg relative overflow-hidden">
+                <div className="p-6 bg-card border border-border rounded-2xl flex flex-col items-center justify-center text-center shadow-md relative overflow-hidden">
                   <div className="absolute top-0 right-0 w-24 h-24 bg-red-500/10 rounded-full blur-2xl pointer-events-none" />
-                  <span className="text-xs font-bold uppercase tracking-wider text-slate-500 mb-4">
+                  <span className="text-xs font-bold uppercase tracking-wider text-muted-foreground mb-4">
                     Package score
                   </span>
 
@@ -242,7 +242,7 @@ function NpmPackageDashboard({ packageName }: { packageName: string }) {
                         cx="50"
                         cy="50"
                         r="40"
-                        className="stroke-slate-950"
+                        className="stroke-muted"
                         strokeWidth="8"
                         fill="transparent"
                       />
@@ -261,29 +261,29 @@ function NpmPackageDashboard({ packageName }: { packageName: string }) {
                       />
                     </svg>
                     <div className="absolute flex flex-col items-center">
-                      <span className="text-4xl font-extrabold text-white">
+                      <span className="text-4xl font-extrabold text-foreground">
                         {scores.overall}
                       </span>
-                      <span className="text-[10px] text-slate-500 font-bold uppercase">
+                      <span className="text-[10px] text-muted-foreground font-bold uppercase">
                         Points
                       </span>
                     </div>
                   </div>
 
-                  <div className="grid grid-cols-2 gap-4 w-full mt-6 pt-6 border-t border-slate-800/80">
+                  <div className="grid grid-cols-2 gap-4 w-full mt-6 pt-6 border-t border-border/80">
                     <div className="flex flex-col items-center">
-                      <span className="text-xs text-slate-500 font-semibold">
+                      <span className="text-xs text-muted-foreground font-semibold">
                         Popularity
                       </span>
-                      <span className="text-lg font-bold text-slate-200">
+                      <span className="text-lg font-bold text-foreground">
                         {scores.popularity}
                       </span>
                     </div>
                     <div className="flex flex-col items-center">
-                      <span className="text-xs text-slate-500 font-semibold">
+                      <span className="text-xs text-muted-foreground font-semibold">
                         Quality
                       </span>
-                      <span className="text-lg font-bold text-slate-200">
+                      <span className="text-lg font-bold text-foreground">
                         {scores.quality}
                       </span>
                     </div>
@@ -291,38 +291,44 @@ function NpmPackageDashboard({ packageName }: { packageName: string }) {
                 </div>
 
                 {/* Registry Details */}
-                <div className="p-6 bg-slate-900/50 border border-slate-800 rounded-2xl space-y-4">
-                  <h3 className="text-sm font-bold uppercase tracking-wider text-slate-400">
+                <div className="p-6 bg-card border border-border rounded-2xl space-y-4">
+                  <h3 className="text-sm font-bold uppercase tracking-wider text-foreground">
                     Registry Info
                   </h3>
                   <div className="space-y-3.5 text-sm font-medium">
                     <div className="flex justify-between">
-                      <span className="text-slate-500">Version</span>
-                      <span className="text-slate-300 font-mono">
+                      <span className="text-muted-foreground">Version</span>
+                      <span className="text-foreground/95 font-mono">
                         {data.version}
                       </span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-slate-500">Weekly Downloads</span>
-                      <span className="text-slate-300">
+                      <span className="text-muted-foreground">
+                        Weekly Downloads
+                      </span>
+                      <span className="text-foreground/95">
                         {data.weeklyDownloads.toLocaleString()}
                       </span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-slate-500">Monthly Downloads</span>
-                      <span className="text-slate-300">
+                      <span className="text-muted-foreground">
+                        Monthly Downloads
+                      </span>
+                      <span className="text-foreground/95">
                         {data.monthlyDownloads.toLocaleString()}
                       </span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-slate-500">License</span>
-                      <span className="text-slate-300">
+                      <span className="text-muted-foreground">License</span>
+                      <span className="text-foreground/95">
                         {data.license || "None"}
                       </span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-slate-500">Total Versions</span>
-                      <span className="text-slate-300">
+                      <span className="text-muted-foreground">
+                        Total Versions
+                      </span>
+                      <span className="text-foreground/95">
                         {data.versionsCount}
                       </span>
                     </div>
@@ -337,7 +343,7 @@ function NpmPackageDashboard({ packageName }: { packageName: string }) {
                       }
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="mt-4 flex items-center justify-center gap-2 py-2 bg-slate-950 hover:bg-slate-900 border border-slate-800 hover:border-slate-700 text-slate-300 hover:text-white text-xs font-bold rounded-xl transition-all shadow"
+                      className="mt-4 flex items-center justify-center gap-2 py-2 bg-muted/40 hover:bg-muted border border-border text-muted-foreground hover:text-foreground text-xs font-bold rounded-xl transition-all shadow-sm"
                     >
                       View Repository <ExternalLink className="h-3 w-3" />
                     </a>
@@ -348,49 +354,49 @@ function NpmPackageDashboard({ packageName }: { packageName: string }) {
               {/* Right Column: Details & Intelligence */}
               <div className="lg:col-span-2 space-y-8">
                 {/* Package Quality Badges */}
-                <div className="p-6 bg-slate-900/50 border border-slate-800 rounded-2xl">
-                  <h3 className="text-sm font-bold uppercase tracking-wider text-slate-400 mb-4">
+                <div className="p-6 bg-card border border-border rounded-2xl">
+                  <h3 className="text-sm font-bold uppercase tracking-wider text-foreground mb-4">
                     Ecosystem Quality Signals
                   </h3>
                   <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-                    <div className="p-3 bg-slate-950 border border-slate-800 rounded-xl flex flex-col gap-1.5 items-center justify-center text-center">
-                      <span className="text-[10px] text-slate-500 font-bold uppercase">
+                    <div className="p-3 bg-muted/45 border border-border/80 rounded-xl flex flex-col gap-1.5 items-center justify-center text-center">
+                      <span className="text-[10px] text-muted-foreground font-bold uppercase">
                         TypeScript
                       </span>
                       <span
-                        className={`text-xs px-2 py-0.5 rounded-full font-bold ${data.hasTypeScript ? "bg-indigo-500/10 text-indigo-400 border border-indigo-500/20" : "bg-slate-900 text-slate-500 border border-slate-800"}`}
+                        className={`text-xs px-2 py-0.5 rounded-full font-bold ${data.hasTypeScript ? "bg-indigo-500/10 text-indigo-400 border border-indigo-500/20" : "bg-muted text-muted-foreground border border-border/80"}`}
                       >
                         {data.hasTypeScript ? "Supported" : "Missing"}
                       </span>
                     </div>
 
-                    <div className="p-3 bg-slate-950 border border-slate-800 rounded-xl flex flex-col gap-1.5 items-center justify-center text-center">
-                      <span className="text-[10px] text-slate-500 font-bold uppercase">
+                    <div className="p-3 bg-muted/45 border border-border/80 rounded-xl flex flex-col gap-1.5 items-center justify-center text-center">
+                      <span className="text-[10px] text-muted-foreground font-bold uppercase">
                         ESM Support
                       </span>
                       <span
-                        className={`text-xs px-2 py-0.5 rounded-full font-bold ${data.hasESM ? "bg-emerald-500/10 text-emerald-400 border border-emerald-500/20" : "bg-slate-900 text-slate-500 border border-slate-800"}`}
+                        className={`text-xs px-2 py-0.5 rounded-full font-bold ${data.hasESM ? "bg-emerald-500/10 text-emerald-400 border border-emerald-500/20" : "bg-muted text-muted-foreground border border-border/80"}`}
                       >
                         {data.hasESM ? "Yes" : "No"}
                       </span>
                     </div>
 
-                    <div className="p-3 bg-slate-950 border border-slate-800 rounded-xl flex flex-col gap-1.5 items-center justify-center text-center">
-                      <span className="text-[10px] text-slate-500 font-bold uppercase">
+                    <div className="p-3 bg-muted/45 border border-border/80 rounded-xl flex flex-col gap-1.5 items-center justify-center text-center">
+                      <span className="text-[10px] text-muted-foreground font-bold uppercase">
                         CJS Support
                       </span>
                       <span
-                        className={`text-xs px-2 py-0.5 rounded-full font-bold ${data.hasCJS ? "bg-amber-500/10 text-amber-400 border border-amber-500/20" : "bg-slate-900 text-slate-500 border border-slate-800"}`}
+                        className={`text-xs px-2 py-0.5 rounded-full font-bold ${data.hasCJS ? "bg-amber-500/10 text-amber-400 border border-amber-500/20" : "bg-muted text-muted-foreground border border-border/80"}`}
                       >
                         {data.hasCJS ? "Yes" : "No"}
                       </span>
                     </div>
 
-                    <div className="p-3 bg-slate-950 border border-slate-800 rounded-xl flex flex-col gap-1.5 items-center justify-center text-center">
-                      <span className="text-[10px] text-slate-500 font-bold uppercase">
+                    <div className="p-3 bg-muted/45 border border-border/80 rounded-xl flex flex-col gap-1.5 items-center justify-center text-center">
+                      <span className="text-[10px] text-muted-foreground font-bold uppercase">
                         Release Rate
                       </span>
-                      <span className="text-xs font-bold text-slate-300">
+                      <span className="text-xs font-bold text-foreground">
                         {data.releaseFrequency} / yr
                       </span>
                     </div>
@@ -398,8 +404,8 @@ function NpmPackageDashboard({ packageName }: { packageName: string }) {
                 </div>
 
                 {/* Findings List */}
-                <div className="p-6 bg-slate-900/50 border border-slate-800 rounded-2xl">
-                  <h3 className="text-sm font-bold uppercase tracking-wider text-slate-400 mb-4">
+                <div className="p-6 bg-card border border-border rounded-2xl">
+                  <h3 className="text-sm font-bold uppercase tracking-wider text-foreground mb-4">
                     Findings
                   </h3>
                   {findings.length > 0 ? (
@@ -420,7 +426,7 @@ function NpmPackageDashboard({ packageName }: { packageName: string }) {
                             <span className="font-bold text-sm block">
                               {f.title}
                             </span>
-                            <span className="text-xs text-slate-400 leading-normal">
+                            <span className="text-xs text-muted-foreground leading-normal">
                               {f.description}
                             </span>
                           </div>
@@ -428,7 +434,7 @@ function NpmPackageDashboard({ packageName }: { packageName: string }) {
                       ))}
                     </div>
                   ) : (
-                    <p className="text-slate-500 text-sm">
+                    <p className="text-muted-foreground text-sm">
                       No critical findings scanned.
                     </p>
                   )}
@@ -436,21 +442,21 @@ function NpmPackageDashboard({ packageName }: { packageName: string }) {
 
                 {/* Recommendations */}
                 {recommendations.length > 0 && (
-                  <div className="p-6 bg-slate-900/50 border border-slate-800 rounded-2xl">
-                    <h3 className="text-sm font-bold uppercase tracking-wider text-slate-400 mb-4">
+                  <div className="p-6 bg-card border border-border rounded-2xl">
+                    <h3 className="text-sm font-bold uppercase tracking-wider text-foreground mb-4">
                       Recommendations
                     </h3>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       {recommendations.map((rec) => (
                         <div
                           key={rec.title}
-                          className="p-4 bg-slate-950 border border-slate-800 rounded-xl space-y-1.5 text-left"
+                          className="p-4 bg-muted/45 border border-border/80 rounded-xl space-y-1.5 text-left"
                         >
-                          <span className="font-bold text-sm text-slate-200 flex items-center gap-1.5">
-                            <ShieldCheck className="h-4 w-4 text-indigo-400" />
+                          <span className="font-bold text-sm text-foreground flex items-center gap-1.5">
+                            <ShieldCheck className="h-4 w-4 text-primary" />
                             {rec.title}
                           </span>
-                          <p className="text-xs text-slate-400 leading-normal">
+                          <p className="text-xs text-muted-foreground leading-normal">
                             {rec.description}
                           </p>
                         </div>

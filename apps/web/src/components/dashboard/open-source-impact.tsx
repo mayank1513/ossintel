@@ -132,49 +132,49 @@ export const OpenSourceImpact: React.FC<OpenSourceImpactProps> = ({
       id: "Framework Contributor",
       name: "Framework Contributor",
       description: "Contributed code to a major web framework",
-      icon: <Zap className="h-5 w-5 text-amber-400" />,
+      icon: <Zap className="h-5 w-5 text-amber-600" />,
     },
     {
       id: "OSS Founder",
       name: "OSS Founder",
       description: "Founded or manages an active organization namespace",
-      icon: <Users className="h-5 w-5 text-indigo-400" />,
+      icon: <Users className="h-5 w-5 text-primary" />,
     },
     {
       id: "Package Publisher",
       name: "Package Publisher",
       description: "Author and publisher of npm library packages",
-      icon: <BookOpen className="h-5 w-5 text-emerald-400" />,
+      icon: <BookOpen className="h-5 w-5 text-emerald-600" />,
     },
     {
       id: "Test Champion",
       name: "Test Champion",
       description: "Merged 5+ PRs targeting testing and coverage",
-      icon: <ShieldCheck className="h-5 w-5 text-sky-400" />,
+      icon: <ShieldCheck className="h-5 w-5 text-sky-600" />,
     },
     {
       id: "Security Champion",
       name: "Security Champion",
       description: "Contributed security vulnerability patches and fixes",
-      icon: <ShieldCheck className="h-5 w-5 text-emerald-400" />,
+      icon: <ShieldCheck className="h-5 w-5 text-emerald-600" />,
     },
     {
       id: "Prodigious Contributor",
       name: "Prodigious Contributor",
       description: "Merged 15+ external upstream pull requests",
-      icon: <Zap className="h-5 w-5 text-indigo-400" />,
+      icon: <Zap className="h-5 w-5 text-primary" />,
     },
     {
       id: "1k Stars Earned",
       name: "1k Stars Earned",
       description: "Accrued 1,000+ stars on personal projects",
-      icon: <Star className="h-5 w-5 text-amber-400" />,
+      icon: <Star className="h-5 w-5 text-amber-600" />,
     },
     {
       id: "1M npm Downloads",
       name: "1M npm Downloads",
       description: "Ecosystem packages exceed 1M downloads/week",
-      icon: <Award className="h-5 w-5 text-violet-400" />,
+      icon: <Award className="h-5 w-5 text-violet-600" />,
     },
   ];
 
@@ -212,14 +212,14 @@ export const OpenSourceImpact: React.FC<OpenSourceImpactProps> = ({
   });
 
   return (
-    <div className="bg-slate-900/90 border border-slate-800 rounded-3xl p-6 shadow-xl space-y-8">
+    <div className="bg-card border border-border rounded-2xl p-6 shadow-sm space-y-8">
       {/* Header & Controls */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-b border-slate-800/80 pb-6">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-b border-border/80 pb-6">
         <div>
-          <h2 className="text-xl font-black text-slate-100 flex items-center gap-2 tracking-tight">
-            <Award className="h-6 w-6 text-indigo-400" /> Open Source Impact
+          <h2 className="text-xl font-black text-foreground flex items-center gap-2 tracking-tight">
+            <Award className="h-6 w-6 text-primary" /> Open Source Impact
           </h2>
-          <p className="text-xs text-slate-400 mt-1">
+          <p className="text-xs text-muted-foreground mt-1">
             Analyzing PR contributions to external GitHub ecosystems
           </p>
         </div>
@@ -228,7 +228,7 @@ export const OpenSourceImpact: React.FC<OpenSourceImpactProps> = ({
         <div className="flex items-center gap-2">
           <label
             htmlFor="contrib-limit"
-            className="text-xs font-bold text-slate-400"
+            className="text-xs font-bold text-muted-foreground"
           >
             Limit Repos:
           </label>
@@ -236,7 +236,7 @@ export const OpenSourceImpact: React.FC<OpenSourceImpactProps> = ({
             id="contrib-limit"
             value={limit}
             onChange={(e) => onLimitChange(Number(e.target.value))}
-            className="bg-slate-950 border border-slate-800 text-xs font-bold rounded-xl px-3 py-2 text-slate-200 outline-none cursor-pointer focus:border-indigo-500/40"
+            className="bg-muted/40 border border-border text-xs font-bold rounded-xl px-3 py-2 text-foreground outline-none cursor-pointer focus:border-primary/40"
           >
             <option value={5}>5 Repositories</option>
             <option value={10}>10 Repositories</option>
@@ -251,10 +251,10 @@ export const OpenSourceImpact: React.FC<OpenSourceImpactProps> = ({
       {limit > 10 && !hasToken && (
         <div className="p-5 bg-amber-500/10 border border-amber-500/20 rounded-2xl flex flex-col md:flex-row justify-between items-start md:items-center gap-4 text-left">
           <div className="space-y-1">
-            <h4 className="text-xs font-bold text-amber-400 uppercase tracking-wider flex items-center gap-1.5">
+            <h4 className="text-xs font-bold text-amber-600 uppercase tracking-wider flex items-center gap-1.5">
               <Sparkles className="h-4 w-4" /> GitHub Connection Recommended
             </h4>
-            <p className="text-sm text-slate-205 leading-relaxed max-w-xl">
+            <p className="text-sm text-muted-foreground leading-relaxed max-w-xl">
               Analyzing more than 10 external projects can exhaust GitHub public
               API rate limits. Connect your GitHub account to ensure successful
               execution.
@@ -270,12 +270,12 @@ export const OpenSourceImpact: React.FC<OpenSourceImpactProps> = ({
       )}
 
       {totalPRs === 0 ? (
-        <div className="p-8 text-center bg-slate-950/40 border border-slate-800/80 rounded-2xl">
-          <GitPullRequest className="h-10 w-10 text-slate-600 mx-auto mb-3" />
-          <p className="text-sm font-semibold text-slate-400">
+        <div className="p-8 text-center bg-muted/40 border border-border/80 rounded-xl">
+          <GitPullRequest className="h-10 w-10 text-muted-foreground/60 mx-auto mb-3" />
+          <p className="text-sm font-semibold text-muted-foreground">
             No external merged PR contributions detected.
           </p>
-          <p className="text-xs text-slate-500 mt-1">
+          <p className="text-xs text-muted-foreground/80 mt-1">
             Contributions are gathered from merged pull requests in non-owned
             repositories.
           </p>
@@ -284,55 +284,53 @@ export const OpenSourceImpact: React.FC<OpenSourceImpactProps> = ({
         <>
           {/* Stats Grid */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            <div className="p-4 bg-slate-950/50 border border-slate-800/60 rounded-2xl space-y-1">
-              <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">
+            <div className="p-4 bg-muted/40 border border-border/60 rounded-xl space-y-1">
+              <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">
                 PRs Merged
               </span>
-              <div className="text-2xl font-black text-indigo-400">
-                {totalPRs}
-              </div>
-              <div className="text-[10px] text-slate-400">
+              <div className="text-2xl font-black text-primary">{totalPRs}</div>
+              <div className="text-[10px] text-muted-foreground">
                 Merged pull requests
               </div>
             </div>
-            <div className="p-4 bg-slate-950/50 border border-slate-800/60 rounded-2xl space-y-1">
-              <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">
+            <div className="p-4 bg-muted/40 border border-border/60 rounded-xl space-y-1">
+              <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">
                 Projects Impacted
               </span>
-              <div className="text-2xl font-black text-indigo-400">
+              <div className="text-2xl font-black text-primary">
                 {totalOrgs}
               </div>
-              <div className="text-[10px] text-slate-400">
+              <div className="text-[10px] text-muted-foreground">
                 Unique external repos
               </div>
             </div>
-            <div className="p-4 bg-slate-950/50 border border-slate-800/60 rounded-2xl space-y-1">
-              <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">
+            <div className="p-4 bg-muted/40 border border-border/60 rounded-xl space-y-1">
+              <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">
                 Max Project Stars
               </span>
-              <div className="text-2xl font-black text-indigo-400">
+              <div className="text-2xl font-black text-primary">
                 {formatCompactNumber(maxStars)}
               </div>
-              <div className="text-[10px] text-slate-400">
+              <div className="text-[10px] text-muted-foreground">
                 Highest star repo reached
               </div>
             </div>
-            <div className="p-4 bg-slate-950/50 border border-slate-800/60 rounded-2xl space-y-1">
-              <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">
+            <div className="p-4 bg-muted/40 border border-border/60 rounded-xl space-y-1">
+              <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">
                 Contribution Mix
               </span>
-              <div className="text-sm font-bold text-slate-200 mt-1 flex flex-wrap gap-x-2 gap-y-0.5">
+              <div className="text-sm font-bold text-foreground mt-1 flex flex-wrap gap-x-2 gap-y-0.5">
                 {codeCount > 0 && (
-                  <span className="text-indigo-400">{codeCount} Code</span>
+                  <span className="text-primary">{codeCount} Code</span>
                 )}
                 {docsCount > 0 && (
-                  <span className="text-emerald-400">{docsCount} Docs</span>
+                  <span className="text-emerald-600">{docsCount} Docs</span>
                 )}
                 {testCount > 0 && (
-                  <span className="text-sky-400">{testCount} Tests</span>
+                  <span className="text-sky-600">{testCount} Tests</span>
                 )}
               </div>
-              <div className="text-[10px] text-slate-400">
+              <div className="text-[10px] text-muted-foreground">
                 Heuristics classification
               </div>
             </div>
@@ -345,11 +343,11 @@ export const OpenSourceImpact: React.FC<OpenSourceImpactProps> = ({
               onClick={() => setEcosystemExpanded(!ecosystemExpanded)}
               className="w-full flex items-center justify-between text-left focus:outline-none group"
             >
-              <h3 className="text-xs font-bold text-slate-400 uppercase tracking-wider group-hover:text-slate-300 transition-colors">
+              <h3 className="text-xs font-bold text-muted-foreground/80 uppercase tracking-wider group-hover:text-foreground transition-colors">
                 Ecosystem Distribution
               </h3>
               <ChevronDown
-                className={`h-4 w-4 text-slate-500 group-hover:text-slate-300 transition-transform duration-200 ${
+                className={`h-4 w-4 text-muted-foreground/80 group-hover:text-foreground transition-transform duration-200 ${
                   ecosystemExpanded ? "transform rotate-180" : ""
                 }`}
               />
@@ -363,15 +361,15 @@ export const OpenSourceImpact: React.FC<OpenSourceImpactProps> = ({
                     placeholder="Search ecosystem repositories..."
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
-                    className="w-full bg-slate-950 border border-slate-800 text-xs rounded-xl px-3 py-2 text-slate-200 outline-none focus:border-indigo-500/40"
+                    className="w-full bg-muted/40 border border-border text-xs rounded-xl px-3 py-2 text-foreground outline-none focus:border-primary/40"
                   />
                 </div>
 
                 {/* Table Container */}
-                <div className="overflow-x-auto border border-slate-800 rounded-2xl bg-slate-950/40">
+                <div className="overflow-x-auto border border-border rounded-xl bg-muted/40">
                   <table className="w-full text-left text-xs border-collapse">
                     <thead>
-                      <tr className="border-b border-slate-800 text-slate-400 font-bold uppercase tracking-wider text-[10px] bg-slate-950/80">
+                      <tr className="border-b border-border text-muted-foreground font-bold uppercase tracking-wider text-[10px] bg-muted">
                         <th className="p-3">
                           <button
                             type="button"
@@ -385,7 +383,7 @@ export const OpenSourceImpact: React.FC<OpenSourceImpactProps> = ({
                                 setSortOrder("asc");
                               }
                             }}
-                            className="hover:text-slate-200 transition-colors flex items-center gap-1 focus:outline-none"
+                            className="hover:text-foreground transition-colors flex items-center gap-1 focus:outline-none"
                           >
                             Repository{" "}
                             {sortBy === "repo" &&
@@ -405,7 +403,7 @@ export const OpenSourceImpact: React.FC<OpenSourceImpactProps> = ({
                                 setSortOrder("desc");
                               }
                             }}
-                            className="hover:text-slate-200 transition-colors flex items-center gap-1 focus:outline-none"
+                            className="hover:text-foreground transition-colors flex items-center gap-1 focus:outline-none"
                           >
                             Contributions{" "}
                             {sortBy === "count" &&
@@ -425,7 +423,7 @@ export const OpenSourceImpact: React.FC<OpenSourceImpactProps> = ({
                                 setSortOrder("desc");
                               }
                             }}
-                            className="hover:text-slate-200 transition-colors flex items-center gap-1 focus:outline-none"
+                            className="hover:text-foreground transition-colors flex items-center gap-1 focus:outline-none"
                           >
                             Stars{" "}
                             {sortBy === "stars" &&
@@ -440,7 +438,7 @@ export const OpenSourceImpact: React.FC<OpenSourceImpactProps> = ({
                         <tr>
                           <td
                             colSpan={4}
-                            className="p-4 text-center text-slate-500 font-medium"
+                            className="p-4 text-center text-muted-foreground font-medium"
                           >
                             No matching repositories found.
                           </td>
@@ -453,25 +451,25 @@ export const OpenSourceImpact: React.FC<OpenSourceImpactProps> = ({
                           return (
                             <tr
                               key={dist.repo}
-                              className="border-b border-slate-800/40 hover:bg-slate-900/20 transition-colors"
+                              className="border-b border-border/40 hover:bg-muted/20 transition-colors"
                             >
-                              <td className="p-3 font-semibold text-slate-200">
+                              <td className="p-3 font-semibold text-foreground">
                                 {dist.repo}
                               </td>
-                              <td className="p-3 font-bold text-indigo-400">
+                              <td className="p-3 font-bold text-primary">
                                 <div className="flex items-center gap-2">
                                   <span className="w-8 shrink-0">
                                     {dist.count} PRs
                                   </span>
-                                  <div className="w-24 bg-slate-950 h-1.5 rounded-full overflow-hidden shrink-0 border border-slate-800/40">
+                                  <div className="w-24 bg-muted h-1.5 rounded-full overflow-hidden shrink-0 border border-border/40">
                                     <div
-                                      className="h-full bg-gradient-to-r from-indigo-600 to-violet-500 rounded-full"
+                                      className="h-full bg-primary rounded-full"
                                       style={{ width: `${percentage}%` }}
                                     />
                                   </div>
                                 </div>
                               </td>
-                              <td className="p-3 text-slate-300">
+                              <td className="p-3 text-foreground/90">
                                 <div className="flex items-center gap-1 text-[11px]">
                                   <Star className="h-3.5 w-3.5 fill-amber-500/20 text-amber-500 shrink-0" />
                                   {formatCompactNumber(dist.stars)}
@@ -482,7 +480,7 @@ export const OpenSourceImpact: React.FC<OpenSourceImpactProps> = ({
                                   href={`https://github.com/${dist.repo}`}
                                   target="_blank"
                                   rel="noopener noreferrer"
-                                  className="px-2.5 py-1 bg-slate-900 border border-slate-800 hover:border-slate-700 text-[10px] font-bold rounded-lg text-slate-400 hover:text-slate-200 transition-all inline-block"
+                                  className="px-2.5 py-1 bg-muted/40 border border-border hover:border-border/80 text-[10px] font-bold rounded-lg text-muted-foreground hover:text-foreground transition-all inline-block"
                                 >
                                   GitHub
                                 </a>
@@ -500,7 +498,7 @@ export const OpenSourceImpact: React.FC<OpenSourceImpactProps> = ({
 
           {/* Badges Panel */}
           <div className="space-y-4">
-            <h3 className="text-xs font-bold text-slate-400 uppercase tracking-wider">
+            <h3 className="text-xs font-bold text-muted-foreground/80 uppercase tracking-wider">
               Earned Contribution Badges
             </h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
@@ -509,21 +507,21 @@ export const OpenSourceImpact: React.FC<OpenSourceImpactProps> = ({
                   key={badge.id}
                   className={`p-4 border rounded-2xl flex items-start gap-3 transition-colors ${
                     badge.eligible
-                      ? "bg-indigo-500/5 border-indigo-500/20 text-slate-200"
-                      : "bg-slate-950/20 border-slate-800/40 text-slate-500 opacity-60"
+                      ? "bg-primary/5 border border-primary/10 text-foreground"
+                      : "bg-muted/20 border border-border/40 text-muted-foreground opacity-60"
                   }`}
                 >
-                  <div className="p-2 bg-slate-950 border border-slate-800 rounded-xl shrink-0">
+                  <div className="p-2 bg-muted border border-border rounded-xl shrink-0">
                     {badge.icon}
                   </div>
                   <div>
                     <h4 className="text-sm font-bold flex items-center gap-1.5">
                       {badge.name}
                       {badge.eligible && (
-                        <CheckCircle className="h-4 w-4 text-indigo-400 shrink-0" />
+                        <CheckCircle className="h-4 w-4 text-primary shrink-0" />
                       )}
                     </h4>
-                    <p className="text-xs text-slate-400 mt-0.5">
+                    <p className="text-xs text-muted-foreground mt-0.5">
                       {badge.description}
                     </p>
                   </div>
@@ -534,10 +532,10 @@ export const OpenSourceImpact: React.FC<OpenSourceImpactProps> = ({
 
           {/* Timeline Section */}
           <div className="space-y-4">
-            <h3 className="text-xs font-bold text-slate-400 uppercase tracking-wider">
+            <h3 className="text-xs font-bold text-muted-foreground/80 uppercase tracking-wider">
               Contribution Timeline
             </h3>
-            <div className="relative border-l border-slate-800 pl-4 ml-2 space-y-6">
+            <div className="relative border-l border-border pl-4 ml-2 space-y-6">
               {sortedYears.map((year) => {
                 const isYearExpanded =
                   expandedYears[year] ?? year === sortedYears[0];
@@ -551,20 +549,20 @@ export const OpenSourceImpact: React.FC<OpenSourceImpactProps> = ({
                 return (
                   <div key={year} className="relative space-y-3">
                     {/* Bullet */}
-                    <div className="absolute -left-[21px] top-1.5 p-1 bg-slate-950 border border-slate-800 rounded-full shrink-0 z-10">
-                      <Calendar className="h-3 w-3 text-indigo-400" />
+                    <div className="absolute -left-[21px] top-1.5 p-1 bg-card border border-border rounded-full shrink-0 z-10">
+                      <Calendar className="h-3 w-3 text-primary" />
                     </div>
                     <button
                       type="button"
                       onClick={toggleYear}
                       className="w-full flex items-center justify-between text-left focus:outline-none group/year"
                     >
-                      <h4 className="text-sm font-bold text-slate-200 group-hover/year:text-indigo-400 transition-colors">
+                      <h4 className="text-sm font-bold text-foreground group-hover/year:text-primary transition-colors">
                         {year} ({timelineByYear[year].length} contribution
                         {timelineByYear[year].length > 1 ? "s" : ""})
                       </h4>
                       <ChevronDown
-                        className={`h-4 w-4 text-slate-500 group-hover/year:text-indigo-400 transition-transform duration-200 ${
+                        className={`h-4 w-4 text-muted-foreground group-hover/year:text-primary transition-transform duration-200 ${
                           isYearExpanded ? "transform rotate-180" : ""
                         }`}
                       />
@@ -574,23 +572,23 @@ export const OpenSourceImpact: React.FC<OpenSourceImpactProps> = ({
                         {timelineByYear[year].map((c) => (
                           <li
                             key={`${c.repoFullName}-${c.number}`}
-                            className="p-3.5 bg-slate-950/40 border border-slate-800/80 rounded-2xl hover:border-slate-700 transition-colors"
+                            className="p-3.5 bg-muted/40 border border-border/80 rounded-xl hover:border-border transition-colors"
                           >
                             <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-1">
                               <div>
-                                <span className="text-[10px] font-bold text-slate-400 bg-slate-900 border border-slate-800 rounded px-1.5 py-0.5 uppercase tracking-wider mr-2">
+                                <span className="text-[10px] font-bold text-muted-foreground bg-muted border border-border rounded px-1.5 py-0.5 uppercase tracking-wider mr-2">
                                   {c.type}
                                 </span>
                                 <a
                                   href={c.htmlUrl}
                                   target="_blank"
                                   rel="noopener noreferrer"
-                                  className="text-xs font-semibold text-slate-200 hover:text-indigo-400 underline transition-colors"
+                                  className="text-xs font-semibold text-foreground hover:text-primary underline transition-colors"
                                 >
                                   {c.title}
                                 </a>
                               </div>
-                              <span className="text-[10px] font-bold text-slate-400 shrink-0">
+                              <span className="text-[10px] font-bold text-muted-foreground shrink-0">
                                 {c.repoFullName}
                               </span>
                             </div>

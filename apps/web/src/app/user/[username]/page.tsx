@@ -46,10 +46,10 @@ export default function UserPage() {
   return (
     <Suspense
       fallback={
-        <div className="min-h-screen bg-slate-950 text-slate-100 flex items-center justify-center">
+        <div className="min-h-screen bg-background text-foreground flex items-center justify-center">
           <div className="flex flex-col items-center gap-3">
-            <div className="h-8 w-8 border-4 border-indigo-500 border-t-transparent rounded-full animate-spin" />
-            <span className="text-sm font-semibold text-slate-400">
+            <div className="h-8 w-8 border-4 border-primary border-t-transparent rounded-full animate-spin" />
+            <span className="text-sm font-semibold text-muted-foreground">
               Loading Dashboard...
             </span>
           </div>
@@ -340,9 +340,9 @@ function UserDashboardContent() {
   }, [clientIntel, userQuery.data, githubUsername]);
 
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-100 font-sans antialiased selection:bg-indigo-500/30">
+    <div className="min-h-screen bg-background text-foreground font-sans antialiased selection:bg-primary/30">
       {/* Background decoration */}
-      <div className="absolute inset-0 bg-[linear-gradient(to_right,#0f172a_1px,transparent_1px),linear-gradient(to_bottom,#0f172a_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)] pointer-events-none opacity-50" />
+      <div className="absolute inset-0 bg-[linear-gradient(to_right,var(--grid-line-color)_1px,transparent_1px),linear-gradient(to_bottom,var(--grid-line-color)_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)] pointer-events-none" />
 
       {/* Main Content */}
       <main className="relative max-w-7xl mx-auto px-6 py-12 z-10 flex flex-col gap-10">
@@ -355,13 +355,13 @@ function UserDashboardContent() {
 
         {/* Dashboard Panels */}
         {!githubUsername && !isLoadingCombined ? (
-          <div className="flex flex-col items-center justify-center py-20 text-center text-slate-500 max-w-md mx-auto space-y-6">
-            <AlertTriangle className="h-12 w-12 text-indigo-400 animate-pulse" />
+          <div className="flex flex-col items-center justify-center py-20 text-center text-muted-foreground/80 max-w-md mx-auto space-y-6">
+            <AlertTriangle className="h-12 w-12 text-primary/80 animate-pulse" />
             <div>
-              <h3 className="text-lg font-bold text-slate-200">
+              <h3 className="text-lg font-bold text-foreground">
                 GitHub Connection Required
               </h3>
-              <p className="text-xs text-slate-400 mt-2">
+              <p className="text-xs text-muted-foreground mt-2">
                 Unified scoring and repository analysis require a linked GitHub
                 profile. Enter a GitHub profile username below to bind your
                 metrics:
@@ -371,7 +371,7 @@ function UserDashboardContent() {
               <input
                 type="text"
                 placeholder="Enter GitHub Username..."
-                className="bg-slate-900 border border-slate-800 rounded-xl p-3 w-full text-slate-200 outline-none focus:border-indigo-500 text-sm"
+                className="bg-muted/40 border border-border rounded-xl p-3 w-full text-foreground outline-none focus:border-primary text-sm"
                 onKeyDown={(e) => {
                   if (e.key === "Enter") {
                     setGithubUsername((e.target as HTMLInputElement).value);
@@ -385,7 +385,7 @@ function UserDashboardContent() {
                     .previousSibling as HTMLInputElement;
                   if (input.value) setGithubUsername(input.value);
                 }}
-                className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-semibold"
+                className="px-4 py-2 bg-primary text-primary-foreground hover:opacity-90 active:scale-[0.98] rounded-xl text-xs font-semibold transition-all"
               >
                 Link
               </button>
@@ -406,13 +406,13 @@ function UserDashboardContent() {
                 />
               )}
               {/* Status Header Banner */}
-              <div className="flex flex-wrap items-center justify-between gap-4 p-4 bg-slate-900/60 border border-slate-800 rounded-2xl shadow-md">
+              <div className="flex flex-wrap items-center justify-between gap-4 p-4 bg-card/60 border border-border/80 rounded-2xl shadow-sm">
                 <div className="flex items-center gap-3">
-                  <div className="flex items-center gap-2 px-3 py-1 bg-indigo-500/10 border border-indigo-500/20 rounded-full text-indigo-400 text-xs font-bold uppercase tracking-wider">
+                  <div className="flex items-center gap-2 px-3 py-1 bg-primary/5 border border-primary/10 rounded-full text-primary text-xs font-bold uppercase tracking-wider">
                     <User className="h-3.5 w-3.5" /> Unified OSS Identity
                   </div>
                   {isFetchingCombined && (
-                    <span className="text-xs text-indigo-400 font-semibold animate-pulse">
+                    <span className="text-xs text-primary/80 font-semibold animate-pulse">
                       Refreshing cache items...
                     </span>
                   )}
@@ -422,16 +422,16 @@ function UserDashboardContent() {
                   <button
                     type="button"
                     onClick={() => setShowTokensConfig(!showTokensConfig)}
-                    className="flex items-center gap-1.5 px-4 py-2 bg-slate-950 border border-slate-800 text-slate-350 hover:text-white text-xs font-bold rounded-xl transition-all"
+                    className="flex items-center gap-1.5 px-4 py-2 bg-muted/40 hover:bg-muted border border-border text-muted-foreground hover:text-foreground text-xs font-bold rounded-xl transition-all"
                   >
-                    <Settings className="h-3.5 w-3.5 text-indigo-400" />{" "}
+                    <Settings className="h-3.5 w-3.5 text-primary/80" />{" "}
                     Settings
                   </button>
 
                   <button
                     type="button"
                     onClick={handleRefresh}
-                    className="flex items-center gap-1 px-4 py-2 bg-slate-950 border border-slate-800 text-slate-350 hover:text-white text-xs font-bold rounded-xl transition-all"
+                    className="flex items-center gap-1 px-4 py-2 bg-muted/40 hover:bg-muted border border-border text-muted-foreground hover:text-foreground text-xs font-bold rounded-xl transition-all"
                   >
                     <RefreshCw className="h-3.5 w-3.5" /> Refresh Analysis
                   </button>
@@ -440,19 +440,19 @@ function UserDashboardContent() {
 
               {/* Tokens Config panel */}
               {showTokensConfig && (
-                <div className="p-6 bg-slate-900 border border-slate-800 rounded-3xl space-y-4 max-w-xl mx-auto animate-fade-in-up">
-                  <h4 className="text-sm font-bold text-slate-200">
+                <div className="p-6 bg-card border border-border rounded-2xl space-y-4 max-w-xl mx-auto animate-fade-in-up">
+                  <h4 className="text-sm font-bold text-foreground">
                     Application Settings
                   </h4>
 
                   <div className="space-y-4 text-left">
                     <div>
-                      <span className="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-2">
+                      <span className="text-xs font-bold text-muted-foreground uppercase tracking-wider block mb-2">
                         GitHub Connection
                       </span>
                       {hasGithubPat ? (
-                        <div className="flex items-center justify-between p-3 bg-slate-950 border border-slate-800 rounded-xl">
-                          <span className="text-xs text-emerald-450 font-bold flex items-center gap-1.5">
+                        <div className="flex items-center justify-between p-3 bg-muted/40 border border-border rounded-xl">
+                          <span className="text-xs text-emerald-600 font-bold flex items-center gap-1.5">
                             <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />{" "}
                             Connected to GitHub
                           </span>
@@ -465,7 +465,7 @@ function UserDashboardContent() {
                               setHasGithubPat(false);
                               handleRefresh();
                             }}
-                            className="px-3 py-1.5 bg-rose-950/40 hover:bg-rose-950/60 border border-rose-900/30 text-rose-300 rounded-lg text-xs font-bold transition-all"
+                            className="px-3 py-1.5 bg-destructive/10 hover:bg-destructive/20 border border-destructive/20 text-destructive rounded-lg text-xs font-bold transition-all"
                           >
                             Disconnect
                           </button>
@@ -473,23 +473,23 @@ function UserDashboardContent() {
                       ) : (
                         <a
                           href="/api/auth/github"
-                          className="flex items-center justify-center gap-2 w-full p-3 bg-indigo-650 hover:bg-indigo-700 text-white rounded-xl text-xs font-bold transition-all shadow-md"
+                          className="flex items-center justify-center gap-2 w-full p-3 bg-primary text-primary-foreground hover:opacity-90 active:scale-[0.98] rounded-xl text-xs font-bold transition-all shadow-sm"
                         >
                           <GithubIcon className="h-4 w-4" /> Connect GitHub
                           Account
                         </a>
                       )}
-                      <p className="text-[10px] text-slate-500 mt-1.5">
+                      <p className="text-[10px] text-muted-foreground mt-1.5">
                         Connecting your GitHub account automatically boosts your
                         API rate limits from 60 to 5,000 requests/hour.
                       </p>
                     </div>
 
                     {/* Local Cache Management */}
-                    <div className="border-t border-slate-800 pt-4 mt-2">
+                    <div className="border-t border-border/80 pt-4 mt-2">
                       <div className="flex items-center gap-1.5 mb-3">
-                        <Database className="h-4 w-4 text-indigo-400" />
-                        <h5 className="text-xs font-bold text-slate-300">
+                        <Database className="h-4 w-4 text-primary/85" />
+                        <h5 className="text-xs font-bold text-foreground">
                           Local Cache Management
                         </h5>
                       </div>
@@ -497,7 +497,7 @@ function UserDashboardContent() {
                         <div>
                           <label
                             htmlFor="cache-quota-input"
-                            className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-1"
+                            className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider block mb-1"
                           >
                             Storage Quota (MB)
                           </label>
@@ -510,13 +510,13 @@ function UserDashboardContent() {
                             onChange={(e) =>
                               setQuotaInput(Number(e.target.value))
                             }
-                            className="w-full bg-slate-950 border border-slate-800 outline-none rounded-lg p-2 text-slate-200 text-xs font-mono"
+                            className="w-full bg-muted/40 border border-border outline-none rounded-lg p-2 text-foreground text-xs font-mono"
                           />
                         </div>
                         <div>
                           <label
                             htmlFor="cache-stale-input"
-                            className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-1"
+                            className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider block mb-1"
                           >
                             Stale Time (Days)
                           </label>
@@ -529,7 +529,7 @@ function UserDashboardContent() {
                             onChange={(e) =>
                               setStaleInput(Number(e.target.value))
                             }
-                            className="w-full bg-slate-950 border border-slate-800 outline-none rounded-lg p-2 text-slate-200 text-xs font-mono"
+                            className="w-full bg-muted/40 border border-border outline-none rounded-lg p-2 text-foreground text-xs font-mono"
                           />
                         </div>
                       </div>
@@ -543,7 +543,7 @@ function UserDashboardContent() {
                             });
                             alert("Cache settings saved successfully.");
                           }}
-                          className="flex-1 px-3 py-2 bg-slate-950 hover:bg-slate-900 border border-slate-800 text-slate-300 hover:text-white rounded-lg text-xs font-bold transition-all"
+                          className="flex-1 px-3 py-2 bg-muted/40 hover:bg-muted border border-border text-muted-foreground hover:text-foreground rounded-lg text-xs font-bold transition-all"
                         >
                           Save Cache Config
                         </button>
@@ -560,7 +560,7 @@ function UserDashboardContent() {
                               handleRefresh();
                             }
                           }}
-                          className="px-3 py-2 bg-rose-950/40 hover:bg-rose-950/60 border border-rose-900/30 text-rose-300 rounded-lg text-xs font-bold transition-all shrink-0"
+                          className="px-3 py-2 bg-destructive/10 hover:bg-destructive/20 border border-destructive/20 text-destructive rounded-lg text-xs font-bold transition-all shrink-0"
                         >
                           Clear Cache
                         </button>
@@ -572,7 +572,7 @@ function UserDashboardContent() {
                     <button
                       type="button"
                       onClick={() => setShowTokensConfig(false)}
-                      className="px-4 py-2 bg-slate-950 text-slate-400 hover:text-white rounded-xl text-xs font-bold"
+                      className="px-4 py-2 bg-muted hover:bg-muted/80 text-muted-foreground hover:text-foreground rounded-xl text-xs font-bold transition-colors"
                     >
                       Close
                     </button>
@@ -594,20 +594,20 @@ function UserDashboardContent() {
                   {userQuery.data?.type !== "org" && (
                     <>
                       {/* Identity Resolution Links */}
-                      <div className="p-6 bg-slate-900/90 border border-slate-800 rounded-3xl shadow-xl space-y-4">
-                        <h4 className="text-sm font-bold text-slate-200">
+                      <div className="p-6 bg-card border border-border rounded-2xl shadow-sm space-y-4">
+                        <h4 className="text-sm font-bold text-foreground">
                           Linked OSS Identities
                         </h4>
                         <div className="space-y-3">
                           {/* GitHub */}
-                          <div className="flex items-center justify-between p-3 bg-slate-950/50 border border-slate-850 rounded-xl">
+                          <div className="flex items-center justify-between p-3 bg-muted/45 border border-border/80 rounded-xl">
                             <div className="flex items-center gap-2">
-                              <GithubIcon className="h-4 w-4 text-slate-400" />
-                              <span className="text-xs font-semibold text-slate-200">
+                              <GithubIcon className="h-4 w-4 text-muted-foreground" />
+                              <span className="text-xs font-semibold text-foreground">
                                 GitHub
                               </span>
                             </div>
-                            <span className="text-xs font-bold text-slate-400 truncate max-w-[120px]">
+                            <span className="text-xs font-bold text-muted-foreground truncate max-w-[120px]">
                               {githubUsername
                                 ? `@${githubUsername}`
                                 : "Not linked"}
@@ -615,24 +615,24 @@ function UserDashboardContent() {
                           </div>
 
                           {/* npm */}
-                          <div className="flex items-center justify-between p-3 bg-slate-950/50 border border-slate-850 rounded-xl">
+                          <div className="flex items-center justify-between p-3 bg-muted/45 border border-border/80 rounded-xl">
                             <div className="flex items-center gap-2">
-                              <div className="h-4 w-4 bg-red-500/10 text-red-400 flex items-center justify-center rounded text-[10px] font-bold">
+                              <div className="h-4 w-4 bg-rose-500/10 text-rose-600 flex items-center justify-center rounded text-[10px] font-bold">
                                 N
                               </div>
-                              <span className="text-xs font-semibold text-slate-200">
+                              <span className="text-xs font-semibold text-foreground">
                                 npm
                               </span>
                             </div>
                             {linkedNpm ? (
                               <div className="flex items-center gap-1.5">
-                                <span className="text-xs font-bold text-slate-400 truncate max-w-[80px]">
+                                <span className="text-xs font-bold text-muted-foreground truncate max-w-[80px]">
                                   ~{linkedNpm}
                                 </span>
                                 <button
                                   type="button"
                                   onClick={() => handleLinkNpm("")}
-                                  className="text-[10px] text-red-500 hover:underline"
+                                  className="text-[10px] text-destructive hover:underline"
                                 >
                                   Unlink
                                 </button>
@@ -644,7 +644,7 @@ function UserDashboardContent() {
                                   const val = prompt("Enter npm username:");
                                   if (val) handleLinkNpm(val);
                                 }}
-                                className="text-[10px] text-indigo-400 hover:underline font-bold"
+                                className="text-[10px] text-primary/90 hover:underline font-bold"
                               >
                                 Link Profile
                               </button>
@@ -652,24 +652,24 @@ function UserDashboardContent() {
                           </div>
 
                           {/* Stack Overflow */}
-                          <div className="flex items-center justify-between p-3 bg-slate-950/50 border border-slate-850 rounded-xl">
+                          <div className="flex items-center justify-between p-3 bg-muted/45 border border-border/80 rounded-xl">
                             <div className="flex items-center gap-2">
-                              <div className="h-4 w-4 bg-orange-500/10 text-orange-400 flex items-center justify-center rounded text-[10px] font-bold">
+                              <div className="h-4 w-4 bg-amber-500/10 text-amber-600 flex items-center justify-center rounded text-[10px] font-bold">
                                 S
                               </div>
-                              <span className="text-xs font-semibold text-slate-200">
+                              <span className="text-xs font-semibold text-foreground">
                                 Stack Overflow
                               </span>
                             </div>
                             {linkedSO ? (
                               <div className="flex items-center gap-1.5">
-                                <span className="text-xs font-bold text-slate-400 truncate max-w-[80px]">
+                                <span className="text-xs font-bold text-muted-foreground truncate max-w-[80px]">
                                   ID: {linkedSO}
                                 </span>
                                 <button
                                   type="button"
                                   onClick={() => handleLinkSO("")}
-                                  className="text-[10px] text-red-500 hover:underline"
+                                  className="text-[10px] text-destructive hover:underline"
                                 >
                                   Unlink
                                 </button>
@@ -683,7 +683,7 @@ function UserDashboardContent() {
                                   );
                                   if (val) handleLinkSO(val);
                                 }}
-                                className="text-[10px] text-indigo-400 hover:underline font-bold"
+                                className="text-[10px] text-primary/90 hover:underline font-bold"
                               >
                                 Link Profile
                               </button>
@@ -693,20 +693,20 @@ function UserDashboardContent() {
                       </div>
 
                       {/* Exclude User Repos Toggle */}
-                      <div className="p-6 bg-slate-900/90 border border-slate-800 rounded-3xl shadow-xl space-y-3">
-                        <h4 className="text-sm font-bold text-slate-200">
+                      <div className="p-6 bg-card border border-border rounded-2xl shadow-sm space-y-3">
+                        <h4 className="text-sm font-bold text-foreground">
                           Personal Repositories Filter
                         </h4>
-                        <label className="flex items-center gap-3 p-3 bg-slate-950/50 border border-slate-800/80 rounded-xl cursor-pointer hover:border-slate-700 transition-colors">
+                        <label className="flex items-center gap-3 p-3 bg-muted/45 border border-border rounded-xl cursor-pointer hover:border-primary/30 transition-colors">
                           <input
                             type="checkbox"
                             checked={includeUserRepos}
                             onChange={(e) =>
                               setIncludeUserRepos(e.target.checked)
                             }
-                            className="rounded border-slate-800 text-indigo-600 focus:ring-indigo-600 focus:ring-offset-slate-950 bg-slate-950 h-4 w-4"
+                            className="rounded border-border text-primary focus:ring-primary focus:ring-offset-background bg-muted h-4 w-4"
                           />
-                          <span className="text-xs font-semibold text-slate-200">
+                          <span className="text-xs font-semibold text-foreground">
                             Include @{githubUsername} repositories
                           </span>
                         </label>

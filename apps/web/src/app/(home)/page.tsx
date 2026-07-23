@@ -151,7 +151,7 @@ export default function HomePage() {
 
           <form
             onSubmit={handleAnalyze}
-            className="p-1.5 bg-card border border-border/80 rounded-2xl shadow-lg shadow-black/5 dark:shadow-black/20 flex flex-col md:flex-row gap-2.5 w-full max-w-3xl mx-auto"
+            className="p-1.5 bg-card border border-border/80 rounded-2xl shadow-lg shadow-shadow flex flex-col md:flex-row gap-2.5 w-full max-w-3xl mx-auto"
           >
             <div className="flex-1 flex items-center gap-3 px-4 bg-muted/40 border border-border/50 rounded-xl focus-within:border-primary/20 focus-within:bg-background transition-all duration-200">
               <Search className="h-5 w-5 text-muted-foreground shrink-0" />
@@ -293,7 +293,7 @@ export default function HomePage() {
 
           {/* GitHub Connection Banner */}
           {hasGithubPat ? (
-            <div className="p-4.5 bg-card border border-border/50 rounded-2xl max-w-xl mx-auto w-full flex items-center justify-between gap-4 mt-2 animate-fade-in-up text-left shadow-sm shadow-black/5">
+            <div className="p-4.5 bg-card border border-border/50 rounded-2xl max-w-xl mx-auto w-full flex items-center justify-between gap-4 mt-2 animate-fade-in-up text-left shadow-sm shadow-shadow">
               <div className="space-y-1">
                 <h4 className="text-xs font-bold text-foreground uppercase tracking-wider flex items-center gap-2">
                   <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />{" "}
@@ -316,7 +316,7 @@ export default function HomePage() {
               </button>
             </div>
           ) : (
-            <div className="p-4.5 bg-card border border-border/50 rounded-2xl max-w-xl mx-auto w-full flex flex-col sm:flex-row items-center justify-between gap-4 mt-2 animate-fade-in-up text-left shadow-sm shadow-black/5">
+            <div className="p-4.5 bg-card border border-border/50 rounded-2xl max-w-xl mx-auto w-full flex flex-col sm:flex-row items-center justify-between gap-4 mt-2 animate-fade-in-up text-left shadow-sm shadow-shadow">
               <div className="space-y-1">
                 <h4 className="text-xs font-bold text-foreground uppercase tracking-wider flex items-center gap-2">
                   <Sparkles className="h-4 w-4 text-primary/70 shrink-0" />{" "}
@@ -346,7 +346,7 @@ export default function HomePage() {
           )}
 
           {/* Repository Scorecard Audit Preview Mockup */}
-          <div className="w-full max-w-2xl mx-auto bg-card border border-border/80 rounded-2xl shadow-xl shadow-black/[0.02] dark:shadow-black/25 overflow-hidden mt-6 animate-fade-in-up text-left">
+          <div className="w-full max-w-2xl mx-auto bg-card border border-border/80 rounded-2xl shadow-xl shadow-shadow overflow-hidden mt-6 animate-fade-in-up text-left">
             {/* Header of the mock window */}
             <div className="flex items-center justify-between px-4 py-3 bg-muted/40 border-b border-border/60">
               <div className="flex items-center gap-1.5">
@@ -556,7 +556,7 @@ export default function HomePage() {
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {/* Scoring Package Card */}
-            <div className="group relative p-6 bg-card border border-border/60 hover:border-ring/20 rounded-2xl transition-all duration-300 flex flex-col justify-between hover:shadow-lg hover:shadow-black/5 dark:hover:shadow-black/25">
+            <div className="group relative p-6 bg-card border border-border/60 hover:border-ring/20 rounded-2xl transition-all duration-300 flex flex-col justify-between hover:shadow-lg hover:shadow-shadow">
               <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-br from-[var(--card-glow)] to-transparent rounded-tr-2xl rounded-bl-full pointer-events-none group-hover:from-[var(--card-glow)] transition-all" />
               <div className="space-y-4">
                 <div className="flex items-center justify-between">
@@ -603,7 +603,7 @@ export default function HomePage() {
             </div>
 
             {/* Normalizer Package Card */}
-            <div className="group relative p-6 bg-card border border-border/60 hover:border-ring/20 rounded-2xl transition-all duration-300 flex flex-col justify-between hover:shadow-lg hover:shadow-black/5 dark:hover:shadow-black/25">
+            <div className="group relative p-6 bg-card border border-border/60 hover:border-ring/20 rounded-2xl transition-all duration-300 flex flex-col justify-between hover:shadow-lg hover:shadow-shadow">
               <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-br from-[var(--card-glow)] to-transparent rounded-tr-2xl rounded-bl-full pointer-events-none group-hover:from-[var(--card-glow)] transition-all" />
               <div className="space-y-4">
                 <div className="flex items-center justify-between">
@@ -650,7 +650,7 @@ export default function HomePage() {
             </div>
 
             {/* Insights Package Card */}
-            <div className="group relative p-6 bg-card border border-border/60 hover:border-ring/20 rounded-2xl transition-all duration-300 flex flex-col justify-between hover:shadow-lg hover:shadow-black/5 dark:hover:shadow-black/25">
+            <div className="group relative p-6 bg-card border border-border/60 hover:border-ring/20 rounded-2xl transition-all duration-300 flex flex-col justify-between hover:shadow-lg hover:shadow-shadow">
               <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-br from-[var(--card-glow)] to-transparent rounded-tr-2xl rounded-bl-full pointer-events-none group-hover:from-[var(--card-glow)] transition-all" />
               <div className="space-y-4">
                 <div className="flex items-center justify-between">

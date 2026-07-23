@@ -33,10 +33,10 @@ export default function OrgPage() {
   return (
     <Suspense
       fallback={
-        <div className="min-h-screen bg-slate-950 text-slate-100 flex items-center justify-center">
+        <div className="min-h-screen bg-background text-foreground flex items-center justify-center">
           <div className="flex flex-col items-center gap-3">
-            <div className="h-8 w-8 border-4 border-indigo-500 border-t-transparent rounded-full animate-spin" />
-            <span className="text-sm font-semibold text-slate-400">
+            <div className="h-8 w-8 border-4 border-primary border-t-transparent rounded-full animate-spin" />
+            <span className="text-sm font-semibold text-muted-foreground">
               Loading Org Dashboard...
             </span>
           </div>
@@ -149,8 +149,8 @@ function OrgDashboardContent() {
   }, [userQuery.data, clientIntel]);
 
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-100 font-sans antialiased selection:bg-indigo-500/30">
-      <div className="absolute inset-0 bg-[linear-gradient(to_right,#0f172a_1px,transparent_1px),linear-gradient(to_bottom,#0f172a_1px,transparent_1px)] bg-size-[4rem_4rem] mask-[radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)] pointer-events-none opacity-50" />
+    <div className="min-h-screen bg-background text-foreground font-sans antialiased selection:bg-primary/30">
+      <div className="absolute inset-0 bg-[linear-gradient(to_right,var(--grid-line-color)_1px,transparent_1px),linear-gradient(to_bottom,var(--grid-line-color)_1px,transparent_1px)] bg-size-[4rem_4rem] mask-[radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)] pointer-events-none" />
 
       <main className="relative max-w-7xl mx-auto px-6 py-12 z-10 flex flex-col gap-10">
         <LoadingOverlay
@@ -179,15 +179,15 @@ function OrgDashboardContent() {
               />
             )}
             {/* Navigation Backlinks */}
-            <div className="flex flex-wrap items-center justify-between gap-4 p-4 bg-slate-900/60 border border-slate-800 rounded-2xl shadow-md">
+            <div className="flex flex-wrap items-center justify-between gap-4 p-4 bg-card/60 border border-border/80 rounded-2xl shadow-sm">
               <div className="flex flex-wrap items-center gap-3">
-                <span className="text-xs text-slate-500 font-bold uppercase tracking-wider">
+                <span className="text-xs text-muted-foreground/80 font-bold uppercase tracking-wider">
                   Backlinks:
                 </span>
                 <button
                   type="button"
                   onClick={() => router.push("/")}
-                  className="px-3 py-1 bg-slate-950 hover:bg-slate-900 border border-slate-800 text-slate-300 hover:text-white text-xs font-bold rounded-lg transition-all"
+                  className="px-3 py-1 bg-muted/40 hover:bg-muted border border-border/80 text-muted-foreground hover:text-foreground text-xs font-bold rounded-lg transition-all"
                 >
                   Home
                 </button>
@@ -197,7 +197,7 @@ function OrgDashboardContent() {
                 <button
                   type="button"
                   onClick={handleRefresh}
-                  className="p-2 bg-slate-950 hover:bg-slate-900 border border-slate-800 text-slate-400 hover:text-white rounded-lg transition-all"
+                  className="p-2 bg-muted/40 hover:bg-muted border border-border/80 text-muted-foreground hover:text-foreground rounded-lg transition-all"
                   title="Force Refresh Data"
                 >
                   <RefreshCw className="h-4 w-4" />

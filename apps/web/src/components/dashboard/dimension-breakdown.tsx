@@ -155,8 +155,8 @@ export const DimensionBreakdown: React.FC<DimensionBreakdownProps> = ({
   const metrics = isUser ? userMetrics : repoMetrics;
 
   return (
-    <div className="p-6 bg-slate-900/90 border border-slate-800 rounded-3xl flex flex-col gap-4 shadow-xl">
-      <h4 className="text-xs font-bold text-slate-500 uppercase tracking-widest">
+    <div className="p-6 bg-card border border-border rounded-2xl flex flex-col gap-4 shadow-sm">
+      <h4 className="text-xs font-bold text-muted-foreground/80 uppercase tracking-widest">
         {isUser ? "OSSIQ Engine Breakdown" : "Dimension Breakdown"}
       </h4>
       <div className="space-y-4">
@@ -169,39 +169,41 @@ export const DimensionBreakdown: React.FC<DimensionBreakdownProps> = ({
           return (
             <div
               key={metric.label}
-              className={`p-4 rounded-2xl flex flex-col gap-3 transition-colors ${
+              className={`p-4 rounded-xl flex flex-col gap-3 transition-colors ${
                 isUser
-                  ? "bg-slate-950/40 border border-slate-800/80 hover:border-slate-800"
+                  ? "bg-muted/40 border border-border/80 hover:border-border"
                   : ""
               }`}
             >
               <div className="flex items-center justify-between text-xs font-semibold">
-                <span className="flex items-center gap-1.5 text-slate-300">
-                  <Icon className="h-4 w-4 text-slate-400" />
+                <span className="flex items-center gap-1.5 text-foreground/90">
+                  <Icon className="h-4 w-4 text-muted-foreground" />
                   {metric.label}
                   <div className="group relative flex items-center">
-                    <Info className="h-3.5 w-3.5 text-slate-500 hover:text-indigo-400 transition-colors cursor-help" />
-                    <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-64 p-3 bg-slate-950 border border-slate-800 text-slate-300 text-[10px] rounded-xl shadow-2xl opacity-0 group-hover:opacity-100 pointer-events-none transition-all duration-200 z-50 normal-case leading-normal font-medium">
-                      <p className="font-bold text-slate-100 mb-1">
+                    <Info className="h-3.5 w-3.5 text-muted-foreground/80 hover:text-primary transition-colors cursor-help" />
+                    <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-64 p-3 bg-card border border-border text-foreground text-[10px] rounded-xl shadow-2xl opacity-0 group-hover:opacity-100 pointer-events-none transition-all duration-200 z-50 normal-case leading-normal font-medium">
+                      <p className="font-bold text-foreground mb-1">
                         How it's calculated:
                       </p>
-                      <p className="text-slate-400 mb-2">{metric.calc}</p>
+                      <p className="text-muted-foreground mb-2">
+                        {metric.calc}
+                      </p>
                       {"factors" in metric &&
                         metric.factors &&
                         metric.factors.length > 0 && (
                           <>
-                            <p className="font-bold text-slate-100 mb-1">
+                            <p className="font-bold text-foreground mb-1">
                               Explainability Factors:
                             </p>
-                            <ul className="space-y-0.5 text-[10px] text-slate-400 list-none pl-0">
+                            <ul className="space-y-0.5 text-[10px] text-muted-foreground list-none pl-0">
                               {metric.factors.map((f: string) => (
                                 <li
                                   key={f}
                                   className={
                                     f.startsWith("+")
-                                      ? "text-emerald-400"
+                                      ? "text-emerald-600"
                                       : f.startsWith("-")
-                                        ? "text-rose-400"
+                                        ? "text-destructive"
                                         : ""
                                   }
                                 >
@@ -213,7 +215,7 @@ export const DimensionBreakdown: React.FC<DimensionBreakdownProps> = ({
                         )}
                       {"getReason" in metric && (
                         <>
-                          <p className="font-bold text-slate-100 mb-1">
+                          <p className="font-bold text-foreground mb-1">
                             Status:
                           </p>
                           <p>{metric.getReason(metric.val)}</p>
@@ -228,7 +230,7 @@ export const DimensionBreakdown: React.FC<DimensionBreakdownProps> = ({
                   {metric.val}
                 </span>
               </div>
-              <div className="bg-slate-950 h-1.5 rounded-full overflow-hidden">
+              <div className="bg-muted h-1.5 rounded-full overflow-hidden">
                 <div
                   className={`h-full rounded-full transition-all ${getScoreBgClass(displayColorVal)}`}
                   style={{ width: `${metric.val}%` }}
@@ -238,10 +240,10 @@ export const DimensionBreakdown: React.FC<DimensionBreakdownProps> = ({
               {"evidence" in metric &&
                 metric.evidence &&
                 metric.evidence.length > 0 && (
-                  <ul className="grid grid-cols-1 sm:grid-cols-2 gap-1 text-[10px] text-slate-400 border-t border-slate-800/40 pt-2 list-none pl-0">
+                  <ul className="grid grid-cols-1 sm:grid-cols-2 gap-1 text-[10px] text-muted-foreground border-t border-border/40 pt-2 list-none pl-0">
                     {metric.evidence.map((ev: string) => (
                       <li key={ev} className="flex items-center gap-1.5">
-                        <div className="h-1 w-1 bg-indigo-500 rounded-full shrink-0" />
+                        <div className="h-1 w-1 bg-primary rounded-full shrink-0" />
                         <span className="truncate">{ev}</span>
                       </li>
                     ))}

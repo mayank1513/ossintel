@@ -60,6 +60,7 @@ export async function GET() {
 
     return NextResponse.json({
       hasGitHubPat,
+      hasGithubPat: hasGitHubPat,
       hasStackOverflowKey,
       login,
       organizations,
@@ -69,6 +70,7 @@ export async function GET() {
 
     return NextResponse.json({
       hasGitHubPat: false,
+      hasGithubPat: false,
       hasStackOverflowKey: false,
       login: null,
       organizations: [],

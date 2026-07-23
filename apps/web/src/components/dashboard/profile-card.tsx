@@ -54,8 +54,8 @@ export const ProfileCard: React.FC<ProfileCardProps> = ({
   const [isOpen, setIsOpen] = useState(false);
 
   return (
-    <div className="p-6 bg-slate-900/90 border border-slate-800 rounded-3xl flex flex-col gap-4 shadow-xl">
-      <h3 className="text-base font-bold flex items-center gap-2 text-indigo-400">
+    <div className="p-6 bg-card border border-border rounded-2xl flex flex-col gap-4 shadow-sm">
+      <h3 className="text-base font-bold flex items-center gap-2 text-primary">
         <FaGithub className="h-5 w-5" />{" "}
         {type === "org" ? "GitHub Organization" : "GitHub Profile"}
       </h3>
@@ -65,49 +65,48 @@ export const ProfileCard: React.FC<ProfileCardProps> = ({
         <img
           src={avatarUrl || "https://avatar.url"}
           alt={name || login}
-          className="h-14 w-14 rounded-2xl border border-slate-700 object-cover shadow-inner"
+          className="h-14 w-14 rounded-2xl border border-border object-cover shadow-inner"
         />
         <div>
-          <h3 className="font-extrabold text-base text-slate-100 leading-tight">
+          <h3 className="font-extrabold text-base text-foreground leading-tight">
             {name || login}
           </h3>
-          <p className="text-xs text-slate-500 font-bold">@{login}</p>
+          <p className="text-xs text-muted-foreground/80 font-bold">@{login}</p>
         </div>
       </div>
 
       {bio && (
-        <p className="text-xs text-slate-400 font-semibold leading-relaxed border-t border-slate-800/80 pt-3">
+        <p className="text-xs text-muted-foreground font-semibold leading-relaxed border-t border-border/80 pt-3">
           {bio}
         </p>
       )}
 
       {(company || location || email) && (
-        <div className="flex flex-col gap-2 border-t border-slate-800/80 pt-3 text-slate-400 font-medium">
+        <div className="flex flex-col gap-2 border-t border-border/80 pt-3 text-muted-foreground font-medium">
           {company && (
             <span className="text-xs flex items-center gap-2">
-              <FaBuilding className="text-indigo-400 h-3.5 w-3.5" /> {company}
+              <FaBuilding className="text-primary h-3.5 w-3.5" /> {company}
             </span>
           )}
           {location && (
             <span className="text-xs flex items-center gap-2">
-              <FaMapMarkerAlt className="text-indigo-400 h-3.5 w-3.5" />{" "}
-              {location}
+              <FaMapMarkerAlt className="text-primary h-3.5 w-3.5" /> {location}
             </span>
           )}
           {email && (
             <span className="text-xs flex items-center gap-2">
-              <FaEnvelope className="text-indigo-400 h-3.5 w-3.5" /> {email}
+              <FaEnvelope className="text-primary h-3.5 w-3.5" /> {email}
             </span>
           )}
         </div>
       )}
 
-      <div className="flex flex-wrap gap-2 border-t border-slate-800/80 pt-3">
+      <div className="flex flex-wrap gap-2 border-t border-border/80 pt-3">
         <a
           href={htmlUrl}
           target="_blank"
           rel="noopener noreferrer"
-          className="p-2 bg-slate-950 border border-slate-800 hover:border-indigo-500/40 text-slate-400 hover:text-indigo-400 rounded-xl transition-all"
+          className="p-2 bg-muted/40 border border-border hover:border-primary/45 text-muted-foreground hover:text-primary rounded-xl transition-all"
           title="GitHub Profile"
         >
           <FaGithub className="h-4 w-4" />
@@ -117,7 +116,7 @@ export const ProfileCard: React.FC<ProfileCardProps> = ({
             href={`https://twitter.com/${twitterUsername}`}
             target="_blank"
             rel="noopener noreferrer"
-            className="p-2 bg-slate-950 border border-slate-800 hover:border-indigo-500/40 text-slate-400 hover:text-indigo-400 rounded-xl transition-all"
+            className="p-2 bg-muted/40 border border-border hover:border-primary/45 text-muted-foreground hover:text-primary rounded-xl transition-all"
             title="Twitter Account"
           >
             <FaTwitter className="h-4 w-4" />
@@ -128,7 +127,7 @@ export const ProfileCard: React.FC<ProfileCardProps> = ({
             href={blog.startsWith("http") ? blog : `https://${blog}`}
             target="_blank"
             rel="noopener noreferrer"
-            className="p-2 bg-slate-950 border border-slate-800 hover:border-indigo-500/40 text-slate-400 hover:text-indigo-400 rounded-xl transition-all"
+            className="p-2 bg-muted/40 border border-border hover:border-primary/45 text-muted-foreground hover:text-primary rounded-xl transition-all"
             title="Website/Blog"
           >
             <FaGlobe className="h-4 w-4" />
@@ -143,7 +142,7 @@ export const ProfileCard: React.FC<ProfileCardProps> = ({
             }
             target="_blank"
             rel="noopener noreferrer"
-            className="p-2 bg-slate-950 border border-slate-800 hover:border-indigo-500/40 text-slate-400 hover:text-indigo-400 rounded-xl transition-all"
+            className="p-2 bg-muted/40 border border-border hover:border-primary/45 text-muted-foreground hover:text-primary rounded-xl transition-all"
             title="LinkedIn Profile"
           >
             <FaLinkedin className="h-4 w-4" />
@@ -154,7 +153,7 @@ export const ProfileCard: React.FC<ProfileCardProps> = ({
             href={stackoverflowUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="p-2 bg-slate-950 border border-slate-800 hover:border-indigo-500/40 text-slate-400 hover:text-indigo-400 rounded-xl transition-all"
+            className="p-2 bg-muted/40 border border-border hover:border-primary/45 text-muted-foreground hover:text-primary rounded-xl transition-all"
             title="Stack Overflow Profile"
           >
             <FaStackOverflow className="h-4 w-4" />
@@ -165,7 +164,7 @@ export const ProfileCard: React.FC<ProfileCardProps> = ({
             href={npmUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="p-2 bg-slate-950 border border-slate-800 hover:border-indigo-500/40 text-slate-400 hover:text-indigo-400 rounded-xl transition-all"
+            className="p-2 bg-muted/40 border border-border hover:border-primary/45 text-muted-foreground hover:text-primary rounded-xl transition-all"
             title="npm Profile"
           >
             <FaNpm className="h-4 w-4" />
@@ -173,11 +172,11 @@ export const ProfileCard: React.FC<ProfileCardProps> = ({
         )}
       </div>
       {readme && (
-        <div className="border-t border-slate-800/80 pt-4 mt-1">
+        <div className="border-t border-border/80 pt-4 mt-1">
           <button
             type="button"
             onClick={() => setIsOpen(!isOpen)}
-            className="w-full flex items-center justify-between py-2 px-3 bg-slate-950/40 border border-slate-850 hover:border-indigo-500/30 rounded-xl text-xs font-bold text-slate-300 hover:text-indigo-400 transition-all cursor-pointer shadow-inner"
+            className="w-full flex items-center justify-between py-2 px-3 bg-muted/40 border border-border/80 hover:border-primary/20 rounded-xl text-xs font-bold text-muted-foreground hover:text-primary transition-all cursor-pointer shadow-inner"
           >
             <span className="flex items-center gap-2">
               <FaGithub className="h-3.5 w-3.5" />
@@ -192,7 +191,7 @@ export const ProfileCard: React.FC<ProfileCardProps> = ({
             </span>
           </button>
           {isOpen && (
-            <div className="mt-4 max-h-80 overflow-y-auto pr-2 bg-slate-950/60 p-5 rounded-2xl border border-slate-850 animate-fade-in-up">
+            <div className="mt-4 max-h-80 overflow-y-auto pr-2 bg-muted/40 p-5 rounded-xl border border-border/80 animate-fade-in-up">
               <Readme readme={readme} />
             </div>
           )}

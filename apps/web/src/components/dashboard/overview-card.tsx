@@ -30,15 +30,15 @@ export const OverviewCard: React.FC<OverviewCardProps> = ({
   impactStats,
 }) => {
   return (
-    <div className="p-6 bg-slate-900/90 border border-slate-800 rounded-3xl flex flex-col items-center text-center gap-6 shadow-xl relative overflow-hidden">
-      <div className="absolute top-0 right-0 w-32 h-32 bg-indigo-500/10 rounded-full filter blur-2xl pointer-events-none" />
+    <div className="p-6 bg-card border border-border rounded-2xl flex flex-col items-center text-center gap-6 shadow-sm relative overflow-hidden">
+      <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5 rounded-full filter blur-2xl pointer-events-none" />
 
       {data.type === "repo" ? (
         <div className="space-y-1">
           <h3 className="text-xl font-bold tracking-tight">
             {data.metadata.name}
           </h3>
-          <p className="text-xs font-semibold text-slate-400 flex items-center justify-center gap-1.5">
+          <p className="text-xs font-semibold text-muted-foreground flex items-center justify-center gap-1.5">
             <GithubIcon className="h-3.5 w-3.5" /> {data.metadata.fullName}
           </p>
         </div>
@@ -48,13 +48,13 @@ export const OverviewCard: React.FC<OverviewCardProps> = ({
           <img
             src={data.metadata.avatarUrl || undefined}
             alt={data.metadata.login}
-            className="h-16 w-16 rounded-2xl border-2 border-slate-800 shadow-md object-cover"
+            className="h-16 w-16 rounded-2xl border-2 border-border shadow-sm object-cover"
           />
           <div className="space-y-1">
             <h3 className="text-xl font-bold tracking-tight">
               {data.metadata.name || data.metadata.login}
             </h3>
-            <p className="text-xs text-slate-400 font-medium">
+            <p className="text-xs text-muted-foreground font-medium">
               @{data.metadata.login}
             </p>
           </div>
@@ -69,7 +69,7 @@ export const OverviewCard: React.FC<OverviewCardProps> = ({
             cx="88"
             cy="88"
             r="76"
-            stroke="#1e293b"
+            stroke="var(--border)"
             strokeWidth="12"
             fill="transparent"
           />
@@ -98,17 +98,17 @@ export const OverviewCard: React.FC<OverviewCardProps> = ({
           <span className="text-5xl font-black tracking-tight">
             {data.scores.overall}
           </span>
-          <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">
+          <span className="text-[10px] font-bold text-muted-foreground/80 uppercase tracking-widest">
             OSSIQ Score
           </span>
           {"confidence" in data.scores && (
             <span
               className={`text-[9px] font-bold px-2 py-0.5 rounded border mt-1.5 uppercase tracking-wider ${
                 data.scores.confidence === "High"
-                  ? "bg-emerald-500/10 border-emerald-500/20 text-emerald-400"
+                  ? "bg-emerald-500/10 border-emerald-500/20 text-emerald-600"
                   : data.scores.confidence === "Medium"
-                    ? "bg-amber-500/10 border-amber-500/20 text-amber-400"
-                    : "bg-rose-500/10 border-rose-500/20 text-rose-400"
+                    ? "bg-amber-500/10 border-amber-500/20 text-amber-600"
+                    : "bg-rose-500/10 border-rose-500/20 text-destructive"
               }`}
             >
               Confidence: {data.scores.confidence}
@@ -117,48 +117,48 @@ export const OverviewCard: React.FC<OverviewCardProps> = ({
         </div>
       </div>
 
-      <div className="w-full border-t border-slate-800/80 pt-4 text-left space-y-4">
+      <div className="w-full border-t border-border/80 pt-4 text-left space-y-4">
         {/* Core Metadata Breakdown */}
         <div className="space-y-2">
-          <span className="text-xs font-bold text-slate-500 uppercase tracking-wider block">
+          <span className="text-xs font-bold text-muted-foreground/80 uppercase tracking-wider block">
             Metadata Breakdown
           </span>
           <div className="grid grid-cols-2 gap-3 text-xs">
             {data.type === "repo" ? (
               <>
-                <div className="bg-slate-950 p-2.5 rounded-xl border border-slate-800/50 space-y-1">
-                  <span className="text-slate-500 font-medium block">
+                <div className="bg-muted/40 p-2.5 rounded-xl border border-border/60 space-y-1">
+                  <span className="text-muted-foreground font-medium block">
                     Language
                   </span>
-                  <span className="font-bold text-slate-200 flex items-center gap-1.5">
-                    <Languages className="h-3.5 w-3.5 text-indigo-400" />{" "}
+                  <span className="font-bold text-foreground flex items-center gap-1.5">
+                    <Languages className="h-3.5 w-3.5 text-primary/80" />{" "}
                     {data.metadata.language || "None"}
                   </span>
                 </div>
-                <div className="bg-slate-950 p-2.5 rounded-xl border border-slate-800/50 space-y-1">
-                  <span className="text-slate-500 font-medium block">
+                <div className="bg-muted/40 p-2.5 rounded-xl border border-border/60 space-y-1">
+                  <span className="text-muted-foreground font-medium block">
                     Default Branch
                   </span>
-                  <span className="font-bold text-slate-200 font-mono">
+                  <span className="font-bold text-foreground font-mono">
                     {data.metadata.defaultBranch}
                   </span>
                 </div>
               </>
             ) : (
               <>
-                <div className="bg-slate-950 p-2.5 rounded-xl border border-slate-800/50 space-y-1">
-                  <span className="text-slate-500 font-medium block">
+                <div className="bg-muted/40 p-2.5 rounded-xl border border-border/60 space-y-1">
+                  <span className="text-muted-foreground font-medium block">
                     Public Repos
                   </span>
-                  <span className="font-bold text-slate-200">
+                  <span className="font-bold text-foreground">
                     {data.metadata.publicRepos}
                   </span>
                 </div>
-                <div className="bg-slate-950 p-2.5 rounded-xl border border-slate-800/50 space-y-1">
-                  <span className="text-slate-500 font-medium block">
+                <div className="bg-muted/40 p-2.5 rounded-xl border border-border/60 space-y-1">
+                  <span className="text-muted-foreground font-medium block">
                     Followers
                   </span>
-                  <span className="font-bold text-slate-200">
+                  <span className="font-bold text-foreground">
                     {data.metadata.followers}
                   </span>
                 </div>
@@ -170,7 +170,7 @@ export const OverviewCard: React.FC<OverviewCardProps> = ({
         {/* Open Source Impact Stats */}
         {impactStats && (
           <div className="space-y-2">
-            <span className="text-xs font-bold text-slate-500 uppercase tracking-wider block">
+            <span className="text-xs font-bold text-muted-foreground/80 uppercase tracking-wider block">
               {data.type === "org"
                 ? "Organization Metrics"
                 : "Open Source Impact"}
@@ -178,28 +178,28 @@ export const OverviewCard: React.FC<OverviewCardProps> = ({
             <div
               className={`grid gap-2 text-xs ${data.type === "org" ? "grid-cols-2" : "grid-cols-3"}`}
             >
-              <div className="bg-slate-950 p-2 rounded-xl border border-slate-800/50 text-center space-y-1">
-                <span className="text-slate-500 font-medium block text-[10px]">
+              <div className="bg-muted/40 p-2 rounded-xl border border-border/60 text-center space-y-1">
+                <span className="text-muted-foreground font-medium block text-[10px]">
                   {data.type === "org" ? "Total Stars" : "Stars"}
                 </span>
-                <span className="font-extrabold text-slate-200 text-sm">
+                <span className="font-extrabold text-foreground text-sm">
                   {impactStats.stars.toLocaleString()}
                 </span>
               </div>
-              <div className="bg-slate-950 p-2 rounded-xl border border-slate-800/50 text-center space-y-1">
-                <span className="text-slate-500 font-medium block text-[10px]">
+              <div className="bg-muted/40 p-2 rounded-xl border border-border/60 text-center space-y-1">
+                <span className="text-muted-foreground font-medium block text-[10px]">
                   {data.type === "org" ? "Total Forks" : "Forks"}
                 </span>
-                <span className="font-extrabold text-slate-200 text-sm">
+                <span className="font-extrabold text-foreground text-sm">
                   {impactStats.forks.toLocaleString()}
                 </span>
               </div>
               {data.type !== "org" && (
-                <div className="bg-slate-950 p-2 rounded-xl border border-slate-800/50 text-center space-y-1">
-                  <span className="text-slate-500 font-medium block text-[10px]">
+                <div className="bg-muted/40 p-2 rounded-xl border border-border/60 text-center space-y-1">
+                  <span className="text-muted-foreground font-medium block text-[10px]">
                     Merged PRs
                   </span>
-                  <span className="font-extrabold text-indigo-400 text-sm">
+                  <span className="font-extrabold text-primary text-sm">
                     {impactStats.prsMerged}
                   </span>
                 </div>
@@ -211,32 +211,32 @@ export const OverviewCard: React.FC<OverviewCardProps> = ({
         {/* npm Stats */}
         {npmStats && (
           <div className="space-y-2">
-            <span className="text-xs font-bold text-red-400/80 uppercase tracking-wider block">
+            <span className="text-xs font-bold text-rose-500/80 uppercase tracking-wider block">
               npm Packages
             </span>
             <div className="grid grid-cols-2 gap-2 text-xs">
-              <div className="bg-slate-950 p-2 rounded-xl border border-slate-800/50 text-center space-y-1">
-                <span className="text-slate-500 font-medium block text-[10px]">
+              <div className="bg-muted/40 p-2 rounded-xl border border-border/60 text-center space-y-1">
+                <span className="text-muted-foreground font-medium block text-[10px]">
                   Total Weekly Downloads
                 </span>
-                <span className="font-extrabold text-emerald-400 text-sm">
+                <span className="font-extrabold text-emerald-600 text-sm">
                   {formatCompactNumber(npmStats.totalDownloads)}
                 </span>
               </div>
-              <div className="bg-slate-950 p-2 rounded-xl border border-slate-800/50 text-center space-y-1">
-                <span className="text-slate-500 font-medium block text-[10px]">
+              <div className="bg-muted/40 p-2 rounded-xl border border-border/60 text-center space-y-1">
+                <span className="text-muted-foreground font-medium block text-[10px]">
                   Packages
                 </span>
-                <span className="font-extrabold text-slate-200 text-sm">
+                <span className="font-extrabold text-foreground text-sm">
                   {npmStats.packageCount}
                 </span>
               </div>
             </div>
             {npmStats.topPackage && (
-              <div className="bg-slate-950 p-2 rounded-xl border border-slate-800/50 text-left text-[11px] font-semibold text-slate-400 flex items-center justify-between">
+              <div className="bg-muted/40 p-2 rounded-xl border border-border/60 text-left text-[11px] font-semibold text-muted-foreground flex items-center justify-between">
                 <span>Top Package:</span>
                 <span
-                  className="text-red-400 font-mono truncate max-w-[150px]"
+                  className="text-rose-600 font-mono truncate max-w-[150px]"
                   title={npmStats.topPackage}
                 >
                   {npmStats.topPackage}
@@ -249,27 +249,27 @@ export const OverviewCard: React.FC<OverviewCardProps> = ({
         {/* Stack Overflow Stats */}
         {soStats && (
           <div className="space-y-2">
-            <span className="text-xs font-bold text-orange-400/80 uppercase tracking-wider block">
+            <span className="text-xs font-bold text-amber-600/80 uppercase tracking-wider block">
               Stack Overflow Reputation
             </span>
             <div className="grid grid-cols-2 gap-2 text-xs">
-              <div className="bg-slate-950 p-2 rounded-xl border border-slate-800/50 text-center space-y-1">
-                <span className="text-slate-500 font-medium block text-[10px]">
+              <div className="bg-muted/40 p-2 rounded-xl border border-border/60 text-center space-y-1">
+                <span className="text-muted-foreground font-medium block text-[10px]">
                   Reputation
                 </span>
-                <span className="font-extrabold text-orange-400 text-sm">
+                <span className="font-extrabold text-amber-600 text-sm">
                   {soStats.reputation.toLocaleString()}
                 </span>
               </div>
-              <div className="bg-slate-950 p-2 rounded-xl border border-slate-800/50 text-center space-y-1">
-                <span className="text-slate-500 font-medium block text-[10px]">
+              <div className="bg-muted/40 p-2 rounded-xl border border-border/60 text-center space-y-1">
+                <span className="text-muted-foreground font-medium block text-[10px]">
                   Badges (G/S/B)
                 </span>
-                <span className="font-extrabold text-slate-200 text-xs flex items-center justify-center gap-1">
-                  <span className="text-yellow-400 font-bold">
+                <span className="font-extrabold text-foreground text-xs flex items-center justify-center gap-1">
+                  <span className="text-yellow-500 font-bold">
                     🥇{soStats.badgeCount.gold}
                   </span>
-                  <span className="text-slate-400 font-bold">
+                  <span className="text-muted-foreground font-bold">
                     🥈{soStats.badgeCount.silver}
                   </span>
                   <span className="text-amber-600 font-bold">
@@ -279,13 +279,13 @@ export const OverviewCard: React.FC<OverviewCardProps> = ({
               </div>
             </div>
             {soStats.topTags.length > 0 && (
-              <div className="bg-slate-950 p-2 rounded-xl border border-slate-800/50 text-left text-[11px] font-semibold text-slate-400 flex items-center justify-between">
+              <div className="bg-muted/40 p-2 rounded-xl border border-border/60 text-left text-[11px] font-semibold text-muted-foreground flex items-center justify-between">
                 <span>Top Tags:</span>
                 <div className="flex gap-1">
                   {soStats.topTags.map((tag) => (
                     <span
                       key={tag}
-                      className="px-1.5 py-0.5 bg-slate-900 border border-slate-800 rounded-md font-mono text-[9px] text-slate-300"
+                      className="px-1.5 py-0.5 bg-muted border border-border rounded-md font-mono text-[9px] text-foreground/80"
                     >
                       {tag}
                     </span>
@@ -301,7 +301,7 @@ export const OverviewCard: React.FC<OverviewCardProps> = ({
             href={data.metadata.htmlUrl}
             target="_blank"
             rel="noreferrer"
-            className="mt-2 w-full py-2 bg-slate-950 hover:bg-slate-900 border border-slate-800 hover:border-slate-700 text-slate-300 rounded-xl text-xs font-semibold tracking-wide flex items-center justify-center gap-1.5 transition-all"
+            className="mt-2 w-full py-2 bg-muted/40 hover:bg-muted border border-border text-muted-foreground hover:text-foreground rounded-xl text-xs font-semibold tracking-wide flex items-center justify-center gap-1.5 transition-all shadow-sm"
           >
             View on GitHub <Globe className="h-3.5 w-3.5" />
           </a>

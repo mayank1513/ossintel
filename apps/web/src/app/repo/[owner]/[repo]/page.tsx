@@ -58,9 +58,9 @@ export default function RepoPage() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-100 font-sans antialiased selection:bg-indigo-500/30">
+    <div className="min-h-screen bg-background text-foreground font-sans antialiased selection:bg-primary/30">
       {/* Background decoration */}
-      <div className="absolute inset-0 bg-[linear-gradient(to_right,#0f172a_1px,transparent_1px),linear-gradient(to_bottom,#0f172a_1px,transparent_1px)] bg-size-[4rem_4rem] mask-[radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)] pointer-events-none opacity-50" />
+      <div className="absolute inset-0 bg-[linear-gradient(to_right,var(--grid-line-color)_1px,transparent_1px),linear-gradient(to_bottom,var(--grid-line-color)_1px,transparent_1px)] bg-size-[4rem_4rem] mask-[radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)] pointer-events-none" />
 
       {/* Main Content */}
       <main className="relative max-w-7xl mx-auto px-6 py-12 z-10 flex flex-col gap-10">
@@ -86,19 +86,19 @@ export default function RepoPage() {
         {data && !isLoading && !isFetching && (
           <div className="space-y-8 animate-fade-in">
             {/* Cache indicator and navigation backlinks panel */}
-            <div className="flex flex-wrap items-center justify-between gap-4 p-4 bg-slate-900/60 border border-slate-800 rounded-2xl shadow-md">
+            <div className="flex flex-wrap items-center justify-between gap-4 p-4 bg-card/60 border border-border/80 rounded-2xl shadow-sm">
               {/* Backlinks */}
               <div className="flex flex-wrap items-center gap-3">
-                <span className="text-xs text-slate-500 font-bold uppercase tracking-wider">
+                <span className="text-xs text-muted-foreground/80 font-bold uppercase tracking-wider">
                   Backlinks:
                 </span>
 
                 <button
                   type="button"
                   onClick={() => router.push(`/user/${owner}`)}
-                  className="px-3 py-1 bg-slate-950 hover:bg-slate-900 border border-slate-800 text-slate-330 hover:text-white text-xs font-bold rounded-lg flex items-center gap-1.5 transition-all shadow"
+                  className="px-3 py-1 bg-muted/40 hover:bg-muted border border-border/80 text-muted-foreground hover:text-foreground text-xs font-bold rounded-lg flex items-center gap-1.5 transition-all shadow-sm"
                 >
-                  <User className="h-3.5 w-3.5 text-indigo-400" /> Owner profile
+                  <User className="h-3.5 w-3.5 text-primary/85" /> Owner profile
                   (@{owner})
                 </button>
 
@@ -106,9 +106,9 @@ export default function RepoPage() {
                   href={`https://github.com/${owner}/${repo}`}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="px-3 py-1 bg-slate-950 hover:bg-slate-900 border border-slate-800 text-slate-330 hover:text-white text-xs font-bold rounded-lg flex items-center gap-1.5 transition-all shadow"
+                  className="px-3 py-1 bg-muted/40 hover:bg-muted border border-border/80 text-muted-foreground hover:text-foreground text-xs font-bold rounded-lg flex items-center gap-1.5 transition-all shadow-sm"
                 >
-                  <FaGithub className="h-3.5 w-3.5 text-indigo-400" /> Outer
+                  <FaGithub className="h-3.5 w-3.5 text-primary/85" /> Outer
                   GitHub <ExternalLink className="h-3 w-3 opacity-60" />
                 </a>
               </div>
@@ -116,7 +116,7 @@ export default function RepoPage() {
               {/* Cache status details */}
               <div className="flex items-center gap-3">
                 {cachedTime && (
-                  <span className="text-xs text-emerald-400 bg-emerald-500/5 border border-emerald-500/10 px-3 py-1 rounded-full font-bold flex items-center gap-1.5">
+                  <span className="text-xs text-emerald-600 bg-emerald-500/5 border border-emerald-500/10 px-3 py-1 rounded-full font-bold flex items-center gap-1.5">
                     <Info className="h-3.5 w-3.5" /> Cached data from{" "}
                     {cachedTime}
                   </span>
@@ -125,7 +125,7 @@ export default function RepoPage() {
                 <button
                   type="button"
                   onClick={handleRefresh}
-                  className="flex items-center gap-1 px-4 py-2 bg-slate-950 border border-slate-800 text-slate-330 hover:text-white text-xs font-bold rounded-xl transition-all"
+                  className="flex items-center gap-1 px-4 py-2 bg-muted/40 hover:bg-muted border border-border/80 text-muted-foreground hover:text-foreground text-xs font-bold rounded-xl transition-all"
                 >
                   <RefreshCw className="h-3.5 w-3.5" /> Refresh
                 </button>

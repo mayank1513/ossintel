@@ -28,14 +28,14 @@ export const RecommendationsGrid: React.FC<RecommendationsGridProps> = ({
           {recommendations.map((r) => {
             const priorityColorClass =
               r.priority === "high"
-                ? "bg-rose-500/10 border-rose-500/20 text-rose-400"
+                ? "bg-rose-500/10 border-rose-500/20 text-destructive"
                 : r.priority === "medium"
-                  ? "bg-amber-500/10 border-amber-500/20 text-amber-400"
-                  : "bg-blue-500/10 border-blue-500/20 text-blue-400";
+                  ? "bg-amber-500/10 border-amber-500/20 text-amber-600"
+                  : "bg-blue-500/10 border-blue-500/20 text-primary";
             return (
               <div
                 key={r.id}
-                className="p-4 bg-slate-950/40 border border-slate-850 rounded-2xl flex gap-4 items-start"
+                className="p-4 bg-muted/40 border border-border/80 rounded-2xl flex gap-4 items-start"
               >
                 <span
                   className={`text-[9px] font-extrabold uppercase px-2 py-1 rounded-full border shrink-0 mt-0.5 ${priorityColorClass}`}
@@ -43,13 +43,13 @@ export const RecommendationsGrid: React.FC<RecommendationsGridProps> = ({
                   {r.priority}
                 </span>
                 <div className="space-y-1.5 flex-1">
-                  <h4 className="font-extrabold text-sm text-slate-100">
+                  <h4 className="font-extrabold text-sm text-foreground">
                     {r.title}
                   </h4>
-                  <p className="text-xs text-slate-350 leading-relaxed font-semibold">
+                  <p className="text-xs text-muted-foreground leading-relaxed font-semibold">
                     {r.description}
                   </p>
-                  <span className="text-[10px] text-slate-550 font-bold uppercase tracking-wider block">
+                  <span className="text-[10px] text-muted-foreground/80 font-bold uppercase tracking-wider block">
                     Category: {r.category}
                   </span>
                 </div>
@@ -58,10 +58,12 @@ export const RecommendationsGrid: React.FC<RecommendationsGridProps> = ({
           })}
         </div>
       ) : (
-        <div className="p-8 bg-slate-950/40 border border-slate-800/60 rounded-2xl text-center space-y-2">
+        <div className="p-8 bg-muted/40 border border-border/80 rounded-2xl text-center space-y-2">
           <CheckCircle2 className="h-8 w-8 text-emerald-500 mx-auto" />
-          <h4 className="font-bold text-sm">Perfect Score Guidelines Met</h4>
-          <p className="text-xs text-slate-500 max-w-xs mx-auto">
+          <h4 className="font-bold text-sm text-foreground">
+            Perfect Score Guidelines Met
+          </h4>
+          <p className="text-xs text-muted-foreground max-w-xs mx-auto">
             This repository has satisfied all standard metrics audits. No
             further actions recommended.
           </p>

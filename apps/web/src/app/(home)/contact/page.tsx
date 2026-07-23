@@ -103,7 +103,7 @@ export default function ContactPage() {
           <p className="text-muted-foreground">
             Please email us at:{" "}
             <code className="text-xs bg-muted px-2 py-1 rounded font-mono text-foreground">
-              support@ossintel.org
+              ossintel-support@mayankchaudhari.com
             </code>
           </p>
           <p className="text-muted-foreground">

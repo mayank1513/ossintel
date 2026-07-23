@@ -2,17 +2,22 @@
 
 import { detectInput } from "@ossintel/input-parser";
 import {
+  Activity,
   AlertTriangle,
   ArrowRight,
   Binary,
+  CheckCircle2,
   Search,
+  ShieldCheck,
   Sparkles,
+  Users,
   Workflow,
 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import type React from "react";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import { Footer } from "@/components/footer";
 import { GithubIcon } from "@/components/icons";
 
 export default function HomePage() {
@@ -20,6 +25,7 @@ export default function HomePage() {
   const [query, setQuery] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [hasGithubPat, setHasGithubPat] = useState(false);
+  const inputRef = useRef<HTMLInputElement>(null);
 
   // Check token status on mount
   useEffect(() => {
@@ -103,42 +109,38 @@ export default function HomePage() {
     performAnalyze();
   };
 
-  const handleQuickSearch = async (q: string, searchType: "repo" | "user") => {
-    const externalBase = process.env.NEXT_PUBLIC_EXTERNAL_DASHBOARD_URL;
-    let targetPath = "";
-    if (searchType === "repo") {
-      const parts = q.split("/");
-      targetPath = `/repo/${parts[0]}/${parts[1]}`;
-    } else {
-      targetPath = `/user/${q}`;
-    }
-
-    if (externalBase) {
-      window.location.href = `${externalBase}${targetPath}`;
-    } else {
-      router.push(targetPath);
-    }
+  const handleExampleClick = (value: string) => {
+    setQuery(value);
+    // Autofocus input box immediately with a tiny timeout to ensure react states sync
+    setTimeout(() => {
+      if (inputRef.current) {
+        inputRef.current.focus();
+        // Position cursor at the very end of the text
+        const len = inputRef.current.value.length;
+        inputRef.current.setSelectionRange(len, len);
+      }
+    }, 10);
   };
 
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-100 font-sans antialiased selection:bg-indigo-500/30 flex flex-col justify-between">
-      {/* Background decoration */}
-      <div className="absolute inset-0 bg-[linear-gradient(to_right,#0f172a_1px,transparent_1px),linear-gradient(to_bottom,#0f172a_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_40%,#000_70%,transparent_100%)] pointer-events-none opacity-50" />
+    <div className="min-h-screen bg-background text-foreground font-sans antialiased selection:bg-primary/30 flex flex-col justify-between transition-colors duration-200">
+      {/* Background decoration - Opacity handled via grid-line-color CSS variable (RGBA) */}
+      <div className="absolute inset-0 bg-[linear-gradient(to_right,var(--grid-line-color)_1px,transparent_1px),linear-gradient(to_bottom,var(--grid-line-color)_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_40%,#000_70%,transparent_100%)] pointer-events-none" />
 
-      {/* Main Search Panel */}
-      <main className="relative max-w-7xl mx-auto px-6 py-20 z-10 flex-1 flex flex-col justify-center items-center gap-10">
-        <section className="flex flex-col gap-8 text-center max-w-3xl mx-auto w-full">
+      {/* Main Search Panel - Reduced padding-vertical for faster visual reveal */}
+      <main className="relative max-w-7xl mx-auto px-6 py-16 md:py-20 z-10 flex-1 flex flex-col justify-center items-center gap-10">
+        <section className="flex flex-col gap-6 text-center max-w-3xl mx-auto w-full">
           <div className="space-y-4">
-            <h2 className="text-5xl md:text-6xl font-extrabold tracking-tight bg-gradient-to-b from-white via-slate-100 to-slate-400 bg-clip-text text-transparent leading-none animate-fade-in pb-4">
+            <h2 className="text-5xl md:text-6xl font-extrabold tracking-tight bg-gradient-to-r from-foreground via-foreground/95 to-muted-foreground/75 bg-clip-text text-transparent leading-tight animate-fade-in pb-2">
               Open Source Intelligence
             </h2>
-            <p className="text-lg md:text-xl text-slate-400 max-w-xl mx-auto font-medium">
-              Unified platform metrics, impact scorecards, active community
-              health, and security risk audits for developers, repositories, and
-              organizations.
+            <p className="text-base md:text-lg text-muted-foreground max-w-3xl mx-auto font-normal leading-relaxed">
+              Evaluate developer portfolios, codebase structures, and security
+              configurations using deterministic scorecards and AI-powered
+              recommendations.
             </p>
             {process.env.NEXT_PUBLIC_EXTERNAL_DASHBOARD_URL && (
-              <div className="inline-flex items-center justify-center gap-2 px-3.5 py-1.5 bg-indigo-500/10 border border-indigo-500/20 rounded-full text-indigo-400 text-xs font-semibold max-w-max mx-auto">
+              <div className="inline-flex items-center justify-center gap-2 px-3.5 py-1.5 bg-muted border border-border rounded-full text-muted-foreground text-xs font-semibold max-w-max mx-auto">
                 <span>
                   Showcase Redirect: Analyses will open in the Vercel Cloud
                   platform.
@@ -149,16 +151,17 @@ export default function HomePage() {
 
           <form
             onSubmit={handleAnalyze}
-            className="p-1.5 bg-slate-900/95 border border-slate-800 rounded-2xl shadow-2xl flex flex-col md:flex-row gap-2.5 w-full"
+            className="p-1.5 bg-card border border-border/80 rounded-2xl shadow-lg shadow-black/5 dark:shadow-black/20 flex flex-col md:flex-row gap-2.5 w-full max-w-3xl mx-auto"
           >
-            <div className="flex-1 flex items-center gap-3 px-3 bg-slate-950/50 border border-slate-800 rounded-xl focus-within:border-indigo-500/50 transition-colors">
-              <Search className="h-5 w-5 text-slate-500 shrink-0" />
+            <div className="flex-1 flex items-center gap-3 px-4 bg-muted/40 border border-border/50 rounded-xl focus-within:border-primary/20 focus-within:bg-background transition-all duration-200">
+              <Search className="h-5 w-5 text-muted-foreground shrink-0" />
               <input
+                ref={inputRef}
                 type="text"
                 placeholder="Enter GitHub/NPM user, org, repo, package URL, or prefix..."
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
-                className="bg-transparent border-0 outline-none w-full py-3.5 text-slate-200 placeholder:text-slate-600 text-sm font-medium"
+                className="bg-transparent border-0 outline-none w-full py-3 text-foreground placeholder:text-muted-foreground/60 text-sm font-normal"
               />
             </div>
 
@@ -166,7 +169,7 @@ export default function HomePage() {
               <button
                 type="submit"
                 disabled={!query.trim()}
-                className="px-6 py-3.5 bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white rounded-xl text-sm font-semibold shadow-lg shadow-indigo-500/20 hover:shadow-indigo-500/30 transition-all flex items-center justify-center gap-2 whitespace-nowrap animate-fade-in disabled:opacity-50 disabled:cursor-not-allowed"
+                className="px-6 py-3 bg-primary text-primary-foreground hover:opacity-90 active:scale-[0.98] rounded-xl text-sm font-semibold shadow-sm transition-all duration-200 flex items-center justify-center gap-2 whitespace-nowrap disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 Analyze <ArrowRight className="h-4 w-4" />
               </button>
@@ -174,9 +177,9 @@ export default function HomePage() {
           </form>
 
           {/* Query Syntax Cheat Sheet */}
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-left max-w-2xl mx-auto w-full mt-2 text-[10px] text-slate-500 font-mono leading-normal bg-slate-950/20 border border-slate-900/30 p-3.5 rounded-2xl">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-left max-w-2xl mx-auto w-full mt-2 text-[11px] text-muted-foreground font-mono leading-normal bg-muted/10 border border-border/40 p-4 rounded-2xl">
             <div>
-              <span className="text-slate-400 font-bold block mb-1">
+              <span className="text-foreground font-bold block mb-1.5">
                 GitHub
               </span>
               <ul className="space-y-0.5 list-none pl-0">
@@ -184,8 +187,8 @@ export default function HomePage() {
                   • repo:{" "}
                   <button
                     type="button"
-                    onClick={() => setQuery("react18-tools/kosha")}
-                    className="text-indigo-400/90 cursor-pointer hover:underline bg-transparent border-0 p-0 text-left font-mono"
+                    onClick={() => handleExampleClick("react18-tools/kosha")}
+                    className="text-primary/80 hover:text-primary cursor-pointer hover:underline bg-transparent border-0 p-0 text-left font-mono"
                   >
                     react18-tools/kosha
                   </button>
@@ -194,8 +197,8 @@ export default function HomePage() {
                   • org:{" "}
                   <button
                     type="button"
-                    onClick={() => setQuery("org:react18-tools")}
-                    className="text-indigo-400/90 cursor-pointer hover:underline bg-transparent border-0 p-0 text-left font-mono"
+                    onClick={() => handleExampleClick("org:react18-tools")}
+                    className="text-primary/80 hover:text-primary cursor-pointer hover:underline bg-transparent border-0 p-0 text-left font-mono"
                   >
                     org:react18-tools
                   </button>
@@ -204,8 +207,8 @@ export default function HomePage() {
                   • user:{" "}
                   <button
                     type="button"
-                    onClick={() => setQuery("user:mayank1513")}
-                    className="text-indigo-400/90 cursor-pointer hover:underline bg-transparent border-0 p-0 text-left font-mono"
+                    onClick={() => handleExampleClick("user:mayank1513")}
+                    className="text-primary/80 hover:text-primary cursor-pointer hover:underline bg-transparent border-0 p-0 text-left font-mono"
                   >
                     user:mayank1513
                   </button>
@@ -213,7 +216,7 @@ export default function HomePage() {
               </ul>
             </div>
             <div>
-              <span className="text-slate-400 font-bold block mb-1">
+              <span className="text-foreground font-bold block mb-1.5">
                 NPM Registry
               </span>
               <ul className="space-y-0.5 list-none pl-0">
@@ -221,8 +224,8 @@ export default function HomePage() {
                   • pkg:{" "}
                   <button
                     type="button"
-                    onClick={() => setQuery("npm:@ossintel/scoring")}
-                    className="text-indigo-400/90 cursor-pointer hover:underline bg-transparent border-0 p-0 text-left font-mono"
+                    onClick={() => handleExampleClick("npm:@ossintel/scoring")}
+                    className="text-primary/80 hover:text-primary cursor-pointer hover:underline bg-transparent border-0 p-0 text-left font-mono"
                   >
                     npm:@ossintel/scoring
                   </button>
@@ -231,8 +234,8 @@ export default function HomePage() {
                   • scoped:{" "}
                   <button
                     type="button"
-                    onClick={() => setQuery("@ossintel/scoring")}
-                    className="text-indigo-400/90 cursor-pointer hover:underline bg-transparent border-0 p-0 text-left font-mono"
+                    onClick={() => handleExampleClick("@ossintel/scoring")}
+                    className="text-primary/80 hover:text-primary cursor-pointer hover:underline bg-transparent border-0 p-0 text-left font-mono"
                   >
                     @ossintel/scoring
                   </button>
@@ -241,8 +244,8 @@ export default function HomePage() {
                   • user:{" "}
                   <button
                     type="button"
-                    onClick={() => setQuery("npm:~mayank1513")}
-                    className="text-indigo-400/90 cursor-pointer hover:underline bg-transparent border-0 p-0 text-left font-mono"
+                    onClick={() => handleExampleClick("npm:~mayank1513")}
+                    className="text-primary/80 hover:text-primary cursor-pointer hover:underline bg-transparent border-0 p-0 text-left font-mono"
                   >
                     npm:~mayank1513
                   </button>
@@ -250,7 +253,7 @@ export default function HomePage() {
               </ul>
             </div>
             <div>
-              <span className="text-slate-400 font-bold block mb-1">
+              <span className="text-foreground font-bold block mb-1.5">
                 Others
               </span>
               <ul className="space-y-0.5 list-none pl-0">
@@ -258,8 +261,8 @@ export default function HomePage() {
                   • stackoverflow:{" "}
                   <button
                     type="button"
-                    onClick={() => setQuery("so:12345")}
-                    className="text-indigo-400/90 cursor-pointer hover:underline bg-transparent border-0 p-0 text-left font-mono"
+                    onClick={() => handleExampleClick("so:12345")}
+                    className="text-primary/80 hover:text-primary cursor-pointer hover:underline bg-transparent border-0 p-0 text-left font-mono"
                   >
                     so:12345
                   </button>
@@ -268,8 +271,8 @@ export default function HomePage() {
                   • medium:{" "}
                   <button
                     type="button"
-                    onClick={() => setQuery("medium:@mayank1513")}
-                    className="text-indigo-400/90 cursor-pointer hover:underline bg-transparent border-0 p-0 text-left font-mono"
+                    onClick={() => handleExampleClick("medium:@mayank1513")}
+                    className="text-primary/80 hover:text-primary cursor-pointer hover:underline bg-transparent border-0 p-0 text-left font-mono"
                   >
                     medium:@mayank1513
                   </button>
@@ -278,8 +281,8 @@ export default function HomePage() {
                   • leetcode:{" "}
                   <button
                     type="button"
-                    onClick={() => setQuery("leetcode:mayank1513")}
-                    className="text-indigo-400/90 cursor-pointer hover:underline bg-transparent border-0 p-0 text-left font-mono"
+                    onClick={() => handleExampleClick("leetcode:mayank1513")}
+                    className="text-primary/80 hover:text-primary cursor-pointer hover:underline bg-transparent border-0 p-0 text-left font-mono"
                   >
                     leetcode:mayank1513
                   </button>
@@ -290,13 +293,13 @@ export default function HomePage() {
 
           {/* GitHub Connection Banner */}
           {hasGithubPat ? (
-            <div className="p-4 bg-emerald-950/10 border border-emerald-500/20 rounded-2xl max-w-xl mx-auto w-full flex items-center justify-between gap-4 mt-2 animate-fade-in-up text-left">
+            <div className="p-4.5 bg-card border border-border/50 rounded-2xl max-w-xl mx-auto w-full flex items-center justify-between gap-4 mt-2 animate-fade-in-up text-left shadow-sm shadow-black/5">
               <div className="space-y-1">
-                <h4 className="text-xs font-bold text-slate-200 uppercase tracking-wider flex items-center gap-1.5">
+                <h4 className="text-xs font-bold text-foreground uppercase tracking-wider flex items-center gap-2">
                   <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />{" "}
                   Connected to GitHub
                 </h4>
-                <p className="text-[11px] text-slate-400 leading-normal">
+                <p className="text-[11px] text-muted-foreground leading-normal">
                   Ecosystem queries are running with an elevated limit of 5,000
                   requests/hour.
                 </p>
@@ -307,19 +310,19 @@ export default function HomePage() {
                   await fetch("/api/auth/logout", { method: "POST" });
                   setHasGithubPat(false);
                 }}
-                className="px-3 py-1.5 bg-rose-950/40 hover:bg-rose-950/60 border border-rose-900/30 text-rose-300 rounded-xl text-xs font-bold transition-all shrink-0"
+                className="px-3 py-1.5 bg-destructive/10 hover:bg-destructive/15 text-destructive rounded-xl text-xs font-semibold transition-all duration-200 shrink-0"
               >
                 Disconnect
               </button>
             </div>
           ) : (
-            <div className="p-4 bg-indigo-950/20 border border-indigo-500/20 rounded-2xl max-w-xl mx-auto w-full flex flex-col sm:flex-row items-center justify-between gap-4 mt-2 animate-fade-in-up text-left">
+            <div className="p-4.5 bg-card border border-border/50 rounded-2xl max-w-xl mx-auto w-full flex flex-col sm:flex-row items-center justify-between gap-4 mt-2 animate-fade-in-up text-left shadow-sm shadow-black/5">
               <div className="space-y-1">
-                <h4 className="text-xs font-bold text-slate-200 uppercase tracking-wider flex items-center gap-1.5">
-                  <Sparkles className="h-3.5 w-3.5 text-indigo-400" /> Enhance
-                  API Limits
+                <h4 className="text-xs font-bold text-foreground uppercase tracking-wider flex items-center gap-2">
+                  <Sparkles className="h-4 w-4 text-primary/70 shrink-0" />{" "}
+                  Enhance API Limits
                 </h4>
-                <p className="text-[11px] text-slate-400 leading-normal">
+                <p className="text-[11px] text-muted-foreground leading-normal">
                   Connect your GitHub account to increase API rate limits to
                   5,000 requests/hour. We only request basic public profile
                   access.
@@ -327,7 +330,7 @@ export default function HomePage() {
               </div>
               <a
                 href="/api/auth/github"
-                className="flex items-center gap-1.5 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-bold transition-all whitespace-nowrap shadow-md"
+                className="flex items-center gap-1.5 px-4 py-2.5 bg-primary text-primary-foreground hover:opacity-90 active:scale-[0.98] rounded-xl text-xs font-bold transition-all whitespace-nowrap shadow-sm"
               >
                 <GithubIcon className="h-3.5 w-3.5 shrink-0" /> Connect GitHub
               </a>
@@ -336,38 +339,153 @@ export default function HomePage() {
 
           {/* Error Alert */}
           {error && (
-            <div className="max-w-lg mx-auto w-full p-4 bg-rose-500/10 border border-rose-500/20 rounded-xl flex gap-3 items-center text-rose-300 text-xs font-semibold leading-normal">
-              <AlertTriangle className="h-4 w-4 text-rose-500 shrink-0" />
+            <div className="max-w-lg mx-auto w-full p-4 bg-destructive/10 border border-destructive/20 rounded-xl flex gap-3 items-center text-destructive text-xs font-semibold leading-normal">
+              <AlertTriangle className="h-4 w-4 text-destructive shrink-0" />
               <span>{error}</span>
             </div>
           )}
 
-          {/* Quick Examples */}
-          <div className="flex flex-wrap items-center justify-center gap-2 mt-4">
-            <span className="text-xs font-semibold text-slate-500">
-              Quick searches:
-            </span>
-            <button
-              type="button"
-              onClick={() => handleQuickSearch("facebook/react", "repo")}
-              className="px-3 py-1.5 bg-slate-900/60 hover:bg-slate-900 border border-slate-800/80 rounded-lg text-xs font-semibold text-slate-300 transition-colors"
-            >
-              facebook/react
-            </button>
-            <button
-              type="button"
-              onClick={() => handleQuickSearch("ossintel/ossintel", "repo")}
-              className="px-3 py-1.5 bg-slate-900/60 hover:bg-slate-900 border border-slate-800/80 rounded-lg text-xs font-semibold text-slate-300 transition-colors"
-            >
-              ossintel/ossintel
-            </button>
-            <button
-              type="button"
-              onClick={() => handleQuickSearch("mayank1513", "user")}
-              className="px-3 py-1.5 bg-slate-900/60 hover:bg-slate-900 border border-slate-800/80 rounded-lg text-xs font-semibold text-slate-300 transition-colors"
-            >
-              mayank1513
-            </button>
+          {/* Repository Scorecard Audit Preview Mockup */}
+          <div className="w-full max-w-2xl mx-auto bg-card border border-border/80 rounded-2xl shadow-xl shadow-black/[0.02] dark:shadow-black/25 overflow-hidden mt-6 animate-fade-in-up text-left">
+            {/* Header of the mock window */}
+            <div className="flex items-center justify-between px-4 py-3 bg-muted/40 border-b border-border/60">
+              <div className="flex items-center gap-1.5">
+                <span className="w-2 h-2 rounded-full bg-border" />
+                <span className="w-2 h-2 rounded-full bg-border" />
+                <span className="w-2 h-2 rounded-full bg-border" />
+              </div>
+              <span className="text-[10px] font-mono text-muted-foreground select-none">
+                ossintel.js.org/repo/react18-tools/kosha
+              </span>
+              <div className="w-6" />
+            </div>
+            {/* Content of the mock window */}
+            <div className="p-5 space-y-5">
+              {/* Title block */}
+              <div className="flex items-center justify-between gap-4 flex-wrap">
+                <div className="flex items-center gap-3">
+                  <div className="p-2 bg-muted/50 rounded-xl border border-border/40">
+                    <GithubIcon className="h-5 w-5 text-foreground" />
+                  </div>
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <h4 className="text-sm font-bold text-foreground">
+                        react18-tools/kosha
+                      </h4>
+                      <span className="px-2 py-0.5 bg-emerald-500/10 border border-emerald-500/20 rounded-full text-[9px] font-semibold text-emerald-600 dark:text-emerald-400">
+                        Healthy
+                      </span>
+                    </div>
+                    <p className="text-[10px] text-muted-foreground">
+                      Deterministic scoring audit completed
+                    </p>
+                  </div>
+                </div>
+                <div>
+                  <div className="text-right">
+                    <span className="text-[10px] text-muted-foreground block">
+                      Audit Score
+                    </span>
+                    <span className="text-xl font-black text-foreground tracking-tight">
+                      92
+                      <span className="text-xs text-muted-foreground font-normal">
+                        /100
+                      </span>
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Pillars Grid */}
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                {/* Security Pillar */}
+                <div className="p-3 bg-muted/20 border border-border/40 rounded-xl space-y-2">
+                  <div className="flex items-center justify-between">
+                    <span className="text-[9px] font-bold uppercase tracking-wider text-muted-foreground flex items-center gap-1">
+                      <ShieldCheck className="h-3 w-3 text-emerald-500" />{" "}
+                      Security
+                    </span>
+                    <span className="text-xs font-bold text-emerald-600 dark:text-emerald-400">
+                      96%
+                    </span>
+                  </div>
+                  <div className="w-full bg-muted h-1 rounded-full overflow-hidden">
+                    <div
+                      className="bg-emerald-500 h-full rounded-full"
+                      style={{ width: "96%" }}
+                    />
+                  </div>
+                  <span className="text-[9px] text-muted-foreground block">
+                    0 Vulnerabilities found
+                  </span>
+                </div>
+
+                {/* Quality Pillar */}
+                <div className="p-3 bg-muted/20 border border-border/40 rounded-xl space-y-2">
+                  <div className="flex items-center justify-between">
+                    <span className="text-[9px] font-bold uppercase tracking-wider text-muted-foreground flex items-center gap-1">
+                      <Activity className="h-3 w-3 text-primary/70" /> Quality
+                    </span>
+                    <span className="text-xs font-bold text-primary">88%</span>
+                  </div>
+                  <div className="w-full bg-muted h-1 rounded-full overflow-hidden">
+                    <div
+                      className="bg-primary h-full rounded-full"
+                      style={{ width: "88%" }}
+                    />
+                  </div>
+                  <span className="text-[9px] text-muted-foreground block">
+                    Active release cycle
+                  </span>
+                </div>
+
+                {/* Community Pillar */}
+                <div className="p-3 bg-muted/20 border border-border/40 rounded-xl space-y-2">
+                  <div className="flex items-center justify-between">
+                    <span className="text-[9px] font-bold uppercase tracking-wider text-muted-foreground flex items-center gap-1">
+                      <Users className="h-3 w-3 text-emerald-500" /> Community
+                    </span>
+                    <span className="text-xs font-bold text-emerald-600 dark:text-emerald-400">
+                      94%
+                    </span>
+                  </div>
+                  <div className="w-full bg-muted h-1 rounded-full overflow-hidden">
+                    <div
+                      className="bg-emerald-500 h-full rounded-full"
+                      style={{ width: "94%" }}
+                    />
+                  </div>
+                  <span className="text-[9px] text-muted-foreground block">
+                    High PR merge rate
+                  </span>
+                </div>
+              </div>
+
+              {/* Insights bullet preview */}
+              <div className="p-3.5 bg-muted/30 border border-border/40 rounded-xl space-y-2">
+                <h5 className="text-[9px] font-bold uppercase tracking-wider text-foreground">
+                  AI Intelligence Summary
+                </h5>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-1.5 text-[10px] text-muted-foreground">
+                  <div className="flex items-center gap-1.5">
+                    <CheckCircle2 className="h-3 w-3 text-emerald-500 shrink-0" />
+                    <span>Outdated dependencies are fully contained</span>
+                  </div>
+                  <div className="flex items-center gap-1.5">
+                    <CheckCircle2 className="h-3 w-3 text-emerald-500 shrink-0" />
+                    <span>Regular publishing schedule maintained</span>
+                  </div>
+                  <div className="flex items-center gap-1.5">
+                    <CheckCircle2 className="h-3 w-3 text-emerald-500 shrink-0" />
+                    <span>Multiple active code reviewers validated</span>
+                  </div>
+                  <div className="flex items-center gap-1.5">
+                    <CheckCircle2 className="h-3 w-3 text-emerald-500 shrink-0" />
+                    <span>Scorecard indicates low risk profile</span>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
         </section>
       </main>
@@ -419,17 +537,17 @@ export default function HomePage() {
         }}
       />
 
-      {/* Reusable Packages Showcase Section */}
-      <section className="relative border-t border-slate-900 bg-slate-950/40 w-full py-24 z-10">
+      {/* Reusable Packages Showcase Section - Alternating background class bg-muted/40 */}
+      <section className="relative border-t border-border bg-muted/40 w-full py-16 md:py-24 z-10">
         <div className="max-w-7xl mx-auto px-6 space-y-16">
-          <div className="text-center space-y-4 max-w-3xl mx-auto">
-            <h3 className="text-indigo-400 text-xs font-bold uppercase tracking-widest">
+          <div className="text-center space-y-3 max-w-3xl mx-auto">
+            <h3 className="text-primary/60 text-xs font-semibold uppercase tracking-widest">
               Modular Architecture
             </h3>
-            <h2 className="text-3xl md:text-4xl font-extrabold tracking-tight bg-gradient-to-b from-white to-slate-400 bg-clip-text text-transparent">
+            <h2 className="text-3xl md:text-4xl font-extrabold tracking-tight bg-gradient-to-r from-foreground to-muted-foreground/80 bg-clip-text text-transparent">
               Powered by Reusable Core Packages
             </h2>
-            <p className="text-sm md:text-base text-slate-400 font-medium leading-relaxed">
+            <p className="text-sm md:text-base text-muted-foreground font-normal leading-relaxed">
               OSSIntel is built as a set of decoupled, standard npm modules.
               Developers can install, extend, and integrate these engines in
               their own applications.
@@ -438,32 +556,37 @@ export default function HomePage() {
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {/* Scoring Package Card */}
-            <div className="group relative p-6 bg-slate-900/40 border border-slate-800/80 hover:border-indigo-500/30 rounded-3xl transition-all duration-300 flex flex-col justify-between hover:shadow-indigo-500/5 hover:shadow-2xl">
-              <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-br from-indigo-500/10 to-transparent rounded-tr-3xl rounded-bl-full pointer-events-none group-hover:from-indigo-500/15 transition-all" />
+            <div className="group relative p-6 bg-card border border-border/60 hover:border-ring/20 rounded-2xl transition-all duration-300 flex flex-col justify-between hover:shadow-lg hover:shadow-black/5 dark:hover:shadow-black/25">
+              <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-br from-[var(--card-glow)] to-transparent rounded-tr-2xl rounded-bl-full pointer-events-none group-hover:from-[var(--card-glow)] transition-all" />
               <div className="space-y-4">
-                <div className="p-3 bg-slate-950 border border-slate-800 rounded-2xl w-max text-indigo-400 group-hover:border-indigo-500/30 group-hover:text-indigo-300 transition-all">
-                  <Workflow className="h-6 w-6" />
+                <div className="flex items-center justify-between">
+                  <div className="p-3 bg-muted/40 border border-border/40 rounded-xl text-muted-foreground group-hover:text-primary group-hover:bg-primary/5 transition-all duration-300">
+                    <Workflow className="h-6 w-6" />
+                  </div>
+                  <span className="px-2 py-0.5 bg-primary/5 border border-border/30 rounded-full text-[9px] font-semibold text-muted-foreground/85 select-none">
+                    Core Engine
+                  </span>
                 </div>
                 <div className="space-y-1.5">
-                  <h4 className="text-base font-bold text-slate-200">
+                  <h4 className="text-base font-bold text-foreground tracking-tight">
                     @ossintel/scoring
                   </h4>
-                  <p className="text-xs text-indigo-400 font-bold uppercase tracking-wider">
+                  <p className="text-xs text-muted-foreground font-semibold uppercase tracking-wider">
                     Deterministic reputation metrics engine
                   </p>
                 </div>
-                <p className="text-xs text-slate-450 leading-relaxed">
+                <p className="text-xs text-muted-foreground/80 leading-relaxed">
                   Evaluates software health, community activity, maintainer
                   metrics, and organization footprints using pure, deterministic
                   mathematical models.
                 </p>
-                <ul className="text-[11px] text-slate-500 space-y-1">
-                  <li className="flex items-center gap-1.5">
-                    <span className="w-1.5 h-1.5 bg-indigo-500 rounded-full" />{" "}
+                <ul className="text-[11px] text-muted-foreground/75 space-y-1.5">
+                  <li className="flex items-center gap-2">
+                    <span className="w-1.5 h-1.5 bg-muted-foreground/30 group-hover:bg-primary/60 rounded-full transition-colors" />{" "}
                     No side-effects, fully deterministic
                   </li>
-                  <li className="flex items-center gap-1.5">
-                    <span className="w-1.5 h-1.5 bg-indigo-500 rounded-full" />{" "}
+                  <li className="flex items-center gap-2">
+                    <span className="w-1.5 h-1.5 bg-muted-foreground/30 group-hover:bg-primary/60 rounded-full transition-colors" />{" "}
                     Extensible weights and tiers
                   </li>
                 </ul>
@@ -471,7 +594,7 @@ export default function HomePage() {
               <div className="pt-6 mt-auto">
                 <Link
                   href="/docs/scoring"
-                  className="inline-flex items-center gap-1.5 text-xs font-bold text-indigo-400 hover:text-indigo-300 transition-colors group/link"
+                  className="inline-flex items-center gap-1.5 text-xs font-semibold text-muted-foreground hover:text-foreground transition-all duration-200 group/link"
                 >
                   Explore API Docs{" "}
                   <ArrowRight className="h-3 w-3 group-hover/link:translate-x-0.5 transition-transform" />
@@ -480,32 +603,37 @@ export default function HomePage() {
             </div>
 
             {/* Normalizer Package Card */}
-            <div className="group relative p-6 bg-slate-900/40 border border-slate-800/80 hover:border-indigo-500/30 rounded-3xl transition-all duration-300 flex flex-col justify-between hover:shadow-indigo-500/5 hover:shadow-2xl">
-              <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-br from-indigo-500/10 to-transparent rounded-tr-3xl rounded-bl-full pointer-events-none group-hover:from-indigo-500/15 transition-all" />
+            <div className="group relative p-6 bg-card border border-border/60 hover:border-ring/20 rounded-2xl transition-all duration-300 flex flex-col justify-between hover:shadow-lg hover:shadow-black/5 dark:hover:shadow-black/25">
+              <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-br from-[var(--card-glow)] to-transparent rounded-tr-2xl rounded-bl-full pointer-events-none group-hover:from-[var(--card-glow)] transition-all" />
               <div className="space-y-4">
-                <div className="p-3 bg-slate-950 border border-slate-800 rounded-2xl w-max text-indigo-400 group-hover:border-indigo-500/30 group-hover:text-indigo-300 transition-all">
-                  <Binary className="h-6 w-6" />
+                <div className="flex items-center justify-between">
+                  <div className="p-3 bg-muted/40 border border-border/40 rounded-xl text-muted-foreground group-hover:text-primary group-hover:bg-primary/5 transition-all duration-300">
+                    <Binary className="h-6 w-6" />
+                  </div>
+                  <span className="px-2 py-0.5 bg-primary/5 border border-border/30 rounded-full text-[9px] font-semibold text-muted-foreground/85 select-none">
+                    Data Parser
+                  </span>
                 </div>
                 <div className="space-y-1.5">
-                  <h4 className="text-base font-bold text-slate-200">
+                  <h4 className="text-base font-bold text-foreground tracking-tight">
                     @ossintel/github-normalizer
                   </h4>
-                  <p className="text-xs text-indigo-400 font-bold uppercase tracking-wider">
+                  <p className="text-xs text-muted-foreground font-semibold uppercase tracking-wider">
                     GitHub API data normalizer
                   </p>
                 </div>
-                <p className="text-xs text-slate-450 leading-relaxed">
+                <p className="text-xs text-muted-foreground/80 leading-relaxed">
                   Fetches and normalizes raw GitHub REST/GraphQL payloads,
                   handling paginated requests, cache mapping, and rate limits
                   gracefully.
                 </p>
-                <ul className="text-[11px] text-slate-500 space-y-1">
-                  <li className="flex items-center gap-1.5">
-                    <span className="w-1.5 h-1.5 bg-indigo-500 rounded-full" />{" "}
+                <ul className="text-[11px] text-muted-foreground/75 space-y-1.5">
+                  <li className="flex items-center gap-2">
+                    <span className="w-1.5 h-1.5 bg-muted-foreground/30 group-hover:bg-primary/60 rounded-full transition-colors" />{" "}
                     Auto-paginated contributions fetcher
                   </li>
-                  <li className="flex items-center gap-1.5">
-                    <span className="w-1.5 h-1.5 bg-indigo-500 rounded-full" />{" "}
+                  <li className="flex items-center gap-2">
+                    <span className="w-1.5 h-1.5 bg-muted-foreground/30 group-hover:bg-primary/60 rounded-full transition-colors" />{" "}
                     Input type detection (user, org, repo)
                   </li>
                 </ul>
@@ -513,7 +641,7 @@ export default function HomePage() {
               <div className="pt-6 mt-auto">
                 <Link
                   href="/docs/github-normalizer"
-                  className="inline-flex items-center gap-1.5 text-xs font-bold text-indigo-400 hover:text-indigo-300 transition-colors group/link"
+                  className="inline-flex items-center gap-1.5 text-xs font-semibold text-muted-foreground hover:text-foreground transition-all duration-200 group/link"
                 >
                   Explore API Docs{" "}
                   <ArrowRight className="h-3 w-3 group-hover/link:translate-x-0.5 transition-transform" />
@@ -522,32 +650,37 @@ export default function HomePage() {
             </div>
 
             {/* Insights Package Card */}
-            <div className="group relative p-6 bg-slate-900/40 border border-slate-800/80 hover:border-indigo-500/30 rounded-3xl transition-all duration-300 flex flex-col justify-between hover:shadow-indigo-500/5 hover:shadow-2xl">
-              <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-br from-indigo-500/10 to-transparent rounded-tr-3xl rounded-bl-full pointer-events-none group-hover:from-indigo-500/15 transition-all" />
+            <div className="group relative p-6 bg-card border border-border/60 hover:border-ring/20 rounded-2xl transition-all duration-300 flex flex-col justify-between hover:shadow-lg hover:shadow-black/5 dark:hover:shadow-black/25">
+              <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-br from-[var(--card-glow)] to-transparent rounded-tr-2xl rounded-bl-full pointer-events-none group-hover:from-[var(--card-glow)] transition-all" />
               <div className="space-y-4">
-                <div className="p-3 bg-slate-950 border border-slate-800 rounded-2xl w-max text-indigo-400 group-hover:border-indigo-500/30 group-hover:text-indigo-300 transition-all">
-                  <Sparkles className="h-6 w-6" />
+                <div className="flex items-center justify-between">
+                  <div className="p-3 bg-muted/40 border border-border/40 rounded-xl text-muted-foreground group-hover:text-primary group-hover:bg-primary/5 transition-all duration-300">
+                    <Sparkles className="h-6 w-6" />
+                  </div>
+                  <span className="px-2 py-0.5 bg-primary/5 border border-border/30 rounded-full text-[9px] font-semibold text-muted-foreground/85 select-none">
+                    Insights Engine
+                  </span>
                 </div>
                 <div className="space-y-1.5">
-                  <h4 className="text-base font-bold text-slate-200">
+                  <h4 className="text-base font-bold text-foreground tracking-tight">
                     @ossintel/insights
                   </h4>
-                  <p className="text-xs text-indigo-400 font-bold uppercase tracking-wider">
+                  <p className="text-xs text-muted-foreground font-semibold uppercase tracking-wider">
                     Rule-based audit insights engine
                   </p>
                 </div>
-                <p className="text-xs text-slate-450 leading-relaxed">
+                <p className="text-xs text-muted-foreground/80 leading-relaxed">
                   Generates natural language software findings, flags key risks,
                   outlines actionable recommendations, and compiles LLM context
                   blocks.
                 </p>
-                <ul className="text-[11px] text-slate-500 space-y-1">
-                  <li className="flex items-center gap-1.5">
-                    <span className="w-1.5 h-1.5 bg-indigo-500 rounded-full" />{" "}
+                <ul className="text-[11px] text-muted-foreground/75 space-y-1.5">
+                  <li className="flex items-center gap-2">
+                    <span className="w-1.5 h-1.5 bg-muted-foreground/30 group-hover:bg-primary/60 rounded-full transition-colors" />{" "}
                     Configurable ruleset definitions
                   </li>
-                  <li className="flex items-center gap-1.5">
-                    <span className="w-1.5 h-1.5 bg-indigo-500 rounded-full" />{" "}
+                  <li className="flex items-center gap-2">
+                    <span className="w-1.5 h-1.5 bg-muted-foreground/30 group-hover:bg-primary/60 rounded-full transition-colors" />{" "}
                     Clean prompt context export
                   </li>
                 </ul>
@@ -555,7 +688,7 @@ export default function HomePage() {
               <div className="pt-6 mt-auto">
                 <Link
                   href="/docs/insights"
-                  className="inline-flex items-center gap-1.5 text-xs font-bold text-indigo-400 hover:text-indigo-300 transition-colors group/link"
+                  className="inline-flex items-center gap-1.5 text-xs font-semibold text-muted-foreground hover:text-foreground transition-all duration-200 group/link"
                 >
                   Explore API Docs{" "}
                   <ArrowRight className="h-3 w-3 group-hover/link:translate-x-0.5 transition-transform" />
@@ -565,22 +698,22 @@ export default function HomePage() {
           </div>
 
           {/* Utility Packages Sub-grid */}
-          <div className="pt-8 border-t border-slate-900/60 flex flex-col md:flex-row items-center justify-between gap-6">
-            <div className="space-y-1.5">
-              <h5 className="text-sm font-bold text-slate-300">
+          <div className="pt-8 border-t border-border/80 flex flex-col md:flex-row items-center justify-between gap-6">
+            <div className="space-y-1.5 text-left">
+              <h5 className="text-sm font-bold text-foreground">
                 Additional Modules
               </h5>
-              <p className="text-xs text-slate-400 leading-normal">
+              <p className="text-xs text-muted-foreground leading-normal">
                 Includes{" "}
                 <Link href="/docs/npm">
-                  <code className="text-indigo-400 font-mono">
+                  <code className="text-foreground font-semibold font-mono">
                     @ossintel/npm
                   </code>{" "}
                   (NPM registry statistics fetcher)
                 </Link>{" "}
                 and{" "}
                 <Link href="/docs/stackoverflow">
-                  <code className="text-indigo-400 font-mono">
+                  <code className="text-foreground font-semibold font-mono">
                     @ossintel/stackoverflow
                   </code>{" "}
                 </Link>
@@ -590,13 +723,13 @@ export default function HomePage() {
             <div className="flex gap-4">
               <Link
                 href="/docs"
-                className="px-5 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold rounded-xl shadow-lg shadow-indigo-500/10 transition-all hover:scale-[1.02] active:scale-[0.98] whitespace-nowrap"
+                className="px-5 py-2.5 bg-primary hover:opacity-90 active:scale-[0.98] text-primary-foreground text-xs font-semibold rounded-xl shadow-sm transition-all whitespace-nowrap"
               >
                 Ecosystem Overview
               </Link>
               <Link
                 href="/docs/scoring"
-                className="px-5 py-2.5 bg-slate-900 border border-slate-800 hover:border-slate-750 hover:bg-slate-900/80 text-slate-300 text-xs font-bold rounded-xl transition-all whitespace-nowrap"
+                className="px-5 py-2.5 bg-muted hover:bg-muted/80 border border-border/60 text-foreground text-xs font-semibold rounded-xl active:scale-[0.98] transition-all whitespace-nowrap"
               >
                 Read Scoring Docs
               </Link>
@@ -605,20 +738,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Footer */}
-      <footer className="relative border-t border-slate-900 bg-slate-950/20 z-10">
-        <div className="max-w-7xl mx-auto px-6 py-8 flex flex-col md:flex-row items-center justify-between gap-4 text-xs font-semibold text-slate-500">
-          <span>&copy; 2026 OSSIntel. Licensed under MIT.</span>
-          <a
-            href="https://mayankchaudhari.com/"
-            target="_blank"
-            rel="noreferrer noopener"
-            className="flex gap-4"
-          >
-            <span className="text-slate-400">Mayank Chaudhari</span>
-          </a>
-        </div>
-      </footer>
+      <Footer />
     </div>
   );
 }

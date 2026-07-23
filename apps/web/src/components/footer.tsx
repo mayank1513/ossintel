@@ -111,7 +111,7 @@ export const Footer: React.FC = () => {
               </li>
               <li>
                 <a
-                  href="https://github.com/mayank1513/ossintel"
+                  href="https://github.com/ossintel/ossintel"
                   target="_blank"
                   rel="noreferrer noopener"
                   className="hover:text-foreground transition-colors flex items-center gap-1.5"

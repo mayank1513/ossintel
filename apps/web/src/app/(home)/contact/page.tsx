@@ -47,7 +47,7 @@ export default function ContactPage() {
           <p className="text-muted-foreground">
             Please open a thread in the{" "}
             <a
-              href="https://github.com/mayank1513/ossintel/discussions"
+              href="https://github.com/ossintel/ossintel/discussions"
               target="_blank"
               rel="noreferrer noopener"
               className="text-primary hover:underline font-semibold"
@@ -75,7 +75,7 @@ export default function ContactPage() {
           <p className="text-muted-foreground">
             Please search for existing issues or open a new bug report in the{" "}
             <a
-              href="https://github.com/mayank1513/ossintel/issues"
+              href="https://github.com/ossintel/ossintel/issues"
               target="_blank"
               rel="noreferrer noopener"
               className="text-primary hover:underline font-semibold"

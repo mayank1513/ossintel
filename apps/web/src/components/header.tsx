@@ -48,7 +48,7 @@ export function Header() {
               <BookOpen className="h-4 w-4" /> Docs
             </Link>
             <a
-              href="https://github.com/mayank1513/ossintel"
+              href="https://github.com/ossintel/ossintel"
               target="_blank"
               rel="noreferrer"
               className="text-sm font-medium text-muted-foreground hover:text-foreground flex items-center gap-1.5 transition-colors"

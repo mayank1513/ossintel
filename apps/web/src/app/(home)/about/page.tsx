@@ -167,7 +167,7 @@ export default function AboutPage() {
           <p className="text-muted-foreground">
             You can view, fork, review, and contribute to the code on our{" "}
             <a
-              href="https://github.com/mayank1513/ossintel"
+              href="https://github.com/ossintel/ossintel"
               target="_blank"
               rel="noreferrer noopener"
               className="text-primary hover:underline font-medium"

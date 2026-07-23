@@ -1,4 +1,13 @@
 import type { NormalizedNpmUser } from "@ossintel/npm";
+import {
+  MAX_SCORE,
+  PUBLISHING_DOWNLOADS_MULTIPLIER,
+  PUBLISHING_DOWNLOADS_WEIGHT,
+  PUBLISHING_PACKAGES_MULTIPLIER,
+  PUBLISHING_PACKAGES_WEIGHT,
+  PUBLISHING_VERIFIED_SCORE,
+  PUBLISHING_VERIFIED_WEIGHT,
+} from "./constants";
 
 export interface PublishingScore {
   /** Overall publishing reputation score (0-100). */
@@ -30,13 +39,23 @@ export const calculatePublishingScore = (
 
   const totalDownloads = npmUser.totalWeeklyDownloads ?? 0;
 
-  const downloads = Math.min(100, Math.log10(totalDownloads + 1) * 15);
-  const packages = Math.min(100, npmUser.activePackagesCount * 10);
-  const verified = npmUser.isVerifiedPublisher ? 100 : 0;
+  const downloads = Math.min(
+    MAX_SCORE,
+    Math.log10(totalDownloads + 1) * PUBLISHING_DOWNLOADS_MULTIPLIER,
+  );
+  const packages = Math.min(
+    MAX_SCORE,
+    npmUser.activePackagesCount * PUBLISHING_PACKAGES_MULTIPLIER,
+  );
+  const verified = npmUser.isVerifiedPublisher ? PUBLISHING_VERIFIED_SCORE : 0;
 
   const score = Math.min(
-    100,
-    Math.round(downloads * 0.5 + packages * 0.3 + verified * 0.2),
+    MAX_SCORE,
+    Math.round(
+      downloads * PUBLISHING_DOWNLOADS_WEIGHT +
+        packages * PUBLISHING_PACKAGES_WEIGHT +
+        verified * PUBLISHING_VERIFIED_WEIGHT,
+    ),
   );
 
   return {

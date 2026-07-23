@@ -1,4 +1,23 @@
 import { calculateBadges } from "./badges";
+import {
+  CONFIDENCE_HIGH_DOWNLOADS,
+  CONFIDENCE_HIGH_PRS,
+  CONFIDENCE_HIGH_REPOS,
+  CONFIDENCE_HIGH_SO_REP,
+  CONFIDENCE_MEDIUM_PRS,
+  CONFIDENCE_MEDIUM_REPOS,
+  CONFIDENCE_MEDIUM_SO_REP,
+  MAX_SCORE,
+  OVERALL_NO_ORG_CONTRIBUTOR_WEIGHT,
+  OVERALL_NO_ORG_INFLUENCE_WEIGHT,
+  OVERALL_NO_ORG_MAINTAINER_WEIGHT,
+  OVERALL_NPM_BONUS_WEIGHT,
+  OVERALL_ORG_CONTRIBUTOR_WEIGHT,
+  OVERALL_ORG_INFLUENCE_WEIGHT,
+  OVERALL_ORG_LEADERSHIP_WEIGHT,
+  OVERALL_ORG_MAINTAINER_WEIGHT,
+  OVERALL_SO_BONUS_WEIGHT,
+} from "./constants";
 import { calculateContributorScore } from "./contributor-scoring";
 import { generateEvidence, generateFactors } from "./evidence";
 import { calculateInfluenceScore } from "./influence-scoring";
@@ -97,13 +116,17 @@ export const calculateIdentityScore = (
   const totalPRsCount = externalContributions.length;
   let confidence: "High" | "Medium" | "Low" = "Low";
   if (
-    totalReposCount >= 10 ||
-    totalPRsCount >= 15 ||
-    totalNpmDownloads >= 5000 ||
-    soRep >= 1000
+    totalReposCount >= CONFIDENCE_HIGH_REPOS ||
+    totalPRsCount >= CONFIDENCE_HIGH_PRS ||
+    totalNpmDownloads >= CONFIDENCE_HIGH_DOWNLOADS ||
+    soRep >= CONFIDENCE_HIGH_SO_REP
   ) {
     confidence = "High";
-  } else if (totalReposCount >= 3 || totalPRsCount >= 3 || soRep >= 100) {
+  } else if (
+    totalReposCount >= CONFIDENCE_MEDIUM_REPOS ||
+    totalPRsCount >= CONFIDENCE_MEDIUM_PRS ||
+    soRep >= CONFIDENCE_MEDIUM_SO_REP
+  ) {
     confidence = "Medium";
   }
 
@@ -116,14 +139,16 @@ export const calculateIdentityScore = (
   let githubOverall = 0;
   if (orgResult.activeCount > 0) {
     githubOverall = Math.round(
-      githubMaintainer * 0.35 +
-        contributor * 0.3 +
-        organizationScore * 0.15 +
-        githubInfluence * 0.2,
+      githubMaintainer * OVERALL_ORG_MAINTAINER_WEIGHT +
+        contributor * OVERALL_ORG_CONTRIBUTOR_WEIGHT +
+        organizationScore * OVERALL_ORG_LEADERSHIP_WEIGHT +
+        githubInfluence * OVERALL_ORG_INFLUENCE_WEIGHT,
     );
   } else {
     githubOverall = Math.round(
-      githubMaintainer * 0.45 + contributor * 0.35 + githubInfluence * 0.2,
+      githubMaintainer * OVERALL_NO_ORG_MAINTAINER_WEIGHT +
+        contributor * OVERALL_NO_ORG_CONTRIBUTOR_WEIGHT +
+        githubInfluence * OVERALL_NO_ORG_INFLUENCE_WEIGHT,
     );
   }
 
@@ -132,18 +157,21 @@ export const calculateIdentityScore = (
   const knowledgeResult = calculateKnowledgeScore(stackoverflowUser);
 
   // Additive bonuses using scaling factor (lower GitHub scores get larger bonuses)
-  const scalingFactor = 1 + (100 - githubOverall) / 100; // 1.0 to 2.0
-  const npmWeight = 8; // Max 8 points at scale 1.0 (max 16 at scale 2.0)
-  const soWeight = 8; // Max 8 points at scale 1.0 (max 16 at scale 2.0)
+  const scalingFactor = 1 + (MAX_SCORE - githubOverall) / MAX_SCORE; // 1.0 to 2.0
+  const npmWeight = OVERALL_NPM_BONUS_WEIGHT; // Max 8 points at scale 1.0 (max 16 at scale 2.0)
+  const soWeight = OVERALL_SO_BONUS_WEIGHT; // Max 8 points at scale 1.0 (max 16 at scale 2.0)
 
   const npmBonus = publishingResult
-    ? (publishingResult.score / 100) * npmWeight * scalingFactor
+    ? (publishingResult.score / MAX_SCORE) * npmWeight * scalingFactor
     : 0;
   const soBonus = knowledgeResult
-    ? (knowledgeResult.score / 100) * soWeight * scalingFactor
+    ? (knowledgeResult.score / MAX_SCORE) * soWeight * scalingFactor
     : 0;
 
-  const overall = Math.min(100, Math.round(githubOverall + npmBonus + soBonus));
+  const overall = Math.min(
+    MAX_SCORE,
+    Math.round(githubOverall + npmBonus + soBonus),
+  );
 
   // 7. Badges
   const activeRepos = repositories.filter((r) => !r.isArchived);

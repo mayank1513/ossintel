@@ -1,6 +1,17 @@
 import type { NormalizedContribution } from "@ossintel/github-normalizer";
 import type { NormalizedNpmUser } from "@ossintel/npm";
 import type { NormalizedStackOverflowUser } from "@ossintel/stackoverflow";
+import {
+  BADGE_DOWNLOADS_1M,
+  BADGE_FRAMEWORK_STARS,
+  BADGE_PRODIGIOUS_PRS,
+  BADGE_SO_ACCEPTANCE_MIN_ANSWERS,
+  BADGE_SO_ACCEPTANCE_RATE,
+  BADGE_SO_ANSWERS,
+  BADGE_SO_REP,
+  BADGE_STARS_1K,
+  BADGE_TEST_PRS,
+} from "./constants";
 
 interface BadgeInputs {
   externalContributions: NormalizedContribution[];
@@ -27,7 +38,7 @@ export const calculateBadges = (inputs: BadgeInputs): string[] => {
   const totalPRsCount = externalContributions.length;
 
   const contributedToCore = externalContributions.some(
-    (c) => c.targetRepoStars >= 20000,
+    (c) => c.targetRepoStars >= BADGE_FRAMEWORK_STARS,
   );
   if (contributedToCore) {
     badges.push("Framework Contributor");
@@ -38,16 +49,16 @@ export const calculateBadges = (inputs: BadgeInputs): string[] => {
   if (npmUser?.packages && npmUser.packages.length >= 1) {
     badges.push("Package Publisher");
   }
-  if (soRep >= 10000) {
+  if (soRep >= BADGE_SO_REP) {
     badges.push("StackOverflow Elite");
   }
-  if (stackoverflowUser && stackoverflowUser.answerCount >= 100) {
+  if (stackoverflowUser && stackoverflowUser.answerCount >= BADGE_SO_ANSWERS) {
     badges.push("Community Helper");
   }
   if (
     stackoverflowUser &&
-    stackoverflowUser.acceptanceRate >= 80 &&
-    stackoverflowUser.answerCount >= 10
+    stackoverflowUser.acceptanceRate >= BADGE_SO_ACCEPTANCE_RATE &&
+    stackoverflowUser.answerCount >= BADGE_SO_ACCEPTANCE_MIN_ANSWERS
   ) {
     badges.push("High Acceptance");
   }
@@ -55,7 +66,7 @@ export const calculateBadges = (inputs: BadgeInputs): string[] => {
   const testPRsCount = externalContributions.filter(
     (c) => c.type === "test",
   ).length;
-  if (testPRsCount >= 5) {
+  if (testPRsCount >= BADGE_TEST_PRS) {
     badges.push("Test Champion");
   }
   const securityPR = externalContributions.some((c) =>
@@ -64,13 +75,13 @@ export const calculateBadges = (inputs: BadgeInputs): string[] => {
   if (securityPR) {
     badges.push("Security Champion");
   }
-  if (totalPRsCount >= 15) {
+  if (totalPRsCount >= BADGE_PRODIGIOUS_PRS) {
     badges.push("Prodigious Contributor");
   }
-  if (totalStarsCount >= 1000) {
+  if (totalStarsCount >= BADGE_STARS_1K) {
     badges.push("1k Stars Earned");
   }
-  if (totalNpmDownloads >= 1000000) {
+  if (totalNpmDownloads >= BADGE_DOWNLOADS_1M) {
     badges.push("1M npm Downloads");
   }
 

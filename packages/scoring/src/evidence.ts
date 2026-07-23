@@ -1,6 +1,17 @@
 import type { NormalizedContribution } from "@ossintel/github-normalizer";
 import type { NormalizedNpmUser } from "@ossintel/npm";
 import type { NormalizedStackOverflowUser } from "@ossintel/stackoverflow";
+import {
+  EVIDENCE_FRAMEWORK_STARS,
+  EVIDENCE_INFLUENCE_DOWNLOADS_THRESHOLD,
+  EVIDENCE_INFLUENCE_SO_REP_THRESHOLD,
+  EVIDENCE_INFLUENCE_STARS_THRESHOLD,
+  EVIDENCE_MAINTAINER_HEALTH_THRESHOLD,
+  EVIDENCE_ORG_FOLLOWERS_THRESHOLD,
+  EVIDENCE_RECENT_ACTIVITY_DAYS,
+  EVIDENCE_REPEAT_CONTRIB_THRESHOLD,
+  MS_PER_DAY,
+} from "./constants";
 import type {
   IdentityScoringInputs,
   PillarEvidence,
@@ -119,12 +130,12 @@ export const generateFactors = (inputs: EvidenceInputs): PillarFactors => {
 
   const totalPRsCount = externalContributions.length;
   const contributedToCore = externalContributions.some(
-    (c) => c.targetRepoStars >= 20000,
+    (c) => c.targetRepoStars >= EVIDENCE_FRAMEWORK_STARS,
   );
 
   // Maintainer factors
   const maintainer: string[] = [];
-  if (maintainerScore >= 80) {
+  if (maintainerScore >= EVIDENCE_MAINTAINER_HEALTH_THRESHOLD) {
     maintainer.push("Active flagship projects with excellent health");
   }
   if (sustainedCount > 0) {
@@ -155,7 +166,7 @@ export const generateFactors = (inputs: EvidenceInputs): PillarFactors => {
     const topRepoPRCount = externalContributions.filter(
       (c) => c.repoFullName === topUpstreamRepo.repo,
     ).length;
-    if (topRepoPRCount > 2) {
+    if (topRepoPRCount > EVIDENCE_REPEAT_CONTRIB_THRESHOLD) {
       contributor.push(
         `+ Repeat contributor bonus for ${topUpstreamRepo.repo}`,
       );
@@ -166,25 +177,27 @@ export const generateFactors = (inputs: EvidenceInputs): PillarFactors => {
   } else {
     const hasRecentContrib = externalContributions.some(
       (c) =>
-        (Date.now() - new Date(c.createdAt).getTime()) / (1000 * 60 * 60 * 24) <
-        90,
+        (Date.now() - new Date(c.createdAt).getTime()) / MS_PER_DAY <
+        EVIDENCE_RECENT_ACTIVITY_DAYS,
     );
     if (!hasRecentContrib) {
-      contributor.push("- No recent upstream activity (past 90 days)");
+      contributor.push(
+        `- No recent upstream activity (past ${EVIDENCE_RECENT_ACTIVITY_DAYS} days)`,
+      );
     }
   }
 
   // Influence factors
   const influence: string[] = [];
-  if (totalStarsCount >= 500) {
+  if (totalStarsCount >= EVIDENCE_INFLUENCE_STARS_THRESHOLD) {
     influence.push(`+ High community interest (${totalStarsCount} stars)`);
   }
-  if (totalNpmDownloads >= 10000) {
+  if (totalNpmDownloads >= EVIDENCE_INFLUENCE_DOWNLOADS_THRESHOLD) {
     influence.push(
       `+ Strong download footprint (${totalNpmDownloads.toLocaleString()} weekly downloads)`,
     );
   }
-  if (soReputation >= 1000) {
+  if (soReputation >= EVIDENCE_INFLUENCE_SO_REP_THRESHOLD) {
     influence.push(
       `+ High developer authority (${soReputation.toLocaleString()} Stack Overflow reputation)`,
     );
@@ -210,7 +223,7 @@ export const generateFactors = (inputs: EvidenceInputs): PillarFactors => {
       `+ Active leadership in ${activeOrgsCount} organizations`,
     );
   }
-  if (totalOrgFollowers > 100) {
+  if (totalOrgFollowers > EVIDENCE_ORG_FOLLOWERS_THRESHOLD) {
     organization.push(
       `+ High organization follower presence (${totalOrgFollowers})`,
     );

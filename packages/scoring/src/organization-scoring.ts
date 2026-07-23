@@ -1,3 +1,8 @@
+import {
+  MAX_SCORE,
+  ORG_ACTIVE_COUNT_WEIGHT,
+  ORG_LEADERSHIP_MULTIPLIER,
+} from "./constants";
 import type { IdentityScoringInputs } from "./types";
 
 export interface OrganizationResult {
@@ -21,11 +26,16 @@ export const calculateOrganizationScore = (
     const orgStars = org.stars || 0;
     const orgFollowers = org.followers || 0;
     const orgRepos = org.publicRepos || 0;
-    const orgWeight = Math.log10(orgFollowers + orgRepos + orgStars + 1) * 8;
+    const orgWeight =
+      Math.log10(orgFollowers + orgRepos + orgStars + 1) *
+      ORG_LEADERSHIP_MULTIPLIER;
     orgLeadershipSum += orgWeight;
   }
 
-  const score = Math.min(100, Math.round(activeCount * 20 + orgLeadershipSum));
+  const score = Math.min(
+    MAX_SCORE,
+    Math.round(activeCount * ORG_ACTIVE_COUNT_WEIGHT + orgLeadershipSum),
+  );
 
   return { score, activeCount };
 };

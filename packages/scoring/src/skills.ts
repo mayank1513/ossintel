@@ -1,6 +1,21 @@
 import type { NormalizedContribution } from "@ossintel/github-normalizer";
 import type { NormalizedNpmUser } from "@ossintel/npm";
 import type { NormalizedStackOverflowUser } from "@ossintel/stackoverflow";
+import {
+  MAX_SCORE,
+  SKILL_DOWNLOADS_CAP,
+  SKILL_DOWNLOADS_MULTIPLIER,
+  SKILL_PACKAGES_CAP,
+  SKILL_PACKAGES_MULTIPLIER,
+  SKILL_PRS_CAP,
+  SKILL_PRS_MULTIPLIER,
+  SKILL_SO_ANSWERS_CAP,
+  SKILL_SO_ANSWERS_MULTIPLIER,
+  SKILL_SO_SCORE_CAP,
+  SKILL_SO_SCORE_MULTIPLIER,
+  SKILL_STARS_CAP,
+  SKILL_STARS_MULTIPLIER,
+} from "./constants";
 import { matchTopic, TOPIC_MAPPINGS } from "./topic-mappings";
 import type { IdentityScoringInputs, TopicExpertise } from "./types";
 
@@ -9,6 +24,14 @@ interface SkillsInputs {
   externalContributions: NormalizedContribution[];
   npmUser?: NormalizedNpmUser | null;
   stackoverflowUser?: NormalizedStackOverflowUser | null;
+}
+
+// Pre-compile regular expressions to prevent high overhead in nested loops
+const compiledRegexCache: Record<string, RegExp[]> = {};
+for (const [cat, keywords] of Object.entries(TOPIC_MAPPINGS)) {
+  compiledRegexCache[cat] = keywords.map(
+    (kw) => new RegExp(`\\b${kw}\\b`, "i"),
+  );
 }
 
 /**
@@ -50,9 +73,9 @@ export const calculateSkills = (inputs: SkillsInputs): TopicExpertise[] => {
   for (const c of externalContributions) {
     const searchStr = `${c.repoFullName} ${c.title} ${c.labels.join(" ")}`;
     const matchedCats = new Set<string>();
-    for (const [cat, keywords] of Object.entries(TOPIC_MAPPINGS)) {
-      for (const kw of keywords) {
-        if (new RegExp(`\\b${kw}\\b`, "i").test(searchStr)) {
+    for (const [cat, regexes] of Object.entries(compiledRegexCache)) {
+      for (const rx of regexes) {
+        if (rx.test(searchStr)) {
           matchedCats.add(cat);
         }
       }
@@ -67,9 +90,9 @@ export const calculateSkills = (inputs: SkillsInputs): TopicExpertise[] => {
     for (const pkg of npmUser.packages) {
       const searchStr = `${pkg.name} ${pkg.description || ""} ${pkg.categories.join(" ")}`;
       const matchedCats = new Set<string>();
-      for (const [cat, keywords] of Object.entries(TOPIC_MAPPINGS)) {
-        for (const kw of keywords) {
-          if (new RegExp(`\\b${kw}\\b`, "i").test(searchStr)) {
+      for (const [cat, regexes] of Object.entries(compiledRegexCache)) {
+        for (const rx of regexes) {
+          if (rx.test(searchStr)) {
             matchedCats.add(cat);
           }
         }
@@ -95,18 +118,30 @@ export const calculateSkills = (inputs: SkillsInputs): TopicExpertise[] => {
   // Calculate final dynamic skill scores
   const skills: TopicExpertise[] = [];
   for (const [topic, ev] of Object.entries(skillsMap)) {
-    const githubStarsWeight = Math.min(40, Math.log10(ev.githubStars + 1) * 10);
-    const githubPrsWeight = Math.min(25, ev.githubPrs * 2.5);
-    const npmPackagesWeight = Math.min(20, ev.npmPackages * 5);
+    const githubStarsWeight = Math.min(
+      SKILL_STARS_CAP,
+      Math.log10(ev.githubStars + 1) * SKILL_STARS_MULTIPLIER,
+    );
+    const githubPrsWeight = Math.min(
+      SKILL_PRS_CAP,
+      ev.githubPrs * SKILL_PRS_MULTIPLIER,
+    );
+    const npmPackagesWeight = Math.min(
+      SKILL_PACKAGES_CAP,
+      ev.npmPackages * SKILL_PACKAGES_MULTIPLIER,
+    );
     const npmDownloadsWeight = Math.min(
-      30,
-      Math.log10(ev.npmDownloads + 1) * 5,
+      SKILL_DOWNLOADS_CAP,
+      Math.log10(ev.npmDownloads + 1) * SKILL_DOWNLOADS_MULTIPLIER,
     );
     const soScoreWeight = Math.min(
-      35,
-      Math.log10(ev.stackoverflowScore + 1) * 10,
+      SKILL_SO_SCORE_CAP,
+      Math.log10(ev.stackoverflowScore + 1) * SKILL_SO_SCORE_MULTIPLIER,
     );
-    const soAnswersWeight = Math.min(25, ev.stackoverflowAnswers * 0.5);
+    const soAnswersWeight = Math.min(
+      SKILL_SO_ANSWERS_CAP,
+      ev.stackoverflowAnswers * SKILL_SO_ANSWERS_MULTIPLIER,
+    );
 
     const rawScore =
       githubStarsWeight +
@@ -115,7 +150,7 @@ export const calculateSkills = (inputs: SkillsInputs): TopicExpertise[] => {
       npmDownloadsWeight +
       soScoreWeight +
       soAnswersWeight;
-    const score = Math.round(Math.min(100, rawScore));
+    const score = Math.round(Math.min(MAX_SCORE, rawScore));
 
     if (score > 0) {
       skills.push({

@@ -1,4 +1,14 @@
 import type { NormalizedRepository } from "@ossintel/github-normalizer";
+import {
+  MAINTAINER_NPM_BONUS_CAP,
+  MAINTAINER_NPM_BONUS_MULTIPLIER,
+  MAINTAINER_NPM_BONUS_OFFSET,
+  MAINTAINER_SUSTAINED_BONUS,
+  MAINTAINER_SUSTAINED_CREATED_AGE,
+  MAINTAINER_SUSTAINED_PUSH_AGE,
+  MAX_SCORE,
+  MS_PER_DAY,
+} from "./constants";
 import { calculateRepositoryScore } from "./repository-scoring";
 
 export interface MaintainerResult {
@@ -33,13 +43,15 @@ export const calculateMaintainerScore = (
     const baseHealth = scores.health;
 
     const pushAgeDays =
-      (Date.now() - new Date(repo.pushedAt).getTime()) / (1000 * 60 * 60 * 24);
+      (Date.now() - new Date(repo.pushedAt).getTime()) / MS_PER_DAY;
     const createdAgeDays =
-      (Date.now() - new Date(repo.createdAt).getTime()) / (1000 * 60 * 60 * 24);
-    const isSustained = createdAgeDays > 365 && pushAgeDays < 90;
+      (Date.now() - new Date(repo.createdAt).getTime()) / MS_PER_DAY;
+    const isSustained =
+      createdAgeDays > MAINTAINER_SUSTAINED_CREATED_AGE &&
+      pushAgeDays < MAINTAINER_SUSTAINED_PUSH_AGE;
 
     const repoHealth = isSustained
-      ? Math.min(100, baseHealth + 10)
+      ? Math.min(MAX_SCORE, baseHealth + MAINTAINER_SUSTAINED_BONUS)
       : baseHealth;
     if (isSustained) {
       sustainedCount++;
@@ -57,10 +69,14 @@ export const calculateMaintainerScore = (
   // Additive npm bonus (never reduces score)
   let npmBonus = 0;
   if (totalNpmDownloads > 0) {
-    npmBonus = Math.min(10, Math.log10(totalNpmDownloads + 1) * 1.5 + 2);
+    npmBonus = Math.min(
+      MAINTAINER_NPM_BONUS_CAP,
+      Math.log10(totalNpmDownloads + 1) * MAINTAINER_NPM_BONUS_MULTIPLIER +
+        MAINTAINER_NPM_BONUS_OFFSET,
+    );
   }
 
-  const score = Math.min(100, Math.round(githubBase + npmBonus));
+  const score = Math.min(MAX_SCORE, Math.round(githubBase + npmBonus));
 
   return { score, githubBase, npmBonus, sustainedCount };
 };

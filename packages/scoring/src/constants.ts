@@ -1,0 +1,176 @@
+export const MAX_SCORE = 100;
+export const MS_PER_DAY = 86400000;
+export const DAYS_PER_YEAR = 365;
+
+// Repository - Activity
+export const DAYS_RECENT_1 = 1;
+export const SCORE_RECENT_1 = 100;
+export const DAYS_RECENT_7 = 7;
+export const SCORE_RECENT_7 = 90;
+export const DAYS_RECENT_30 = 30;
+export const SCORE_RECENT_30 = 80;
+export const DAYS_RECENT_90 = 90;
+export const SCORE_RECENT_90 = 60;
+export const DAYS_RECENT_180 = 180;
+export const SCORE_RECENT_180 = 40;
+export const DAYS_RECENT_365 = 365;
+export const SCORE_RECENT_365 = 20;
+export const ACTIVITY_RELEASE_DEFAULT_SCORE = 50;
+export const ACTIVITY_RELEASE_FACTOR = 20;
+export const ACTIVITY_RECENCY_WEIGHT = 0.6;
+export const ACTIVITY_RELEASE_WEIGHT = 0.4;
+
+// Repository - Impact
+export const IMPACT_STAR_WEIGHT = 20;
+export const IMPACT_FORK_WEIGHT = 25;
+export const IMPACT_WATCHER_WEIGHT = 30;
+export const IMPACT_STAR_FACTOR = 0.5;
+export const IMPACT_FORK_FACTOR = 0.35;
+export const IMPACT_WATCHER_FACTOR = 0.15;
+
+// Repository - Community
+export const CONTRIBUTOR_ESTIMATOR_CAP = 100;
+export const CONTRIBUTOR_ESTIMATOR_MULTIPLIER = 50;
+export const COMMUNITY_CONTRIBUTOR_WEIGHT = 0.7;
+export const COMMUNITY_TOPIC_WEIGHT = 0.15;
+export const COMMUNITY_META_WEIGHT = 0.15;
+export const COMMUNITY_META_DESCRIPTION_SCORE = 50;
+export const COMMUNITY_META_HOMEPAGE_SCORE = 50;
+
+// Repository - Health
+export const HEALTH_POPULARITY_OFFSET = 10;
+export const HEALTH_ISSUE_RATIO_MULTIPLIER = 500;
+export const HEALTH_UPDATE_30_DAYS = 30;
+export const HEALTH_UPDATE_30_SCORE = 100;
+export const HEALTH_UPDATE_90_DAYS = 90;
+export const HEALTH_UPDATE_90_SCORE = 80;
+export const HEALTH_UPDATE_180_DAYS = 180;
+export const HEALTH_UPDATE_180_SCORE = 60;
+export const HEALTH_UPDATE_365_DAYS = 365;
+export const HEALTH_UPDATE_365_SCORE = 40;
+export const HEALTH_UPDATE_OLD_SCORE = 10;
+export const HEALTH_FORK_SCORE = 50;
+export const HEALTH_NON_FORK_SCORE = 100;
+export const HEALTH_ISSUE_WEIGHT = 0.5;
+export const HEALTH_UPDATE_WEIGHT = 0.3;
+export const HEALTH_FORK_WEIGHT = 0.2;
+
+// Repository - Risk
+export const RISK_PUSH_90_DAYS = 90;
+export const RISK_PUSH_90_SCORE = 10;
+export const RISK_PUSH_180_DAYS = 180;
+export const RISK_PUSH_180_SCORE = 20;
+export const RISK_PUSH_365_DAYS = 365;
+export const RISK_PUSH_365_SCORE = 30;
+export const RISK_CONTRIBUTOR_1_SCORE = 30;
+export const RISK_CONTRIBUTOR_3_SCORE = 20;
+export const RISK_CONTRIBUTOR_5_SCORE = 10;
+export const RISK_FORK_SCORE = 20;
+export const RISK_OPEN_ISSUES_THRESHOLD_HIGH = 50;
+export const RISK_OPEN_ISSUES_THRESHOLD_LOW = 20;
+export const RISK_OPEN_ISSUES_SCORE_HIGH = 20;
+export const RISK_OPEN_ISSUES_SCORE_LOW = 10;
+
+// Contributor Scoring (Upstream PRs)
+export const CONTRIB_IMPORTANCE_DIVISOR = 4;
+export const CONTRIB_BASE_CAP_OFFSET = 20;
+export const CONTRIB_BASE_CAP_MULTIPLIER = 20;
+export const CONTRIB_QUALITY_DOCS = 0.4;
+export const CONTRIB_QUALITY_TEST = 1.2;
+export const CONTRIB_QUALITY_CHORE = 0.5;
+export const CONTRIB_QUALITY_CODE = 1.0;
+export const CONTRIB_BASE_POINTS_MULTIPLIER = 15;
+export const CONTRIB_BASE_POINTS_BONUS = 10;
+export const CONTRIB_SUBSEQUENT_POINTS_BASE = 5;
+export const CONTRIB_SUBSEQUENT_POINTS_FACTOR = 0.5;
+
+// Influence Scoring
+export const INFLUENCE_STAR_WEIGHT = 20;
+export const INFLUENCE_FORK_WEIGHT = 20;
+export const INFLUENCE_NPM_BONUS_CAP = 15;
+export const INFLUENCE_NPM_BONUS_MULTIPLIER = 2.5;
+export const INFLUENCE_SO_BONUS_CAP = 15;
+export const INFLUENCE_SO_BONUS_MULTIPLIER = 2.5;
+
+// Knowledge Scoring
+export const KNOWLEDGE_SO_REP_CAP = 100;
+export const KNOWLEDGE_SO_REP_MULTIPLIER = 20;
+export const KNOWLEDGE_SO_ANSWERS_CAP = 100;
+export const KNOWLEDGE_SO_ANSWERS_MULTIPLIER = 2;
+export const KNOWLEDGE_REP_WEIGHT = 0.5;
+export const KNOWLEDGE_ANSWERS_WEIGHT = 0.3;
+export const KNOWLEDGE_ACCEPTANCE_WEIGHT = 0.2;
+
+// Maintainer Scoring
+export const MAINTAINER_SUSTAINED_PUSH_AGE = 90;
+export const MAINTAINER_SUSTAINED_CREATED_AGE = 365;
+export const MAINTAINER_SUSTAINED_BONUS = 10;
+export const MAINTAINER_NPM_BONUS_CAP = 10;
+export const MAINTAINER_NPM_BONUS_MULTIPLIER = 1.5;
+export const MAINTAINER_NPM_BONUS_OFFSET = 2;
+
+// Organization Scoring
+export const ORG_LEADERSHIP_MULTIPLIER = 8;
+export const ORG_ACTIVE_COUNT_WEIGHT = 20;
+
+// Publishing Scoring
+export const PUBLISHING_DOWNLOADS_MULTIPLIER = 15;
+export const PUBLISHING_PACKAGES_MULTIPLIER = 10;
+export const PUBLISHING_VERIFIED_SCORE = 100;
+export const PUBLISHING_DOWNLOADS_WEIGHT = 0.5;
+export const PUBLISHING_PACKAGES_WEIGHT = 0.3;
+export const PUBLISHING_VERIFIED_WEIGHT = 0.2;
+
+// Identity Scoring
+export const CONFIDENCE_HIGH_REPOS = 10;
+export const CONFIDENCE_HIGH_PRS = 15;
+export const CONFIDENCE_HIGH_DOWNLOADS = 5000;
+export const CONFIDENCE_HIGH_SO_REP = 1000;
+export const CONFIDENCE_MEDIUM_REPOS = 3;
+export const CONFIDENCE_MEDIUM_PRS = 3;
+export const CONFIDENCE_MEDIUM_SO_REP = 100;
+export const OVERALL_ORG_MAINTAINER_WEIGHT = 0.35;
+export const OVERALL_ORG_CONTRIBUTOR_WEIGHT = 0.3;
+export const OVERALL_ORG_LEADERSHIP_WEIGHT = 0.15;
+export const OVERALL_ORG_INFLUENCE_WEIGHT = 0.2;
+export const OVERALL_NO_ORG_MAINTAINER_WEIGHT = 0.45;
+export const OVERALL_NO_ORG_CONTRIBUTOR_WEIGHT = 0.35;
+export const OVERALL_NO_ORG_INFLUENCE_WEIGHT = 0.2;
+export const OVERALL_NPM_BONUS_WEIGHT = 8;
+export const OVERALL_SO_BONUS_WEIGHT = 8;
+
+// Badges
+export const BADGE_FRAMEWORK_STARS = 20000;
+export const BADGE_SO_REP = 10000;
+export const BADGE_SO_ANSWERS = 100;
+export const BADGE_SO_ACCEPTANCE_RATE = 80;
+export const BADGE_SO_ACCEPTANCE_MIN_ANSWERS = 10;
+export const BADGE_TEST_PRS = 5;
+export const BADGE_PRODIGIOUS_PRS = 15;
+export const BADGE_STARS_1K = 1000;
+export const BADGE_DOWNLOADS_1M = 1000000;
+
+// Skills
+export const SKILL_STARS_CAP = 40;
+export const SKILL_STARS_MULTIPLIER = 10;
+export const SKILL_PRS_CAP = 25;
+export const SKILL_PRS_MULTIPLIER = 2.5;
+export const SKILL_PACKAGES_CAP = 20;
+export const SKILL_PACKAGES_MULTIPLIER = 5;
+export const SKILL_DOWNLOADS_CAP = 30;
+export const SKILL_DOWNLOADS_MULTIPLIER = 5;
+export const SKILL_SO_SCORE_CAP = 35;
+export const SKILL_SO_SCORE_MULTIPLIER = 10;
+export const SKILL_SO_ANSWERS_CAP = 25;
+export const SKILL_SO_ANSWERS_MULTIPLIER = 0.5;
+
+// Evidence & Factors
+export const EVIDENCE_FRAMEWORK_STARS = 20000;
+export const EVIDENCE_MAINTAINER_HEALTH_THRESHOLD = 80;
+export const EVIDENCE_REPEAT_CONTRIB_THRESHOLD = 2;
+export const EVIDENCE_RECENT_ACTIVITY_DAYS = 90;
+export const EVIDENCE_INFLUENCE_STARS_THRESHOLD = 500;
+export const EVIDENCE_INFLUENCE_DOWNLOADS_THRESHOLD = 10000;
+export const EVIDENCE_INFLUENCE_SO_REP_THRESHOLD = 1000;
+export const EVIDENCE_ORG_FOLLOWERS_THRESHOLD = 100;
+export const EVIDENCE_ORG_FOLLOWERS_HIGH_THRESHOLD = 100;

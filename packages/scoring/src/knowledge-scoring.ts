@@ -1,4 +1,14 @@
 import type { NormalizedStackOverflowUser } from "@ossintel/stackoverflow";
+import {
+  KNOWLEDGE_ACCEPTANCE_WEIGHT,
+  KNOWLEDGE_ANSWERS_WEIGHT,
+  KNOWLEDGE_REP_WEIGHT,
+  KNOWLEDGE_SO_ANSWERS_CAP,
+  KNOWLEDGE_SO_ANSWERS_MULTIPLIER,
+  KNOWLEDGE_SO_REP_CAP,
+  KNOWLEDGE_SO_REP_MULTIPLIER,
+  MAX_SCORE,
+} from "./constants";
 
 export interface KnowledgeScore {
   /** Overall knowledge sharing score (0-100). */
@@ -30,13 +40,23 @@ export const calculateKnowledgeScore = (
 
   const soRep = stackoverflowUser.reputation ?? 0;
 
-  const reputation = Math.min(100, Math.log10(soRep + 1) * 20);
-  const answers = Math.min(100, stackoverflowUser.answerCount * 2);
+  const reputation = Math.min(
+    KNOWLEDGE_SO_REP_CAP,
+    Math.log10(soRep + 1) * KNOWLEDGE_SO_REP_MULTIPLIER,
+  );
+  const answers = Math.min(
+    KNOWLEDGE_SO_ANSWERS_CAP,
+    stackoverflowUser.answerCount * KNOWLEDGE_SO_ANSWERS_MULTIPLIER,
+  );
   const acceptance = stackoverflowUser.acceptanceRate || 0;
 
   const score = Math.min(
-    100,
-    Math.round(reputation * 0.5 + answers * 0.3 + acceptance * 0.2),
+    MAX_SCORE,
+    Math.round(
+      reputation * KNOWLEDGE_REP_WEIGHT +
+        answers * KNOWLEDGE_ANSWERS_WEIGHT +
+        acceptance * KNOWLEDGE_ACCEPTANCE_WEIGHT,
+    ),
   );
 
   return {

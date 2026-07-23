@@ -1,13 +1,14 @@
+import { STACKOVERFLOW_BASE_URL } from "./constants";
 import {
   type StackOverflowFetchOptions,
   StackOverflowHttpError,
 } from "./types";
 
-export async function stackoverflowFetch<T>(
+export const stackoverflowFetch = async <T>(
   endpoint: string,
   options?: StackOverflowFetchOptions,
-): Promise<T> {
-  const baseUrl = options?.baseUrl ?? "https://api.stackexchange.com/2.3";
+): Promise<T> => {
+  const baseUrl = options?.baseUrl ?? STACKOVERFLOW_BASE_URL;
   const apiKey = options?.apiKey ?? process.env["STACKEXCHANGE_API_KEY"];
 
   const urlObj = new URL(
@@ -48,4 +49,4 @@ export async function stackoverflowFetch<T>(
   }
 
   return response.json() as Promise<T>;
-}
+};

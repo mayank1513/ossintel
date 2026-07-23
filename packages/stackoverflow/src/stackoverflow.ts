@@ -1,4 +1,10 @@
 import { stackoverflowFetch } from "./client";
+import {
+  MIN_YEARS_ACTIVE,
+  MS_PER_YEAR_LEAP,
+  ROUNDING_DECIMAL_MULTIPLIER,
+  SO_PAGE_SIZE,
+} from "./constants";
 import type {
   NormalizedStackOverflowUser,
   StackOverflowFetchOptions,
@@ -37,10 +43,10 @@ interface RawSOAnswer {
 /**
  * Fetch and normalize Stack Overflow profile details for a given userId
  */
-export async function fetchStackOverflowUser(
+export const fetchStackOverflowUser = async (
   userId: string,
   options?: StackOverflowFetchOptions,
-): Promise<NormalizedStackOverflowUser> {
+): Promise<NormalizedStackOverflowUser> => {
   const cleanId = userId.trim();
 
   // 1. Fetch user general information
@@ -81,7 +87,7 @@ export async function fetchStackOverflowUser(
 
   try {
     const answersRes = await stackoverflowFetch<{ items: RawSOAnswer[] }>(
-      `/users/${cleanId}/answers?pagesize=55`,
+      `/users/${cleanId}/answers?pagesize=${SO_PAGE_SIZE}`,
       options,
     );
     const answers = answersRes.items || [];
@@ -100,8 +106,9 @@ export async function fetchStackOverflowUser(
   const createdDate = new Date(rawUser.creation_date * 1000);
   const diffMs = Date.now() - createdDate.getTime();
   const yearsActive = Math.max(
-    0.1,
-    Math.round((diffMs / (1000 * 60 * 60 * 24 * 365.25)) * 10) / 10,
+    MIN_YEARS_ACTIVE,
+    Math.round((diffMs / MS_PER_YEAR_LEAP) * ROUNDING_DECIMAL_MULTIPLIER) /
+      ROUNDING_DECIMAL_MULTIPLIER,
   );
 
   return {
@@ -121,4 +128,4 @@ export async function fetchStackOverflowUser(
     yearsActive,
     topTags,
   };
-}
+};

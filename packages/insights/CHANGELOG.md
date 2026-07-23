@@ -1,5 +1,14 @@
 # @ossintel/insights
 
+## 0.1.2
+
+### Patch Changes
+
+- Updated dependencies [[`bf91f5d`](https://github.com/ossintel/ossintel/commit/bf91f5d05b9edc69213a8643e7586888331b0c8d)]:
+  - @ossintel/github-normalizer@0.1.2
+  - @ossintel/npm@0.0.3
+  - @ossintel/scoring@0.1.2
+
 ## 0.1.1
 
 ### Patch Changes

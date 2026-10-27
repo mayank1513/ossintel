@@ -15,7 +15,8 @@
       "!build",
       "!coverage",
       "!apps/web/content/docs",
-      "!.forge-meta.json"
+      "!.forge-meta.json",
+      "!.changeset"
     ]
   },
   "formatter": {

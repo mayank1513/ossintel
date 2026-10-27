@@ -1,3 +1,4 @@
+import { detectManifest } from "@ossintel/input-parser";
 import {
   ACTIVITY_RECENCY_WEIGHT,
   ACTIVITY_RELEASE_DEFAULT_SCORE,
@@ -38,6 +39,10 @@ import {
   IMPACT_STAR_WEIGHT,
   IMPACT_WATCHER_FACTOR,
   IMPACT_WATCHER_WEIGHT,
+  IMPACT_WITH_VELOCITY_FACTOR,
+  IMPACT_WITH_VELOCITY_FORK_FACTOR,
+  IMPACT_WITH_VELOCITY_STAR_FACTOR,
+  IMPACT_WITH_VELOCITY_WATCHER_FACTOR,
   MAX_SCORE,
   MS_PER_DAY,
   RISK_CONTRIBUTOR_1_SCORE,
@@ -60,12 +65,35 @@ import {
   SCORE_RECENT_90,
   SCORE_RECENT_180,
   SCORE_RECENT_365,
+  VELOCITY_LOG_MULTIPLIER,
 } from "./constants";
 import type { RepositoryScores, ScoringInputs } from "./types";
 
-/** Calculate the impact score based on stars, forks, and watchers. */
+/** Calculate installation velocity score (0-100) from npm downloads or VS Code marketplace installs. */
+export const calculateVelocityScore = (
+  packageVelocity?: ScoringInputs["packageVelocity"],
+  npmPackage?: ScoringInputs["npmPackage"],
+): number => {
+  const downloads = Math.max(
+    packageVelocity?.downloads ?? 0,
+    packageVelocity?.monthlyDownloads ?? 0,
+    (packageVelocity?.weeklyDownloads ?? 0) * 4,
+    packageVelocity?.installs ?? 0,
+    npmPackage?.monthlyDownloads ?? 0,
+    (npmPackage?.weeklyDownloads ?? 0) * 4,
+  );
+
+  if (downloads <= 0) return 0;
+  return Math.min(
+    MAX_SCORE,
+    Math.round(Math.log10(downloads + 1) * VELOCITY_LOG_MULTIPLIER),
+  );
+};
+
+/** Calculate the impact score based on stars, forks, watchers, and optional installation velocity. */
 export const calculateImpactScore = (
   repository: ScoringInputs["repository"],
+  velocityScore = 0,
 ): number => {
   const stars = repository.stargazersCount;
   const forks = repository.forksCount;
@@ -83,6 +111,15 @@ export const calculateImpactScore = (
     MAX_SCORE,
     Math.log10(watchers + 1) * IMPACT_WATCHER_WEIGHT,
   );
+
+  if (velocityScore > 0) {
+    return Math.round(
+      starScore * IMPACT_WITH_VELOCITY_STAR_FACTOR +
+        forkScore * IMPACT_WITH_VELOCITY_FORK_FACTOR +
+        watcherScore * IMPACT_WITH_VELOCITY_WATCHER_FACTOR +
+        velocityScore * IMPACT_WITH_VELOCITY_FACTOR,
+    );
+  }
 
   return Math.round(
     starScore * IMPACT_STAR_FACTOR +
@@ -247,10 +284,22 @@ export const calculateRiskScore = (
 export const calculateRepositoryScore = (
   inputs: ScoringInputs,
 ): RepositoryScores => {
-  const { repository, contributors, releases } = inputs;
+  const {
+    repository,
+    contributors,
+    releases,
+    packageManifest,
+    npmPackage,
+    packageVelocity,
+  } = inputs;
 
+  const manifestDetection = packageManifest
+    ? detectManifest(packageManifest)
+    : undefined;
+
+  const velocity = calculateVelocityScore(packageVelocity, npmPackage);
   const health = calculateHealthScore(repository);
-  const impact = calculateImpactScore(repository);
+  const impact = calculateImpactScore(repository, velocity);
   const activity = calculateActivityScore(repository, releases);
   const community = calculateCommunityScore(repository, contributors);
   const risk = calculateRiskScore(repository, contributors);
@@ -270,5 +319,7 @@ export const calculateRepositoryScore = (
     activity,
     community,
     risk,
+    ...(velocity > 0 ? { velocity } : {}),
+    ...(manifestDetection ? { manifestDetection } : {}),
   };
 };

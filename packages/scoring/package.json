@@ -39,6 +39,7 @@
   },
   "dependencies": {
     "@ossintel/github-normalizer": "workspace:*",
+    "@ossintel/input-parser": "workspace:*",
     "@ossintel/npm": "workspace:*",
     "@ossintel/stackoverflow": "workspace:*"
   },

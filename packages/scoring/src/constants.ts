@@ -27,6 +27,11 @@ export const IMPACT_WATCHER_WEIGHT = 30;
 export const IMPACT_STAR_FACTOR = 0.5;
 export const IMPACT_FORK_FACTOR = 0.35;
 export const IMPACT_WATCHER_FACTOR = 0.15;
+export const IMPACT_WITH_VELOCITY_STAR_FACTOR = 0.35;
+export const IMPACT_WITH_VELOCITY_FORK_FACTOR = 0.25;
+export const IMPACT_WITH_VELOCITY_WATCHER_FACTOR = 0.1;
+export const IMPACT_WITH_VELOCITY_FACTOR = 0.3;
+export const VELOCITY_LOG_MULTIPLIER = 15;
 
 // Repository - Community
 export const CONTRIBUTOR_ESTIMATOR_CAP = 100;

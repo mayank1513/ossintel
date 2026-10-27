@@ -5,14 +5,51 @@ import type {
   NormalizedRelease,
   NormalizedRepository,
 } from "@ossintel/github-normalizer";
-import type { NormalizedNpmUser } from "@ossintel/npm";
+import type {
+  ManifestDetectionResult,
+  PackageManifest,
+} from "@ossintel/input-parser";
+import type { NormalizedNpmPackage, NormalizedNpmUser } from "@ossintel/npm";
 import type { NormalizedStackOverflowUser } from "@ossintel/stackoverflow";
+
+export type { ManifestDetectionResult, PackageManifest };
+
+export interface PackageVelocity {
+  /**
+   * Weekly downloads (e.g. from npm)
+   */
+  weeklyDownloads?: number;
+  /**
+   * Monthly downloads (e.g. from npm)
+   */
+  monthlyDownloads?: number;
+  /**
+   * Real-world installations (e.g. VS Code Marketplace installs)
+   */
+  installs?: number;
+  /**
+   * General download count
+   */
+  downloads?: number;
+}
 
 export interface ScoringInputs {
   repository: NormalizedRepository;
   contributors?: NormalizedContributor[];
   releases?: NormalizedRelease[];
   languages?: NormalizedLanguage[];
+  /**
+   * Raw or parsed package.json manifest for auto-detecting npm packages and VS Code extensions
+   */
+  packageManifest?: PackageManifest | string | null;
+  /**
+   * Associated npm package details if resolved
+   */
+  npmPackage?: NormalizedNpmPackage | null;
+  /**
+   * Real-world installation/download velocity metrics
+   */
+  packageVelocity?: PackageVelocity | null;
 }
 
 export interface RepositoryScores {
@@ -22,6 +59,14 @@ export interface RepositoryScores {
   activity: number;
   community: number;
   risk: number;
+  /**
+   * Installation velocity score (0-100)
+   */
+  velocity?: number;
+  /**
+   * Package or extension classification result
+   */
+  manifestDetection?: ManifestDetectionResult;
 }
 
 export interface TopicExpertise {

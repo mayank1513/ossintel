@@ -108,7 +108,7 @@ export default function RepoPage() {
                   rel="noopener noreferrer"
                   className="px-3 py-1 bg-muted/40 hover:bg-muted border border-border/80 text-muted-foreground hover:text-foreground text-xs font-bold rounded-lg flex items-center gap-1.5 transition-all shadow-sm"
                 >
-                  <FaGithub className="h-3.5 w-3.5 text-primary/85" /> Outer
+                  <FaGithub className="h-3.5 w-3.5 text-primary/85" />
                   GitHub <ExternalLink className="h-3 w-3 opacity-60" />
                 </a>
               </div>

@@ -484,6 +484,9 @@ importers:
       "@ossintel/github-normalizer":
         specifier: workspace:*
         version: link:../github-normalizer
+      "@ossintel/input-parser":
+        specifier: workspace:*
+        version: link:../input-parser
       "@ossintel/npm":
         specifier: workspace:*
         version: link:../npm

@@ -26,6 +26,7 @@ export {
   calculateImpactScore,
   calculateRepositoryScore,
   calculateRiskScore,
+  calculateVelocityScore,
 } from "./repository-scoring";
 export { calculateSkills } from "./skills";
 export { matchTopic, TOPIC_MAPPINGS } from "./topic-mappings";

@@ -1,6 +1,9 @@
 import { describe, expect, test } from "vitest";
 import { calculateIdentityScore } from "./identity-scoring";
-import { calculateRepositoryScore } from "./repository-scoring";
+import {
+  calculateRepositoryScore,
+  calculateVelocityScore,
+} from "./repository-scoring";
 import type { ScoringInputs } from "./types";
 
 const mockRepository = (
@@ -532,5 +535,86 @@ describe("scoring engine", () => {
     expect(withHighNpmResult.influence).toBeGreaterThanOrEqual(
       baseResult.influence,
     );
+  });
+
+  describe("repository package & extension auto-detection and installation velocity", () => {
+    test("calculateVelocityScore computes log-scale velocity from downloads or installs", () => {
+      expect(calculateVelocityScore()).toBe(0);
+      expect(calculateVelocityScore({ downloads: 0 })).toBe(0);
+
+      const lowVelocity = calculateVelocityScore({ downloads: 1000 });
+      const midVelocity = calculateVelocityScore({ monthlyDownloads: 100000 });
+      const highVelocity = calculateVelocityScore({ installs: 1000000 });
+
+      expect(lowVelocity).toBeGreaterThan(0);
+      expect(midVelocity).toBeGreaterThan(lowVelocity);
+      expect(highVelocity).toBeGreaterThan(midVelocity);
+      expect(highVelocity).toBeLessThanOrEqual(100);
+    });
+
+    test("auto-detects npm package manifest and boosts Alpha Score with installation velocity", () => {
+      const baseRepo = mockRepository({
+        stargazersCount: 50,
+        forksCount: 10,
+        watchersCount: 5,
+      });
+
+      const withoutVelocity = calculateRepositoryScore({
+        repository: baseRepo,
+      });
+
+      const withVelocity = calculateRepositoryScore({
+        repository: baseRepo,
+        packageManifest: {
+          name: "@ossintel/scoring",
+          version: "0.1.3",
+        },
+        packageVelocity: {
+          monthlyDownloads: 500000,
+        },
+      });
+
+      expect(withVelocity.manifestDetection?.isNpmPackage).toBe(true);
+      expect(withVelocity.manifestDetection?.packageName).toBe(
+        "@ossintel/scoring",
+      );
+      expect(withVelocity.velocity).toBeGreaterThan(0);
+      expect(withVelocity.impact).toBeGreaterThan(withoutVelocity.impact);
+      expect(withVelocity.overall).toBeGreaterThan(withoutVelocity.overall);
+    });
+
+    test("auto-detects VSCode extension manifest and integrates marketplace installs into Alpha Score", () => {
+      const baseRepo = mockRepository({
+        stargazersCount: 30,
+        forksCount: 5,
+        watchersCount: 3,
+      });
+
+      const withoutExtension = calculateRepositoryScore({
+        repository: baseRepo,
+      });
+
+      const withExtension = calculateRepositoryScore({
+        repository: baseRepo,
+        packageManifest: JSON.stringify({
+          name: "promptshield-vscode",
+          publisher: "mayank1513",
+          engines: {
+            vscode: "^1.80.0",
+          },
+        }),
+        packageVelocity: {
+          installs: 250000,
+        },
+      });
+
+      expect(withExtension.manifestDetection?.isVsCodeExtension).toBe(true);
+      expect(withExtension.manifestDetection?.vscodeExtensionId).toBe(
+        "mayank1513.promptshield-vscode",
+      );
+      expect(withExtension.velocity).toBeGreaterThan(0);
+      expect(withExtension.impact).toBeGreaterThan(withoutExtension.impact);
+      expect(withExtension.overall).toBeGreaterThan(withoutExtension.overall);
+    });
   });
 });

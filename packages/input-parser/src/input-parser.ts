@@ -53,6 +53,108 @@ export interface InputDetectionResult {
   rawInput: string;
 }
 
+export interface PackageManifest {
+  name?: string;
+  publisher?: string;
+  version?: string;
+  engines?: {
+    vscode?: string;
+  };
+  private?: boolean;
+}
+
+export interface ManifestDetectionResult {
+  isPackage: boolean;
+  isVsCodeExtension: boolean;
+  isNpmPackage: boolean;
+  packageName?: string;
+  vscodeExtensionId?: string;
+  publisher?: string;
+  version?: string;
+}
+
+/**
+ * Auto-detects package ecosystem and identity from a package.json manifest.
+ * Inspects `name`, `publisher`, and `engines.vscode` to distinguish between
+ * standard npm packages and VS Code extensions.
+ *
+ * @param manifestInput - Raw JSON string or parsed package.json manifest object
+ * @returns Detection result identifying package flags, name, and VS Code extension ID
+ */
+export const detectManifest = (
+  manifestInput:
+    | string
+    | PackageManifest
+    | Record<string, unknown>
+    | null
+    | undefined,
+): ManifestDetectionResult => {
+  if (!manifestInput) {
+    return {
+      isPackage: false,
+      isVsCodeExtension: false,
+      isNpmPackage: false,
+    };
+  }
+
+  let parsed: PackageManifest;
+  if (typeof manifestInput === "string") {
+    try {
+      parsed = JSON.parse(manifestInput) as PackageManifest;
+    } catch {
+      return {
+        isPackage: false,
+        isVsCodeExtension: false,
+        isNpmPackage: false,
+      };
+    }
+  } else if (typeof manifestInput === "object") {
+    parsed = manifestInput as PackageManifest;
+  } else {
+    return {
+      isPackage: false,
+      isVsCodeExtension: false,
+      isNpmPackage: false,
+    };
+  }
+
+  const rawName =
+    typeof parsed.name === "string" ? parsed.name.trim() : undefined;
+  const rawPublisher =
+    typeof parsed.publisher === "string" ? parsed.publisher.trim() : undefined;
+  const rawVersion =
+    typeof parsed.version === "string" ? parsed.version.trim() : undefined;
+
+  const engines =
+    parsed.engines && typeof parsed.engines === "object"
+      ? parsed.engines
+      : undefined;
+
+  const isVsCodeExtension = Boolean(
+    engines && typeof engines.vscode === "string",
+  );
+  const isNpmPackage = Boolean(rawName);
+
+  let vscodeExtensionId: string | undefined;
+  if (isVsCodeExtension) {
+    if (rawPublisher && rawName) {
+      vscodeExtensionId = `${rawPublisher}.${rawName}`;
+    } else if (rawName) {
+      vscodeExtensionId = rawName;
+    }
+  }
+
+  return {
+    isPackage: isNpmPackage || isVsCodeExtension,
+    isVsCodeExtension,
+    isNpmPackage,
+    packageName: rawName,
+    vscodeExtensionId,
+    publisher: rawPublisher,
+    version: rawVersion,
+  };
+};
+
 /**
  * Parses and resolves search query strings into platform and type targets.
  * Supporting URLs, prefixes, and fallback shorthands.
@@ -74,6 +176,27 @@ export interface InputDetectionResult {
  */
 export const detectInput = (input: string): InputDetectionResult => {
   const trimmed = input.trim();
+
+  // 0. JSON Manifest auto-detection
+  if (trimmed.startsWith("{") && trimmed.endsWith("}")) {
+    const manifest = detectManifest(trimmed);
+    if (manifest.isVsCodeExtension && manifest.vscodeExtensionId) {
+      return {
+        platform: "vscode",
+        type: "package",
+        name: manifest.vscodeExtensionId,
+        rawInput: trimmed,
+      };
+    }
+    if (manifest.isNpmPackage && manifest.packageName) {
+      return {
+        platform: "npm",
+        type: "package",
+        name: manifest.packageName,
+        rawInput: trimmed,
+      };
+    }
+  }
 
   // 1. Prefix Shortcuts
   if (trimmed.startsWith("npm:pkg:")) {

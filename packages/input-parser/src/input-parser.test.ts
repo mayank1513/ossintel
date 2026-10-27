@@ -1,5 +1,5 @@
 import { describe, expect, test } from "vitest";
-import { detectInput } from "./input-parser";
+import { detectInput, detectManifest } from "./input-parser";
 
 describe("input-parser - detectInput", () => {
   test("should detect GitHub orgs correctly from various syntaxes", () => {
@@ -217,6 +217,112 @@ describe("input-parser - detectInput", () => {
       type: "user",
       profileId: "mayank1513",
       rawInput: "leetcode:mayank1513",
+    });
+  });
+
+  describe("detectManifest", () => {
+    test("should detect standard npm package manifest correctly", () => {
+      const manifest = {
+        name: "@ossintel/scoring",
+        version: "1.0.0",
+        description: "Scoring engine",
+      };
+
+      const result = detectManifest(manifest);
+      expect(result).toEqual({
+        isPackage: true,
+        isVsCodeExtension: false,
+        isNpmPackage: true,
+        packageName: "@ossintel/scoring",
+        vscodeExtensionId: undefined,
+        publisher: undefined,
+        version: "1.0.0",
+      });
+    });
+
+    test("should detect VSCode extension manifest correctly", () => {
+      const manifest = {
+        name: "promptshield-vscode",
+        publisher: "mayank1513",
+        version: "0.2.0",
+        engines: {
+          vscode: "^1.80.0",
+        },
+      };
+
+      const result = detectManifest(manifest);
+      expect(result).toEqual({
+        isPackage: true,
+        isVsCodeExtension: true,
+        isNpmPackage: true,
+        packageName: "promptshield-vscode",
+        vscodeExtensionId: "mayank1513.promptshield-vscode",
+        publisher: "mayank1513",
+        version: "0.2.0",
+      });
+    });
+
+    test("should handle JSON string manifests", () => {
+      const jsonStr = JSON.stringify({
+        name: "my-extension",
+        publisher: "dev",
+        engines: { vscode: ">=1.90.0" },
+      });
+
+      const result = detectManifest(jsonStr);
+      expect(result.isVsCodeExtension).toBe(true);
+      expect(result.vscodeExtensionId).toBe("dev.my-extension");
+    });
+
+    test("should handle invalid inputs and non-package manifests gracefully", () => {
+      expect(detectManifest(null)).toEqual({
+        isPackage: false,
+        isVsCodeExtension: false,
+        isNpmPackage: false,
+      });
+
+      expect(detectManifest("invalid-json{")).toEqual({
+        isPackage: false,
+        isVsCodeExtension: false,
+        isNpmPackage: false,
+      });
+
+      expect(detectManifest({})).toEqual({
+        isPackage: false,
+        isVsCodeExtension: false,
+        isNpmPackage: false,
+        packageName: undefined,
+        vscodeExtensionId: undefined,
+        publisher: undefined,
+        version: undefined,
+      });
+    });
+
+    test("detectInput should resolve JSON string manifests into target platforms", () => {
+      const vscodeJson = JSON.stringify({
+        name: "theme-dark",
+        publisher: "myorg",
+        engines: { vscode: "^1.0.0" },
+      });
+      const resVscode = detectInput(vscodeJson);
+      expect(resVscode).toEqual({
+        platform: "vscode",
+        type: "package",
+        name: "myorg.theme-dark",
+        rawInput: vscodeJson,
+      });
+
+      const npmJson = JSON.stringify({
+        name: "super-lib",
+        version: "2.0.0",
+      });
+      const resNpm = detectInput(npmJson);
+      expect(resNpm).toEqual({
+        platform: "npm",
+        type: "package",
+        name: "super-lib",
+        rawInput: npmJson,
+      });
     });
   });
 });

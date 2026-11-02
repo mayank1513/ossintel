@@ -28,11 +28,14 @@
 - **Ecosystem Agnostic**: Parses query strings, profiles, and URLs across GitHub, NPM, StackOverflow, VS Code, Medium, and LeetCode.
 - **URL Auto-Healing**: Extracts platform, owner, repo, package name, or user IDs directly from browser copy-pasted URLs.
 - **Prefix Shortcuts**: Handles intuitive prefix syntax (e.g. `org:react18-tools`, `npm:~isaacs`, `so:12345`).
+- **Manifest Auto-Detection**: Inspects `package.json` contents to distinguish standard npm libraries from VS Code extensions (via `engines.vscode`, `publisher`, and `name`) for repository ingestion workflows.
 - **Fully Typed & Lightweight**: Zero external dependencies, compiling to highly optimized, type-safe ESM/CJS bundles.
 
 ---
 
 ## 🚀 Usage
+
+### 1. Parsing User Queries and URLs
 
 ```typescript
 import { detectInput } from "@ossintel/input-parser";
@@ -49,6 +52,48 @@ const org = detectInput("org:react18-tools");
 const npmUser = detectInput("npm:~mayank1513");
 // => { platform: "npm", type: "user", name: "mayank1513", rawInput: "..." }
 ```
+
+### 2. Auto-Detecting Manifests (Repository Ingestion)
+
+When analyzing repositories during ingestion, pass the repository's `package.json` manifest (either as a parsed object or raw JSON string) to identify package identity and VS Code extension targets:
+
+```typescript
+import { detectManifest } from "@ossintel/input-parser";
+
+// Detect a VS Code extension manifest
+const extensionResult = detectManifest({
+  name: "promptshield-vscode",
+  publisher: "mayank1513",
+  version: "0.2.0",
+  engines: { vscode: "^1.80.0" },
+});
+// => {
+//   isPackage: true,
+//   isVsCodeExtension: true,
+//   isNpmPackage: true,
+//   packageName: "promptshield-vscode",
+//   vscodeExtensionId: "mayank1513.promptshield-vscode",
+//   publisher: "mayank1513",
+//   version: "0.2.0"
+// }
+
+// Detect a standard NPM package manifest
+const pkgResult = detectManifest({
+  name: "@ossintel/scoring",
+  version: "1.0.0",
+});
+// => {
+//   isPackage: true,
+//   isVsCodeExtension: false,
+//   isNpmPackage: true,
+//   packageName: "@ossintel/scoring",
+//   vscodeExtensionId: undefined,
+//   publisher: undefined,
+//   version: "1.0.0"
+// }
+```
+
+> **Note**: `detectInput` also supports raw JSON strings as an opportunistic fallback, automatically routing to `platform: "vscode"` or `platform: "npm"`.
 
 ---
 

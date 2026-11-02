@@ -1,0 +1,40 @@
+[**@ossintel/scoring**](../index.mdx)
+
+***
+
+[@ossintel/scoring](../index.mdx) / logScale
+
+# Function: logScale()
+
+> **logScale**(`value`, `multiplier`, `max?`): `number`
+
+Defined in: [scoring/src/utils.ts:12](https://github.com/ossintel/ossintel/blob/main/packages/scoring/src/utils.ts#L12)
+
+Calculates a bounded logarithmic score:
+score = min(max, log10(value + 1) * multiplier)
+
+## Parameters
+
+### value
+
+`number`
+
+The input metric count (e.g. downloads, stars, reputation)
+
+### multiplier
+
+`number`
+
+Scaling factor for log10
+
+### max?
+
+`number` = `MAX_SCORE`
+
+Upper bound cap (defaults to MAX_SCORE = 100)
+
+## Returns
+
+`number`
+
+Scaled score (0 to max)

@@ -1,22 +1,27 @@
-[**@ossintel/scoring**](../index.md)
+[**@ossintel/scoring**](../index.mdx)
 
 ***
 
-[@ossintel/scoring](../index.md) / calculateImpactScore
+[@ossintel/scoring](../index.mdx) / calculateImpactScore
 
 # Function: calculateImpactScore()
 
-> **calculateImpactScore**(`repository`): `number`
+> **calculateImpactScore**(`repository`, `velocityScore?`): `number`
 
-Defined in: [repository-scoring.ts:67](https://github.com/ossintel/ossintel/blob/main/packages/scoring/src/repository-scoring.ts#L67)
+Defined in: [scoring/src/repository-scoring.ts:128](https://github.com/ossintel/ossintel/blob/main/packages/scoring/src/repository-scoring.ts#L128)
 
-Calculate the impact score based on stars, forks, and watchers.
+Calculate the impact score based on stars, forks, and watchers,
+with installation velocity providing an additive bonus capped at +50.
 
 ## Parameters
 
 ### repository
 
 `NormalizedRepository`
+
+### velocityScore?
+
+`number` = `0`
 
 ## Returns
 

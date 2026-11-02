@@ -37,7 +37,7 @@ Converts normalized repository and developer metrics into objective scores.
 - **Velocity Scoring** (`calculateVelocityScore`): Logarithmic scoring of real-world installation and download velocity (npm downloads, VS Code extension installs & ratings), supporting single packages and monorepo package aggregations.
 - **Manifest Auto-Detection**: When a repository's `packageManifest` or `packageManifests` is supplied to `calculateRepositoryScore`, auto-detects package and extension targets (via `@ossintel/input-parser`), providing an additive velocity bonus to the Impact score:
   - _Base Impact (100%)_: Stars (50%) + Forks (35%) + Watchers (15%)
-  - _Installation Velocity Bonus_: Pure additive bonus capped at +50 points ($\text{Impact} = \min(100, \text{Base Impact} + \text{Velocity Bonus})$), guaranteeing that having published packages can only increase or preserve the score.
+  - _Installation Velocity Bonus_: Pure additive bonus capped at +50 points ($\text\{Impact\} = \min(100, \text\{Base Impact\} + \text\{Velocity Bonus\})$), guaranteeing that having published packages can only increase or preserve the score.
 
 ### Identity Scoring (OSSIQ)
 
@@ -135,10 +135,10 @@ Merged pull requests are weighted according to target repository popularity and 
 | **&ge; 2,000 Stars**   | **Tier 2 (Medium OSS)** | 3.0         | Quality Multiplier                                               |
 | **&lt; 2,000 Stars**   | **Tier 3 (Small OSS)**  | 1.0         | Quality Multiplier                                               |
 
-The resulting Ecosystem Contribution Score ($S_{\text{eco}}$) is aggregated as:
+The resulting Ecosystem Contribution Score ($S_\{\text\{eco\}\}$) is aggregated as:
 
 $$
-S_{\text{eco}} = \min\left(100, \sum (\text{BaseWeight} \times \text{QualityMultiplier})\right)
+S_\{\text\{eco\}\} = \min\left(100, \sum (\text\{BaseWeight\} \times \text\{QualityMultiplier\})\right)
 $$
 
 ---

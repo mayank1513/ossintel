@@ -1,0 +1,28 @@
+[**@ossintel/scoring**](../index.mdx)
+
+***
+
+[@ossintel/scoring](../index.mdx) / calculateVelocityScore
+
+# Function: calculateVelocityScore()
+
+> **calculateVelocityScore**(`packageVelocity?`, `npmPackage?`): `number`
+
+Defined in: [scoring/src/repository-scoring.ts:95](https://github.com/ossintel/ossintel/blob/main/packages/scoring/src/repository-scoring.ts#L95)
+
+Calculate installation velocity score (0-100) from npm downloads or VS Code marketplace installs.
+Supports single packages as well as multi-package repositories / monorepos.
+
+## Parameters
+
+### packageVelocity?
+
+[`PackageVelocity`](../interfaces/PackageVelocity.mdx) \| [`PackageVelocity`](../interfaces/PackageVelocity.mdx)[] \| `null`
+
+### npmPackage?
+
+`NormalizedNpmPackage` \| `NormalizedNpmPackage`[] \| `null`
+
+## Returns
+
+`number`

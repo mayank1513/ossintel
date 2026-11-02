@@ -1,0 +1,29 @@
+[**@ossintel/input-parser**](../index.mdx)
+
+***
+
+[@ossintel/input-parser](../index.mdx) / detectManifest
+
+# Function: detectManifest()
+
+> **detectManifest**(`manifestInput`): [`ManifestDetectionResult`](../interfaces/ManifestDetectionResult.mdx)
+
+Defined in: [input-parser.ts:95](https://github.com/ossintel/ossintel/blob/main/packages/input-parser/src/input-parser.ts#L95)
+
+Auto-detects package ecosystem and identity from a package.json manifest.
+Inspects `name`, `publisher`, and `engines.vscode` to distinguish between
+standard npm packages and VS Code extensions.
+
+## Parameters
+
+### manifestInput
+
+`string` \| [`PackageManifest`](../interfaces/PackageManifest.mdx) \| `Record`\<`string`, `unknown`\> \| `null` \| `undefined`
+
+Raw JSON string or parsed package.json manifest object
+
+## Returns
+
+[`ManifestDetectionResult`](../interfaces/ManifestDetectionResult.mdx)
+
+Detection result identifying package flags, name, and VS Code extension ID

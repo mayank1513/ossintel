@@ -1,0 +1,28 @@
+[**@ossintel/input-parser**](../index.mdx)
+
+***
+
+[@ossintel/input-parser](../index.mdx) / detectManifests
+
+# Function: detectManifests()
+
+> **detectManifests**(`manifestsInput`): [`MultiManifestDetectionResult`](../interfaces/MultiManifestDetectionResult.mdx)
+
+Defined in: [input-parser.ts:184](https://github.com/ossintel/ossintel/blob/main/packages/input-parser/src/input-parser.ts#L184)
+
+Analyzes multiple manifests (e.g. from monorepos or multi-package workspaces).
+Identifies whether the workspace is a monorepo and categorizes subpackages.
+
+## Parameters
+
+### manifestsInput
+
+(`string` \| [`PackageManifest`](../interfaces/PackageManifest.mdx) \| `Record`\<`string`, `unknown`\> \| `null` \| `undefined`)[]
+
+Array of manifest objects or JSON strings
+
+## Returns
+
+[`MultiManifestDetectionResult`](../interfaces/MultiManifestDetectionResult.mdx)
+
+Aggregated multi-manifest detection result

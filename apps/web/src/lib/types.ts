@@ -1,3 +1,6 @@
+import type { PackageManifest } from "@ossintel/input-parser";
+import type { NormalizedNpmPackage } from "@ossintel/npm";
+
 export interface AnalysisData {
   type: "repo" | "user" | "org";
   metadata: {
@@ -88,6 +91,8 @@ export interface AnalysisData {
   };
   languages?: Array<{ name: string; bytes: number }>;
   contributorsCount?: number;
+  packages?: NormalizedNpmPackage[];
+  packageManifests?: PackageManifest[];
   repositories?: Array<{
     repoName: string;
     fullName: string;

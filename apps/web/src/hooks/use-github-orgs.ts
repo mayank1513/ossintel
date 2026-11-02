@@ -6,13 +6,15 @@ import type {
   NormalizedRelease,
   NormalizedRepository,
 } from "@ossintel/github-normalizer";
+import type { PackageManifest } from "@ossintel/input-parser";
 import type {
   Finding,
   PromptContext,
   Recommendation,
 } from "@ossintel/insights";
 import { generateInsights } from "@ossintel/insights";
-import type { RepositoryScores } from "@ossintel/scoring";
+import type { NormalizedNpmPackage } from "@ossintel/npm";
+import type { PackageVelocity, RepositoryScores } from "@ossintel/scoring";
 import { calculateRepositoryScore } from "@ossintel/scoring";
 import { useQueries, useQuery } from "@tanstack/react-query";
 import { useState } from "react";
@@ -118,6 +120,9 @@ export interface RepoRawResponse {
   contributors: NormalizedContributor[];
   releases: NormalizedRelease[];
   languages: NormalizedLanguage[];
+  packageManifests?: PackageManifest[];
+  npmPackages?: NormalizedNpmPackage[];
+  packageVelocities?: PackageVelocity[];
   cachedAt?: number;
 }
 
@@ -134,7 +139,15 @@ export const useGithubRepo = (owner: string, repo: string) => {
           { owner, repo },
           isRefreshing,
         );
-        const scores = calculateRepositoryScore({ repository: raw.repository });
+        const scores = calculateRepositoryScore({
+          repository: raw.repository,
+          contributors: raw.contributors,
+          releases: raw.releases,
+          languages: raw.languages,
+          packageManifests: raw.packageManifests,
+          npmPackages: raw.npmPackages,
+          packageVelocities: raw.packageVelocities,
+        });
         const insightsResult = generateInsights(
           {
             repository: raw.repository,
@@ -153,6 +166,8 @@ export const useGithubRepo = (owner: string, repo: string) => {
           promptContext: insightsResult.promptContext,
           languages: raw.languages,
           contributorsCount: raw.contributors.length,
+          packages: raw.npmPackages ?? [],
+          packageManifests: raw.packageManifests ?? [],
           cachedAt: raw.cachedAt,
         };
       } finally {

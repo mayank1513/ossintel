@@ -14,6 +14,9 @@ import {
   type NormalizedRelease,
   suggestLinkedIdentities,
 } from "@ossintel/github-normalizer";
+import type { PackageManifest } from "@ossintel/input-parser";
+import type { NormalizedNpmPackage } from "@ossintel/npm";
+import type { PackageVelocity } from "@ossintel/scoring";
 import { revalidateTag, unstable_cache } from "next/cache";
 import { formatOrgResponse, formatUserResponse } from "./api-helpers";
 import {
@@ -22,6 +25,7 @@ import {
   CACHE_SAFETY_NET_TTL,
   GITHUB_APP_PAGE_SIZE,
 } from "./constants-backend";
+import { fetchRepoPackages } from "./repo-packages";
 
 interface FetchOptions {
   token?: string;
@@ -264,11 +268,32 @@ const fetchRepositoryDataRaw = async (
     console.error("Failed to fetch languages in server-cache", e);
   }
 
+  let packageManifests: PackageManifest[] = [];
+  let npmPackages: NormalizedNpmPackage[] = [];
+  let packageVelocities: PackageVelocity[] = [];
+
+  try {
+    const pkgData = await fetchRepoPackages(
+      owner,
+      repo,
+      repository.defaultBranch || "main",
+      options,
+    );
+    packageManifests = pkgData.manifests;
+    npmPackages = pkgData.npmPackages;
+    packageVelocities = pkgData.packageVelocities;
+  } catch (e) {
+    console.error("Failed to fetch repo packages in server-cache", e);
+  }
+
   return {
     repository,
     contributors,
     releases,
     languages,
+    packageManifests,
+    npmPackages,
+    packageVelocities,
   };
 };
 

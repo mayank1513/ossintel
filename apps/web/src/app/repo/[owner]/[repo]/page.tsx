@@ -2,7 +2,7 @@
 
 import { ExternalLink, Info, RefreshCw, User } from "lucide-react";
 import { useParams, useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { FaGithub } from "react-icons/fa";
 import { AINarrator } from "@/components/dashboard/ai-narrator";
 import { DimensionBreakdown } from "@/components/dashboard/dimension-breakdown";
@@ -10,6 +10,7 @@ import { FindingsList } from "@/components/dashboard/findings-list";
 import { LanguagesChart } from "@/components/dashboard/languages-chart";
 import { OverviewCard } from "@/components/dashboard/overview-card";
 import { RecommendationsGrid } from "@/components/dashboard/recommendations-grid";
+import { RepoPackagesCard } from "@/components/dashboard/repo-packages-card";
 import { ErrorAlert } from "@/components/ui/error-alert";
 import { LoadingOverlay } from "@/components/ui/loading-overlay";
 import { useGithubRepo } from "@/hooks/use-github-orgs";
@@ -56,6 +57,19 @@ export default function RepoPage() {
   const handleRefresh = () => {
     refresh();
   };
+
+  const npmStats = useMemo(() => {
+    if (!data?.packages || data.packages.length === 0) return null;
+    const totalDownloads = data.packages.reduce(
+      (sum, p) => sum + (p.monthlyDownloads || 0),
+      0,
+    );
+    return {
+      totalDownloads,
+      packageCount: data.packages.length,
+      topPackage: data.packages[0]?.name,
+    };
+  }, [data?.packages]);
 
   return (
     <div className="min-h-screen bg-background text-foreground font-sans antialiased selection:bg-primary/30">
@@ -136,7 +150,7 @@ export default function RepoPage() {
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
               {/* Left Column */}
               <div className="lg:col-span-1 flex flex-col gap-6">
-                <OverviewCard data={data} />
+                <OverviewCard data={data} npmStats={npmStats} />
                 <DimensionBreakdown scores={data.scores} />
                 {data.languages && (
                   <LanguagesChart languages={data.languages} />
@@ -146,6 +160,12 @@ export default function RepoPage() {
               {/* Right Column */}
               <div className="lg:col-span-2 flex flex-col gap-8">
                 <AINarrator promptContext={data.promptContext} />
+                {data.packages && data.packages.length > 0 && (
+                  <RepoPackagesCard
+                    packages={data.packages}
+                    velocityScore={data.scores.velocity}
+                  />
+                )}
                 <FindingsList findings={data.findings} />
                 <RecommendationsGrid recommendations={data.recommendations} />
               </div>

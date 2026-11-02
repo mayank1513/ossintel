@@ -1,5 +1,16 @@
 # @ossintel/scoring
 
+## 0.2.0
+
+### Minor Changes
+
+- [`3e361bf`](https://github.com/ossintel/ossintel/commit/3e361bf58199135f9730dbbeda01aef86a1bb97e) Thanks [@mayank1513](https://github.com/mayank1513)! - Factor package and VS Code extension installation velocity into repository Alpha Score via `calculateVelocityScore` and manifest auto-detection.
+
+### Patch Changes
+
+- Updated dependencies [[`5c648e4`](https://github.com/ossintel/ossintel/commit/5c648e406a13cff389b30d3615cdb552bcd43868)]:
+  - @ossintel/input-parser@0.3.0
+
 ## 0.1.3
 
 ### Patch Changes

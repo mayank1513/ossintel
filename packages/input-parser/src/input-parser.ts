@@ -61,16 +61,27 @@ export interface PackageManifest {
     vscode?: string;
   };
   private?: boolean;
+  workspaces?: string[] | { packages?: string[] };
 }
 
 export interface ManifestDetectionResult {
   isPackage: boolean;
   isVsCodeExtension: boolean;
   isNpmPackage: boolean;
+  isMonorepo?: boolean;
+  isPrivate?: boolean;
   packageName?: string;
   vscodeExtensionId?: string;
   publisher?: string;
   version?: string;
+}
+
+export interface MultiManifestDetectionResult {
+  isMonorepo: boolean;
+  totalPackages: number;
+  npmPackages: ManifestDetectionResult[];
+  vscodeExtensions: ManifestDetectionResult[];
+  all: ManifestDetectionResult[];
 }
 
 /**
@@ -134,6 +145,12 @@ export const detectManifest = (
     engines && typeof engines.vscode === "string",
   );
   const isNpmPackage = Boolean(rawName);
+  const isWorkspacesMonorepo = Boolean(
+    parsed.workspaces &&
+      (Array.isArray(parsed.workspaces) ||
+        (typeof parsed.workspaces === "object" &&
+          Array.isArray(parsed.workspaces.packages))),
+  );
 
   let vscodeExtensionId: string | undefined;
   if (isVsCodeExtension) {
@@ -148,10 +165,66 @@ export const detectManifest = (
     isPackage: isNpmPackage || isVsCodeExtension,
     isVsCodeExtension,
     isNpmPackage,
+    ...(isWorkspacesMonorepo ? { isMonorepo: true } : {}),
+    ...(parsed.private ? { isPrivate: true } : {}),
     packageName: rawName,
     vscodeExtensionId,
     publisher: rawPublisher,
     version: rawVersion,
+  };
+};
+
+/**
+ * Analyzes multiple manifests (e.g. from monorepos or multi-package workspaces).
+ * Identifies whether the workspace is a monorepo and categorizes subpackages.
+ *
+ * @param manifestsInput - Array of manifest objects or JSON strings
+ * @returns Aggregated multi-manifest detection result
+ */
+export const detectManifests = (
+  manifestsInput: Array<
+    string | PackageManifest | Record<string, unknown> | null | undefined
+  >,
+): MultiManifestDetectionResult => {
+  if (!Array.isArray(manifestsInput) || manifestsInput.length === 0) {
+    return {
+      isMonorepo: false,
+      totalPackages: 0,
+      npmPackages: [],
+      vscodeExtensions: [],
+      all: [],
+    };
+  }
+
+  const all: ManifestDetectionResult[] = [];
+  const npmPackages: ManifestDetectionResult[] = [];
+  const vscodeExtensions: ManifestDetectionResult[] = [];
+  let hasMonorepoWorkspace = false;
+
+  for (const item of manifestsInput) {
+    const result = detectManifest(item);
+    if (result.isMonorepo) {
+      hasMonorepoWorkspace = true;
+    }
+    if (result.isPackage) {
+      all.push(result);
+      if (result.isVsCodeExtension) {
+        vscodeExtensions.push(result);
+      }
+      if (result.isNpmPackage) {
+        npmPackages.push(result);
+      }
+    }
+  }
+
+  const isMonorepo = hasMonorepoWorkspace || all.length > 1;
+
+  return {
+    isMonorepo,
+    totalPackages: all.length,
+    npmPackages,
+    vscodeExtensions,
+    all,
   };
 };
 

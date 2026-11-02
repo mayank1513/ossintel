@@ -1,5 +1,5 @@
 import { describe, expect, test } from "vitest";
-import { detectInput, detectManifest } from "./input-parser";
+import { detectInput, detectManifest, detectManifests } from "./input-parser";
 
 describe("input-parser - detectInput", () => {
   test("should detect GitHub orgs correctly from various syntaxes", () => {
@@ -323,6 +323,61 @@ describe("input-parser - detectInput", () => {
         name: "super-lib",
         rawInput: npmJson,
       });
+    });
+  });
+
+  describe("detectManifests", () => {
+    test("should handle empty or invalid inputs safely", () => {
+      expect(detectManifests([])).toEqual({
+        isMonorepo: false,
+        totalPackages: 0,
+        npmPackages: [],
+        vscodeExtensions: [],
+        all: [],
+      });
+      // @ts-expect-error test non-array
+      expect(detectManifests(null)).toEqual({
+        isMonorepo: false,
+        totalPackages: 0,
+        npmPackages: [],
+        vscodeExtensions: [],
+        all: [],
+      });
+    });
+
+    test("should identify monorepo workspace from root manifest and packages", () => {
+      const rootManifest = {
+        name: "my-monorepo",
+        private: true,
+        workspaces: ["packages/*"],
+      };
+      const subPkg1 = {
+        name: "@my-monorepo/core",
+        version: "1.0.0",
+      };
+      const subPkg2 = {
+        name: "my-vscode-ext",
+        publisher: "myorg",
+        engines: { vscode: "^1.80.0" },
+      };
+
+      const result = detectManifests([rootManifest, subPkg1, subPkg2]);
+      expect(result.isMonorepo).toBe(true);
+      expect(result.totalPackages).toBe(3);
+      expect(result.npmPackages).toHaveLength(3); // all have name
+      expect(result.vscodeExtensions).toHaveLength(1);
+      expect(result.vscodeExtensions[0]?.vscodeExtensionId).toBe(
+        "myorg.my-vscode-ext",
+      );
+    });
+
+    test("should identify monorepo if multiple packages are present without explicit workspaces key", () => {
+      const pkg1 = { name: "pkg-a" };
+      const pkg2 = { name: "pkg-b" };
+
+      const result = detectManifests([pkg1, pkg2]);
+      expect(result.isMonorepo).toBe(true);
+      expect(result.totalPackages).toBe(2);
     });
   });
 });

@@ -30,6 +30,6 @@ export {
 } from "./repository-scoring";
 export { calculateSkills } from "./skills";
 export { matchTopic, TOPIC_MAPPINGS } from "./topic-mappings";
-
 // Types
 export * from "./types";
+export { logScale } from "./utils";

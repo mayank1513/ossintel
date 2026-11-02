@@ -7,6 +7,7 @@ import {
   INFLUENCE_STAR_WEIGHT,
   MAX_SCORE,
 } from "./constants";
+import { logScale } from "./utils";
 
 export interface InfluenceResult {
   /** Final influence score (0-100). */
@@ -31,23 +32,25 @@ export const calculateInfluenceScore = (
   totalNpmDownloads: number,
   soReputation: number,
 ): InfluenceResult => {
-  const starWeight = Math.log10(totalStarsCount + 1) * INFLUENCE_STAR_WEIGHT;
-  const forkWeight = Math.log10(totalForksCount + 1) * INFLUENCE_FORK_WEIGHT;
+  const starWeight = logScale(totalStarsCount, INFLUENCE_STAR_WEIGHT);
+  const forkWeight = logScale(totalForksCount, INFLUENCE_FORK_WEIGHT);
   const githubBase = Math.min(MAX_SCORE, Math.round(starWeight + forkWeight));
 
   const npmBonus =
     totalNpmDownloads > 0
-      ? Math.min(
+      ? logScale(
+          totalNpmDownloads,
+          INFLUENCE_NPM_BONUS_MULTIPLIER,
           INFLUENCE_NPM_BONUS_CAP,
-          Math.log10(totalNpmDownloads + 1) * INFLUENCE_NPM_BONUS_MULTIPLIER,
         )
       : 0;
 
   const soBonus =
     soReputation > 0
-      ? Math.min(
+      ? logScale(
+          soReputation,
+          INFLUENCE_SO_BONUS_MULTIPLIER,
           INFLUENCE_SO_BONUS_CAP,
-          Math.log10(soReputation + 1) * INFLUENCE_SO_BONUS_MULTIPLIER,
         )
       : 0;
 

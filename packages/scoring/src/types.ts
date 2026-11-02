@@ -7,12 +7,17 @@ import type {
 } from "@ossintel/github-normalizer";
 import type {
   ManifestDetectionResult,
+  MultiManifestDetectionResult,
   PackageManifest,
 } from "@ossintel/input-parser";
 import type { NormalizedNpmPackage, NormalizedNpmUser } from "@ossintel/npm";
 import type { NormalizedStackOverflowUser } from "@ossintel/stackoverflow";
 
-export type { ManifestDetectionResult, PackageManifest };
+export type {
+  ManifestDetectionResult,
+  MultiManifestDetectionResult,
+  PackageManifest,
+};
 
 export interface PackageVelocity {
   /**
@@ -43,13 +48,25 @@ export interface ScoringInputs {
    */
   packageManifest?: PackageManifest | string | null;
   /**
+   * Multiple package.json manifests for monorepos or multi-package workspaces
+   */
+  packageManifests?: Array<PackageManifest | string> | null;
+  /**
    * Associated npm package details if resolved
    */
   npmPackage?: NormalizedNpmPackage | null;
   /**
+   * Multiple npm package details for monorepos or multi-package workspaces
+   */
+  npmPackages?: NormalizedNpmPackage[] | null;
+  /**
    * Real-world installation/download velocity metrics
    */
   packageVelocity?: PackageVelocity | null;
+  /**
+   * Real-world installation/download velocity metrics across multiple packages in a monorepo
+   */
+  packageVelocities?: PackageVelocity[] | null;
 }
 
 export interface RepositoryScores {
@@ -67,6 +84,10 @@ export interface RepositoryScores {
    * Package or extension classification result
    */
   manifestDetection?: ManifestDetectionResult;
+  /**
+   * Multi-manifest / monorepo classification result
+   */
+  multiManifestDetection?: MultiManifestDetectionResult;
 }
 
 export interface TopicExpertise {

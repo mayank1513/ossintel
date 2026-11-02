@@ -616,5 +616,81 @@ describe("scoring engine", () => {
       expect(withExtension.impact).toBeGreaterThan(withoutExtension.impact);
       expect(withExtension.overall).toBeGreaterThan(withoutExtension.overall);
     });
+
+    test("aggregates installation velocity and detects multi-package monorepos", () => {
+      const baseRepo = mockRepository({
+        stargazersCount: 500,
+        forksCount: 80,
+      });
+
+      const singleScore = calculateVelocityScore({
+        monthlyDownloads: 100000,
+      });
+
+      const multiScore = calculateVelocityScore([
+        { monthlyDownloads: 100000 },
+        { monthlyDownloads: 400000 },
+      ]);
+
+      // Total downloads = 500,000 > 100,000 -> higher velocity score
+      expect(multiScore).toBeGreaterThan(singleScore);
+
+      const monorepoResult = calculateRepositoryScore({
+        repository: baseRepo,
+        packageManifests: [
+          {
+            name: "@org/monorepo-root",
+            private: true,
+            workspaces: ["packages/*"],
+          },
+          {
+            name: "@org/core",
+            version: "1.0.0",
+          },
+          {
+            name: "@org/cli",
+            version: "1.0.0",
+          },
+        ],
+        packageVelocities: [
+          { monthlyDownloads: 50000 },
+          { monthlyDownloads: 150000 },
+        ],
+      });
+
+      expect(monorepoResult.multiManifestDetection?.isMonorepo).toBe(true);
+      expect(monorepoResult.multiManifestDetection?.totalPackages).toBe(3);
+      expect(monorepoResult.velocity).toBeGreaterThan(0);
+      expect(monorepoResult.impact).toBeGreaterThan(0);
+    });
+
+    test("guarantees monotonicity: having a package with low downloads never reduces impact score", () => {
+      const popularRepo = mockRepository({
+        stargazersCount: 50000,
+        forksCount: 5000,
+        watchersCount: 1000,
+      });
+
+      const withoutPackage = calculateRepositoryScore({
+        repository: popularRepo,
+      });
+
+      const withLowDownloadsPackage = calculateRepositoryScore({
+        repository: popularRepo,
+        packageManifest: {
+          name: "@scope/tiny-pkg",
+        },
+        packageVelocity: {
+          monthlyDownloads: 5,
+        },
+      });
+
+      expect(withLowDownloadsPackage.impact).toBeGreaterThanOrEqual(
+        withoutPackage.impact,
+      );
+      expect(withLowDownloadsPackage.overall).toBeGreaterThanOrEqual(
+        withoutPackage.overall,
+      );
+    });
   });
 });

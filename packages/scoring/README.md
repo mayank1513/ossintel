@@ -34,10 +34,10 @@ Converts normalized repository and developer metrics into objective scores.
 ### Repository Scoring
 
 - Health, Impact, Activity, Community, Risk, and Overall Alpha scores
-- **Velocity Scoring** (`calculateVelocityScore`): Logarithmic scoring of real-world installation and download velocity (npm downloads, VS Code extension installs & ratings).
-- **Manifest Auto-Detection**: When a repository's `packageManifest` (`package.json`) is supplied to `calculateRepositoryScore`, auto-detects package and extension targets (via `@ossintel/input-parser`), blending verified installation velocity into the Impact score:
-  - _Base Impact (no velocity)_: Stars (40%) + Forks (30%) + Watchers (10%) + Subscribers (20%)
-  - _Impact with Velocity_: Velocity (35%) + Stars (30%) + Forks (20%) + Subscribers (10%) + Watchers (5%)
+- **Velocity Scoring** (`calculateVelocityScore`): Logarithmic scoring of real-world installation and download velocity (npm downloads, VS Code extension installs & ratings), supporting single packages and monorepo package aggregations.
+- **Manifest Auto-Detection**: When a repository's `packageManifest` or `packageManifests` is supplied to `calculateRepositoryScore`, auto-detects package and extension targets (via `@ossintel/input-parser`), providing an additive velocity bonus to the Impact score:
+  - _Base Impact (100%)_: Stars (50%) + Forks (35%) + Watchers (15%)
+  - _Installation Velocity Bonus_: Pure additive bonus capped at +50 points ($\text{Impact} = \min(100, \text{Base Impact} + \text{Velocity Bonus})$), guaranteeing that having published packages can only increase or preserve the score.
 
 ### Identity Scoring (OSSIQ)
 

@@ -1,4 +1,4 @@
-import { detectManifest } from "@ossintel/input-parser";
+import { detectManifest, detectManifests } from "@ossintel/input-parser";
 import {
   ACTIVITY_RECENCY_WEIGHT,
   ACTIVITY_RELEASE_DEFAULT_SCORE,
@@ -37,12 +37,10 @@ import {
   IMPACT_FORK_WEIGHT,
   IMPACT_STAR_FACTOR,
   IMPACT_STAR_WEIGHT,
+  IMPACT_VELOCITY_BONUS_CAP,
+  IMPACT_VELOCITY_BONUS_MULTIPLIER,
   IMPACT_WATCHER_FACTOR,
   IMPACT_WATCHER_WEIGHT,
-  IMPACT_WITH_VELOCITY_FACTOR,
-  IMPACT_WITH_VELOCITY_FORK_FACTOR,
-  IMPACT_WITH_VELOCITY_STAR_FACTOR,
-  IMPACT_WITH_VELOCITY_WATCHER_FACTOR,
   MAX_SCORE,
   MS_PER_DAY,
   RISK_CONTRIBUTOR_1_SCORE,
@@ -67,14 +65,20 @@ import {
   SCORE_RECENT_365,
   VELOCITY_LOG_MULTIPLIER,
 } from "./constants";
-import type { RepositoryScores, ScoringInputs } from "./types";
+import type {
+  ManifestDetectionResult,
+  MultiManifestDetectionResult,
+  PackageVelocity,
+  RepositoryScores,
+  ScoringInputs,
+} from "./types";
+import { logScale } from "./utils";
 
-/** Calculate installation velocity score (0-100) from npm downloads or VS Code marketplace installs. */
-export const calculateVelocityScore = (
-  packageVelocity?: ScoringInputs["packageVelocity"],
+const extractMonthlyDownloads = (
+  packageVelocity?: PackageVelocity | null,
   npmPackage?: ScoringInputs["npmPackage"],
 ): number => {
-  const downloads = Math.max(
+  return Math.max(
     packageVelocity?.downloads ?? 0,
     packageVelocity?.monthlyDownloads ?? 0,
     (packageVelocity?.weeklyDownloads ?? 0) * 4,
@@ -82,15 +86,45 @@ export const calculateVelocityScore = (
     npmPackage?.monthlyDownloads ?? 0,
     (npmPackage?.weeklyDownloads ?? 0) * 4,
   );
-
-  if (downloads <= 0) return 0;
-  return Math.min(
-    MAX_SCORE,
-    Math.round(Math.log10(downloads + 1) * VELOCITY_LOG_MULTIPLIER),
-  );
 };
 
-/** Calculate the impact score based on stars, forks, watchers, and optional installation velocity. */
+/**
+ * Calculate installation velocity score (0-100) from npm downloads or VS Code marketplace installs.
+ * Supports single packages as well as multi-package repositories / monorepos.
+ */
+export const calculateVelocityScore = (
+  packageVelocity?:
+    | ScoringInputs["packageVelocity"]
+    | ScoringInputs["packageVelocities"],
+  npmPackage?: ScoringInputs["npmPackage"] | ScoringInputs["npmPackages"],
+): number => {
+  const velocities = Array.isArray(packageVelocity)
+    ? packageVelocity
+    : packageVelocity
+      ? [packageVelocity]
+      : [];
+  const npmPackages = Array.isArray(npmPackage)
+    ? npmPackage
+    : npmPackage
+      ? [npmPackage]
+      : [];
+
+  const maxLen = Math.max(velocities.length, npmPackages.length);
+  if (maxLen === 0) return 0;
+
+  let totalDownloads = 0;
+  for (let i = 0; i < maxLen; i++) {
+    totalDownloads += extractMonthlyDownloads(velocities[i], npmPackages[i]);
+  }
+
+  if (totalDownloads <= 0) return 0;
+  return Math.round(logScale(totalDownloads, VELOCITY_LOG_MULTIPLIER));
+};
+
+/**
+ * Calculate the impact score based on stars, forks, and watchers,
+ * with installation velocity providing an additive bonus capped at +50.
+ */
 export const calculateImpactScore = (
   repository: ScoringInputs["repository"],
   velocityScore = 0,
@@ -99,33 +133,24 @@ export const calculateImpactScore = (
   const forks = repository.forksCount;
   const watchers = repository.watchersCount;
 
-  const starScore = Math.min(
-    MAX_SCORE,
-    Math.log10(stars + 1) * IMPACT_STAR_WEIGHT,
-  );
-  const forkScore = Math.min(
-    MAX_SCORE,
-    Math.log10(forks + 1) * IMPACT_FORK_WEIGHT,
-  );
-  const watcherScore = Math.min(
-    MAX_SCORE,
-    Math.log10(watchers + 1) * IMPACT_WATCHER_WEIGHT,
-  );
+  const starScore = logScale(stars, IMPACT_STAR_WEIGHT);
+  const forkScore = logScale(forks, IMPACT_FORK_WEIGHT);
+  const watcherScore = logScale(watchers, IMPACT_WATCHER_WEIGHT);
 
-  if (velocityScore > 0) {
-    return Math.round(
-      starScore * IMPACT_WITH_VELOCITY_STAR_FACTOR +
-        forkScore * IMPACT_WITH_VELOCITY_FORK_FACTOR +
-        watcherScore * IMPACT_WITH_VELOCITY_WATCHER_FACTOR +
-        velocityScore * IMPACT_WITH_VELOCITY_FACTOR,
-    );
-  }
-
-  return Math.round(
+  const baseImpact =
     starScore * IMPACT_STAR_FACTOR +
-      forkScore * IMPACT_FORK_FACTOR +
-      watcherScore * IMPACT_WATCHER_FACTOR,
-  );
+    forkScore * IMPACT_FORK_FACTOR +
+    watcherScore * IMPACT_WATCHER_FACTOR;
+
+  const velocityBonus =
+    velocityScore > 0
+      ? Math.min(
+          IMPACT_VELOCITY_BONUS_CAP,
+          velocityScore * IMPACT_VELOCITY_BONUS_MULTIPLIER,
+        )
+      : 0;
+
+  return Math.min(MAX_SCORE, Math.round(baseImpact + velocityBonus));
 };
 
 /** Calculate the activity score based on push recency and release frequency. */
@@ -289,15 +314,32 @@ export const calculateRepositoryScore = (
     contributors,
     releases,
     packageManifest,
+    packageManifests,
     npmPackage,
+    npmPackages,
     packageVelocity,
+    packageVelocities,
   } = inputs;
 
-  const manifestDetection = packageManifest
-    ? detectManifest(packageManifest)
-    : undefined;
+  let manifestDetection: ManifestDetectionResult | undefined;
+  let multiManifestDetection: MultiManifestDetectionResult | undefined;
 
-  const velocity = calculateVelocityScore(packageVelocity, npmPackage);
+  if (packageManifests && packageManifests.length > 0) {
+    multiManifestDetection = detectManifests(packageManifests);
+    manifestDetection = multiManifestDetection.all[0];
+  } else if (packageManifest) {
+    manifestDetection = detectManifest(packageManifest);
+  }
+
+  const effectiveVelocities =
+    packageVelocities ?? (packageVelocity ? [packageVelocity] : undefined);
+  const effectiveNpmPackages =
+    npmPackages ?? (npmPackage ? [npmPackage] : undefined);
+
+  const velocity = calculateVelocityScore(
+    effectiveVelocities,
+    effectiveNpmPackages,
+  );
   const health = calculateHealthScore(repository);
   const impact = calculateImpactScore(repository, velocity);
   const activity = calculateActivityScore(repository, releases);
@@ -321,5 +363,6 @@ export const calculateRepositoryScore = (
     risk,
     ...(velocity > 0 ? { velocity } : {}),
     ...(manifestDetection ? { manifestDetection } : {}),
+    ...(multiManifestDetection ? { multiManifestDetection } : {}),
   };
 };

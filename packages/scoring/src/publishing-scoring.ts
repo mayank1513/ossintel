@@ -8,6 +8,7 @@ import {
   PUBLISHING_VERIFIED_SCORE,
   PUBLISHING_VERIFIED_WEIGHT,
 } from "./constants";
+import { logScale } from "./utils";
 
 export interface PublishingScore {
   /** Overall publishing reputation score (0-100). */
@@ -39,10 +40,7 @@ export const calculatePublishingScore = (
 
   const totalDownloads = npmUser.totalWeeklyDownloads ?? 0;
 
-  const downloads = Math.min(
-    MAX_SCORE,
-    Math.log10(totalDownloads + 1) * PUBLISHING_DOWNLOADS_MULTIPLIER,
-  );
+  const downloads = logScale(totalDownloads, PUBLISHING_DOWNLOADS_MULTIPLIER);
   const packages = Math.min(
     MAX_SCORE,
     npmUser.activePackagesCount * PUBLISHING_PACKAGES_MULTIPLIER,

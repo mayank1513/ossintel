@@ -1,5 +1,11 @@
 # @ossintel/input-parser
 
+## 0.3.0
+
+### Minor Changes
+
+- [`5c648e4`](https://github.com/ossintel/ossintel/commit/5c648e406a13cff389b30d3615cdb552bcd43868) Thanks [@mayank1513](https://github.com/mayank1513)! - Add package.json and VS Code extension manifest auto-detection (`detectManifest`) and support JSON manifest inputs in `detectInput`.
+
 ## 0.2.1
 
 ### Patch Changes

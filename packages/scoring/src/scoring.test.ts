@@ -108,7 +108,7 @@ describe("scoring engine", () => {
     expect(scores.overall).toBeLessThanOrEqual(30);
   });
 
-  test("fork repositories should have lower health and higher risk", () => {
+  test("fork repositories should have lower health score (provenance baseline)", () => {
     const inputs: ScoringInputs = {
       repository: mockRepository({
         isFork: true,
@@ -125,7 +125,6 @@ describe("scoring engine", () => {
 
     const forkScores = calculateRepositoryScore(inputs);
     expect(forkScores.health).toBeLessThan(normalScores.health);
-    expect(forkScores.risk).toBeGreaterThan(normalScores.risk);
   });
 
   test("should handle missing contributors and releases gracefully", () => {

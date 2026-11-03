@@ -46,7 +46,6 @@ import {
   RISK_CONTRIBUTOR_1_SCORE,
   RISK_CONTRIBUTOR_3_SCORE,
   RISK_CONTRIBUTOR_5_SCORE,
-  RISK_FORK_SCORE,
   RISK_OPEN_ISSUES_SCORE_HIGH,
   RISK_OPEN_ISSUES_SCORE_LOW,
   RISK_OPEN_ISSUES_THRESHOLD_HIGH,
@@ -289,8 +288,6 @@ export const calculateRiskScore = (
   if (contributorCount <= 1) riskScore += RISK_CONTRIBUTOR_1_SCORE;
   else if (contributorCount <= 3) riskScore += RISK_CONTRIBUTOR_3_SCORE;
   else if (contributorCount <= 5) riskScore += RISK_CONTRIBUTOR_5_SCORE;
-
-  if (repository.isFork) riskScore += RISK_FORK_SCORE;
 
   const popularity = repository.stargazersCount + repository.forksCount;
   if (

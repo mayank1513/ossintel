@@ -2,8 +2,8 @@
   "title": "@ossintel/scoring",
   "description": "Deterministic reputation metrics engine",
   "tagLine": "Mathematical, deterministic metrics calculator to evaluate open-source software health, impact, activity, community adoption, and risk profiles.",
-  "lastModified": "2026-11-02T12:08:30.051Z",
-  "version": "0.2.0",
+  "lastModified": "2026-11-03T11:54:13.416Z",
+  "version": "0.2.1",
   "root": true,
   "icon": "Gauge",
   "pages": [

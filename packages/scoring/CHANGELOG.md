@@ -1,5 +1,11 @@
 # @ossintel/scoring
 
+## 0.2.1
+
+### Patch Changes
+
+- [`286caf4`](https://github.com/ossintel/ossintel/commit/286caf4ef3cb515ee76e152708d526b9c1688da9) Thanks [@mayank1513](https://github.com/mayank1513)! - Consolidate repository fork evaluation strictly under Health provenance scoring, removing duplicate fork risk penalty from `calculateRiskScore`.
+
 ## 0.2.0
 
 ### Minor Changes

@@ -1,5 +1,12 @@
 # @ossintel/insights
 
+## 0.1.5
+
+### Patch Changes
+
+- Updated dependencies [[`286caf4`](https://github.com/ossintel/ossintel/commit/286caf4ef3cb515ee76e152708d526b9c1688da9)]:
+  - @ossintel/scoring@0.2.1
+
 ## 0.1.4
 
 ### Patch Changes

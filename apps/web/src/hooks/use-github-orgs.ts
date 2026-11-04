@@ -17,7 +17,7 @@ import type { NormalizedNpmPackage } from "@ossintel/npm";
 import type { PackageVelocity, RepositoryScores } from "@ossintel/scoring";
 import { calculateRepositoryScore } from "@ossintel/scoring";
 import { useQueries, useQuery } from "@tanstack/react-query";
-import { useRef, useState } from "react";
+import { useRef } from "react";
 import { fetchWithCache } from "@/lib/api-client";
 
 export interface OrgResponse {
@@ -49,37 +49,29 @@ export interface RepoResponse {
   contributorsCount: number;
 }
 
-const fetchOrgData = async (
-  orgName: string,
-  isRefreshing: boolean,
-  onFinish: () => void,
-) => {
-  try {
-    return await fetchWithCache<OrgResponse>(
-      `org:${orgName.toLowerCase()}`,
-      "/api/github/org",
-      {
-        query: orgName,
-      },
-      isRefreshing,
-    );
-  } finally {
-    onFinish();
-  }
+const fetchOrgData = async (orgName: string, forceRefresh: boolean) => {
+  return await fetchWithCache<OrgResponse>(
+    `org:${orgName.toLowerCase()}`,
+    "/api/github/org",
+    {
+      query: orgName,
+    },
+    forceRefresh,
+  );
 };
 
 export const useGithubOrg = (orgName: string) => {
-  const [isRefreshing, setIsRefreshing] = useState(false);
   const isRefreshingRef = useRef(false);
 
   const query = useQuery({
     queryKey: ["org", orgName?.toLowerCase()],
-    queryFn: () => {
+    queryFn: async () => {
       const forceRefresh = isRefreshingRef.current;
-      return fetchOrgData(orgName, forceRefresh, () => {
+      try {
+        return await fetchOrgData(orgName, forceRefresh);
+      } finally {
         isRefreshingRef.current = false;
-        setIsRefreshing(false);
-      });
+      }
     },
     enabled: !!orgName,
     retry: false,
@@ -87,15 +79,13 @@ export const useGithubOrg = (orgName: string) => {
 
   const refresh = async () => {
     isRefreshingRef.current = true;
-    setIsRefreshing(true);
     await query.refetch();
   };
 
-  return { ...query, refresh, isRefreshing };
+  return { ...query, refresh };
 };
 
 export const useGithubOrgs = (orgNames: string[]) => {
-  const [isRefreshing, setIsRefreshing] = useState(false);
   const isRefreshingRef = useRef(false);
 
   const queries = useQueries({
@@ -103,9 +93,7 @@ export const useGithubOrgs = (orgNames: string[]) => {
       queryKey: ["org", orgName.toLowerCase()],
       queryFn: () => {
         const forceRefresh = isRefreshingRef.current;
-        return fetchOrgData(orgName, forceRefresh, () => {
-          setIsRefreshing(false);
-        });
+        return fetchOrgData(orgName, forceRefresh);
       },
       enabled: !!orgName,
       retry: false,
@@ -114,13 +102,11 @@ export const useGithubOrgs = (orgNames: string[]) => {
 
   const refreshAll = async () => {
     isRefreshingRef.current = true;
-    setIsRefreshing(true);
     try {
       const queriesRefetch = queries.map((q) => q.refetch());
       await Promise.all(queriesRefetch);
     } finally {
       isRefreshingRef.current = false;
-      setIsRefreshing(false);
     }
   };
 
@@ -130,7 +116,6 @@ export const useGithubOrgs = (orgNames: string[]) => {
     isFetching: queries.some((q) => q.isFetching),
     error: queries.find((q) => q.error)?.error || null,
     refreshAll,
-    isRefreshing,
   };
 };
 
@@ -146,7 +131,6 @@ export interface RepoRawResponse {
 }
 
 export const useGithubRepo = (owner: string, repo: string) => {
-  const [isRefreshing, setIsRefreshing] = useState(false);
   const isRefreshingRef = useRef(false);
 
   const query = useQuery({
@@ -193,7 +177,6 @@ export const useGithubRepo = (owner: string, repo: string) => {
         };
       } finally {
         isRefreshingRef.current = false;
-        setIsRefreshing(false);
       }
     },
     enabled: !!owner && !!repo,
@@ -202,9 +185,8 @@ export const useGithubRepo = (owner: string, repo: string) => {
 
   const refresh = async () => {
     isRefreshingRef.current = true;
-    setIsRefreshing(true);
     await query.refetch();
   };
 
-  return { ...query, refresh, isRefreshing };
+  return { ...query, refresh };
 };

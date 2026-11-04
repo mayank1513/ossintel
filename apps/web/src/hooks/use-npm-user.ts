@@ -1,11 +1,10 @@
 import type { NormalizedNpmUser } from "@ossintel/npm";
 import { useQuery } from "@tanstack/react-query";
-import { useRef, useState } from "react";
+import { useRef } from "react";
 import { fetchWithCache } from "@/lib/api-client";
 
 export const useNpmUser = (username: string) => {
   const cleanUsername = username?.trim();
-  const [isRefreshing, setIsRefreshing] = useState(false);
   const isRefreshingRef = useRef(false);
 
   const query = useQuery({
@@ -24,7 +23,6 @@ export const useNpmUser = (username: string) => {
         return data;
       } finally {
         isRefreshingRef.current = false;
-        setIsRefreshing(false);
       }
     },
     enabled: !!cleanUsername,
@@ -34,9 +32,8 @@ export const useNpmUser = (username: string) => {
   const refresh = async () => {
     if (!cleanUsername) return;
     isRefreshingRef.current = true;
-    setIsRefreshing(true);
     await query.refetch();
   };
 
-  return { ...query, refresh, isRefreshing };
+  return { ...query, refresh };
 };

@@ -1,11 +1,10 @@
 import type { NormalizedNpmPackage } from "@ossintel/npm";
 import { useQuery } from "@tanstack/react-query";
-import { useRef, useState } from "react";
+import { useRef } from "react";
 import { fetchWithCache } from "@/lib/api-client";
 
 export const useNpmPackage = (packageName: string) => {
   const cleanPackageName = packageName?.trim();
-  const [isRefreshing, setIsRefreshing] = useState(false);
   const isRefreshingRef = useRef(false);
 
   const query = useQuery({
@@ -24,7 +23,6 @@ export const useNpmPackage = (packageName: string) => {
         return data;
       } finally {
         isRefreshingRef.current = false;
-        setIsRefreshing(false);
       }
     },
     enabled: !!cleanPackageName,
@@ -34,9 +32,8 @@ export const useNpmPackage = (packageName: string) => {
   const refresh = async () => {
     if (!cleanPackageName) return;
     isRefreshingRef.current = true;
-    setIsRefreshing(true);
     await query.refetch();
   };
 
-  return { ...query, refresh, isRefreshing };
+  return { ...query, refresh };
 };

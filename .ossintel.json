@@ -1,5 +1,5 @@
 {
-  "$schema": "./schemas/ossintel.schema.json",
+  "$schema": "https://ossintel.js.org/schemas/0.3.0/schema.json",
   "version": "1",
   "profile": {
     "orgs": {

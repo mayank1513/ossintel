@@ -52,6 +52,7 @@ describe("Badges Library - Shields.io Endpoint Compliance", () => {
       overall: 88,
       velocity: 92,
       health: 80,
+      activity: 85,
       community: 75,
       impact: 85,
       risk: 15,

@@ -1,5 +1,3 @@
-import fs from "node:fs";
-import path from "node:path";
 import {
   calculateIdentityScore,
   calculateRepositoryScore,
@@ -33,6 +31,7 @@ export type RepoMetric =
   | "overall"
   | "velocity"
   | "health"
+  | "activity"
   | "community"
   | "impact"
   | "risk";
@@ -108,6 +107,11 @@ export const formatRepoBadge = (
       defaultLabel = "OSS Health";
       message = `${scores.health}/100`;
       color = getScoreColor(scores.health);
+      break;
+    case "activity":
+      defaultLabel = "OSS Activity";
+      message = `${scores.activity}/100`;
+      color = getScoreColor(scores.activity);
       break;
     case "community":
       defaultLabel = "OSS Community";
@@ -233,9 +237,9 @@ export const getUserBadge = async (
   const raw = await getCachedDeveloperData(username, 10, { token });
 
   const scores = calculateIdentityScore({
-    repositories: raw.personalRepos,
+    repositories: raw.repositories,
     externalContributions: raw.externalContributions,
-    organizations: raw.organizations,
+    organizations: raw.metadata.organizations,
   });
 
   return formatUserBadge(scores, options);
@@ -264,14 +268,7 @@ export const syncBadgeToGithubAppRepo = async ({
 }: SyncBadgeOptions): Promise<boolean> => {
   const jsonContent = `${JSON.stringify(badgeData, null, 2)}\n`;
 
-  // 1. Try local filesystem sync (works during local dev, build scripts, or server volume)
-  try {
-    writeBadgeToLocalRepo(filePath, jsonContent);
-  } catch (localErr) {
-    console.debug("[Badges] Local filesystem write skipped/failed:", localErr);
-  }
-
-  // 2. Resolve token: Try GitHub App installation token for the repoOwner
+  // Resolve token: Try GitHub App installation token for the repoOwner
   let token = await getInstallationToken(repoOwner);
   if (!token) {
     token = process.env.GITHUB_TOKEN;
@@ -347,35 +344,5 @@ export const syncBadgeToGithubAppRepo = async ({
       error,
     );
     return false;
-  }
-};
-
-/**
- * Helper to write badge JSON to local workspace paths (only root `badges/`, avoiding public/ asset bloat).
- */
-export const writeBadgeToLocalRepo = (
-  relativeFilePath: string,
-  jsonContent: string,
-): void => {
-  if (typeof process === "undefined" || !process.cwd) return;
-
-  const cwd = process.cwd();
-  // Target: Root / repo-level path only (e.g. badges/repo/owner/repo.json)
-  const targetCandidates = [
-    path.resolve(cwd, relativeFilePath),
-    path.resolve(cwd, "..", "..", relativeFilePath),
-  ];
-
-  for (const targetPath of targetCandidates) {
-    try {
-      const dir = path.dirname(targetPath);
-      if (!fs.existsSync(dir)) {
-        fs.mkdirSync(dir, { recursive: true });
-      }
-      fs.writeFileSync(targetPath, jsonContent, "utf-8");
-      break;
-    } catch {
-      // Ignore if dir cannot be written
-    }
   }
 };

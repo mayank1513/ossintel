@@ -19,6 +19,7 @@ vi.mock("@/lib/badges", async () => {
           overall: 92,
           velocity: 88,
           health: 90,
+          activity: 87,
           community: 85,
           impact: 95,
           risk: 12,

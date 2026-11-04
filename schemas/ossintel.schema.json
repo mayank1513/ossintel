@@ -1,6 +1,6 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "$id": "https://raw.githubusercontent.com/ossintel/ossintel/main/schemas/ossintel.schema.json",
+  "$id": "https://ossintel.js.org/schemas/0.3.0/schema.json",
   "title": "OSSIntel Configuration Schema",
   "description": "Configuration specification for OSSIntel repository analysis, developer profile hierarchy, and telemetry overrides.",
   "type": "object",

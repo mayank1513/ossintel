@@ -1,0 +1,228 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://ossintel.js.org/schemas/0.3.0/schema.json",
+  "title": "OSSIntel Configuration Schema",
+  "description": "Configuration specification for OSSIntel repository analysis, developer profile hierarchy, and telemetry overrides.",
+  "type": "object",
+  "properties": {
+    "$schema": {
+      "type": "string",
+      "description": "JSON schema reference URI for editor autocompletion."
+    },
+    "version": {
+      "type": "string",
+      "description": "Specification version. Default: '1'.",
+      "enum": ["1", "1.0"]
+    },
+    "profile": {
+      "type": "object",
+      "description": "Identity and portfolio presentation preferences for user or organization profiles.",
+      "properties": {
+        "orgs": {
+          "type": "object",
+          "description": "Organization ordering and visibility preferences.",
+          "properties": {
+            "priority": {
+              "type": "array",
+              "description": "Organizations to prioritize and display above personal repositories.",
+              "items": {
+                "oneOf": [
+                  {
+                    "type": "string",
+                    "description": "Organization login (e.g. 'md2docx')."
+                  },
+                  {
+                    "type": "object",
+                    "required": ["org"],
+                    "properties": {
+                      "org": {
+                        "type": "string",
+                        "description": "Organization login."
+                      },
+                      "reason": {
+                        "type": "string",
+                        "description": "User-facing rationale displayed in profile insights (e.g. 'Flagship ecosystem umbrella')."
+                      }
+                    }
+                  }
+                ]
+              }
+            },
+            "exclude": {
+              "type": "array",
+              "description": "Organizations to exclude from aggregated profile telemetry.",
+              "items": {
+                "oneOf": [
+                  { "type": "string" },
+                  {
+                    "type": "object",
+                    "required": ["org"],
+                    "properties": {
+                      "org": { "type": "string" },
+                      "reason": {
+                        "type": "string",
+                        "description": "Reason for exclusion (e.g. 'Legacy client org', 'Archived contributions')."
+                      }
+                    }
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "repositories": {
+          "type": "object",
+          "description": "Repository curation and filtering rules.",
+          "properties": {
+            "pinned": {
+              "type": "array",
+              "description": "Repositories to highlight and pin at the top of the portfolio table.",
+              "items": {
+                "oneOf": [
+                  {
+                    "type": "string",
+                    "description": "Full name or repo name (e.g. 'md2docx/md2docx')."
+                  },
+                  {
+                    "type": "object",
+                    "required": ["repo"],
+                    "properties": {
+                      "repo": { "type": "string" },
+                      "reason": {
+                        "type": "string",
+                        "description": "User-facing highlight rationale (e.g. 'Core compiler architecture')."
+                      }
+                    }
+                  }
+                ]
+              }
+            },
+            "exclude": {
+              "type": "array",
+              "description": "Repositories to omit from scoring calculations, commit activity, and portfolio display.",
+              "items": {
+                "oneOf": [
+                  {
+                    "type": "string",
+                    "description": "Repo full name (e.g. 'mayank1513/scratchpad')."
+                  },
+                  {
+                    "type": "object",
+                    "required": ["repo"],
+                    "properties": {
+                      "repo": { "type": "string" },
+                      "reason": {
+                        "type": "string",
+                        "description": "Explanation shown in audit notes (e.g. 'Archived playground / prototype')."
+                      }
+                    }
+                  }
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    "telemetry": {
+      "type": "object",
+      "description": "Codebase telemetry, language overrides, and file pattern exclusions.",
+      "properties": {
+        "languages": {
+          "type": "object",
+          "description": "Linguist language filtering rules to eliminate auto-generation distortions.",
+          "properties": {
+            "ignore": {
+              "type": "array",
+              "description": "Languages to exclude from repository language breakdowns.",
+              "items": {
+                "oneOf": [
+                  {
+                    "type": "string",
+                    "description": "Language name matching GitHub Linguist (e.g. 'MDX', 'HTML')."
+                  },
+                  {
+                    "type": "object",
+                    "required": ["language"],
+                    "properties": {
+                      "language": {
+                        "type": "string",
+                        "description": "Language name."
+                      },
+                      "reason": {
+                        "type": "string",
+                        "description": "User-facing reason (e.g. 'Auto-generated docs by Fumadocs & TypeDoc')."
+                      }
+                    }
+                  }
+                ]
+              }
+            },
+            "primaryOverride": {
+              "type": "string",
+              "description": "Explicit primary language override if auto-detection is misrepresenting the project core (e.g. 'TypeScript')."
+            }
+          }
+        },
+        "ignorePaths": {
+          "type": "array",
+          "description": "File paths, directories, or glob patterns to exclude from tree inspections and manifest scanning.",
+          "items": {
+            "oneOf": [
+              {
+                "type": "string",
+                "description": "Glob pattern or directory path (e.g. 'apps/web/content/docs/**', '**/generated/**')."
+              },
+              {
+                "type": "object",
+                "required": ["pattern"],
+                "properties": {
+                  "pattern": {
+                    "type": "string",
+                    "description": "Glob pattern or path."
+                  },
+                  "reason": {
+                    "type": "string",
+                    "description": "Explanation (e.g. 'Auto-generated documentation corpus')."
+                  }
+                }
+              }
+            ]
+          }
+        },
+        "monorepo": {
+          "type": "object",
+          "description": "Monorepo workspace hints for manifest package discovery.",
+          "properties": {
+            "workspaces": {
+              "type": "array",
+              "description": "Explicit package search patterns (e.g. ['packages/*', 'apps/*']).",
+              "items": { "type": "string" }
+            },
+            "mainPackages": {
+              "type": "array",
+              "description": "Flagship packages prioritized in velocity scoring.",
+              "items": { "type": "string" }
+            }
+          }
+        }
+      }
+    },
+    "narrative": {
+      "type": "object",
+      "description": "Maintainer architectural notes surfaced alongside AI and deterministic findings.",
+      "properties": {
+        "summary": {
+          "type": "string",
+          "description": "Brief architectural positioning statement for the project or profile."
+        },
+        "highlights": {
+          "type": "array",
+          "description": "Key milestone bullets or engineering differentiators.",
+          "items": { "type": "string" }
+        }
+      }
+    }
+  },
+  "additionalProperties": false
+}

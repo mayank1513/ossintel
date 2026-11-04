@@ -6,11 +6,13 @@ import {
   Database,
   RefreshCw,
   Settings,
+  ShieldCheck,
   User,
 } from "lucide-react";
 import { useParams, useRouter, useSearchParams } from "next/navigation";
 import { Suspense, useEffect, useMemo, useRef, useState } from "react";
 import { AINarrator } from "@/components/dashboard/ai-narrator";
+import { BadgeModal } from "@/components/dashboard/badge-modal";
 import { DimensionBreakdown } from "@/components/dashboard/dimension-breakdown";
 import { EcosystemGraph } from "@/components/dashboard/ecosystem-graph";
 import { FindingsList } from "@/components/dashboard/findings-list";
@@ -137,6 +139,7 @@ function UserDashboardContent() {
 
   // API Key configurations state
   const [showTokensConfig, setShowTokensConfig] = useState(false);
+  const [isBadgeModalOpen, setIsBadgeModalOpen] = useState(false);
   const queryClient = useQueryClient();
   const { data: authData, isLoading: loadingAuth } = useAuthStatus();
   const hasGithubPat = !!authData?.hasGithubPat;
@@ -413,6 +416,14 @@ function UserDashboardContent() {
                 </div>
 
                 <div className="flex gap-2">
+                  <button
+                    type="button"
+                    onClick={() => setIsBadgeModalOpen(true)}
+                    className="flex items-center gap-1.5 px-4 py-2 bg-primary/10 hover:bg-primary/20 border border-primary/30 text-primary text-xs font-bold rounded-xl transition-all shadow-sm"
+                  >
+                    <ShieldCheck className="h-3.5 w-3.5" /> Badges
+                  </button>
+
                   <button
                     type="button"
                     onClick={() => setShowTokensConfig(!showTokensConfig)}
@@ -853,6 +864,15 @@ function UserDashboardContent() {
                 onDismiss={() => setDismissedSO(true)}
               />
             )}
+
+          {/* Shields.io Badge Modal */}
+          <BadgeModal
+            isOpen={isBadgeModalOpen}
+            onClose={() => setIsBadgeModalOpen(false)}
+            type="user"
+            target={username}
+            currentScore={clientIntel?.scores?.overall}
+          />
         </div>
       </main>
     </div>

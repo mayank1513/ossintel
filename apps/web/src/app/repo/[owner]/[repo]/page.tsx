@@ -1,10 +1,11 @@
 "use client";
 
-import { ExternalLink, Info, RefreshCw, User } from "lucide-react";
+import { ExternalLink, Info, RefreshCw, ShieldCheck, User } from "lucide-react";
 import { useParams, useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 import { FaGithub } from "react-icons/fa";
 import { AINarrator } from "@/components/dashboard/ai-narrator";
+import { BadgeModal } from "@/components/dashboard/badge-modal";
 import { DimensionBreakdown } from "@/components/dashboard/dimension-breakdown";
 import { FindingsList } from "@/components/dashboard/findings-list";
 import { LanguagesChart } from "@/components/dashboard/languages-chart";
@@ -40,6 +41,7 @@ export default function RepoPage() {
 
   // Cached state indicator
   const [cachedTime, setCachedTime] = useState<string | null>(null);
+  const [isBadgeModalOpen, setIsBadgeModalOpen] = useState(false);
 
   // Read cache timestamp for UI display
   useEffect(() => {
@@ -125,6 +127,14 @@ export default function RepoPage() {
                   <FaGithub className="h-3.5 w-3.5 text-primary/85" />
                   GitHub <ExternalLink className="h-3 w-3 opacity-60" />
                 </a>
+
+                <button
+                  type="button"
+                  onClick={() => setIsBadgeModalOpen(true)}
+                  className="px-3 py-1 bg-primary/10 hover:bg-primary/20 border border-primary/30 text-primary text-xs font-bold rounded-lg flex items-center gap-1.5 transition-all shadow-sm"
+                >
+                  <ShieldCheck className="h-3.5 w-3.5" /> Badges
+                </button>
               </div>
 
               {/* Cache status details */}
@@ -170,6 +180,15 @@ export default function RepoPage() {
                 <RecommendationsGrid recommendations={data.recommendations} />
               </div>
             </div>
+
+            {/* Shields.io Badge Modal */}
+            <BadgeModal
+              isOpen={isBadgeModalOpen}
+              onClose={() => setIsBadgeModalOpen(false)}
+              type="repo"
+              target={`${owner}/${repo}`}
+              currentScore={data.scores.overall}
+            />
           </div>
         )}
       </main>

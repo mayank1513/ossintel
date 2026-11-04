@@ -1,5 +1,7 @@
 # OSSIntel
 
+[![OSSIntel Alpha Score](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/ossintel/badges/main/repo/ossintel/ossintel.json)](https://ossintel.js.org/repo/ossintel/ossintel)
+
 ![Banner](./ossintel-banner.jpg)
 
 > Open Source Intelligence Platform
@@ -145,6 +147,30 @@ The development workflow includes:
 5. Task decomposition
 6. AI-assisted implementation
 7. Human review and refinement
+
+## Shields.io Badges
+
+Embed verifiable, deterministic OSSIntel telemetry in your `README.md` using [Shields.io Custom Endpoints](https://shields.io/badges/endpoint-badge).
+
+### Zero-Infra GitHub CDN Badge (Recommended)
+Hosted directly in the GitHub App repository with global edge caching and zero API quota consumption:
+
+```markdown
+[![OSSIntel Alpha Score](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/ossintel/badges/main/repo/ossintel/ossintel.json)](https://ossintel.js.org/repo/ossintel/ossintel)
+```
+
+### Dynamic SWR API Endpoint
+Computes live telemetry on the fly with edge caching:
+
+```markdown
+[![OSSIntel Alpha Score](https://img.shields.io/endpoint?url=https://ossintel.js.org/api/badges/repo/:owner/:repo)](https://ossintel.js.org/repo/:owner/:repo)
+```
+
+### Supported Metrics
+- **Repositories**: `overall` (Alpha Score), `velocity`, `health`, `community`, `impact`, `risk`
+  - Query parameter: `?metric=velocity`
+- **Developers / Users**: `overall` (OSSIQ), `maintainer`, `contributor`, `influence`
+  - Query parameter: `?metric=maintainer`
 
 ## Roadmap
 

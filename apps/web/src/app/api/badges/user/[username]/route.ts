@@ -37,12 +37,14 @@ export const GET = async (
     });
 
     if (metric === "overall") {
-      syncBadgeToGithubAppRepo({
-        filePath: `user/${cleanUser.toLowerCase()}.json`,
-        badgeData,
-      }).catch((err) => {
-        console.debug("[Badges] Background user sync error:", err);
-      });
+      try {
+        await syncBadgeToGithubAppRepo({
+          filePath: `user/${cleanUser.toLowerCase()}.json`,
+          badgeData,
+        });
+      } catch (err) {
+        console.error("[Badges] User route badge sync error:", err);
+      }
     }
 
     return NextResponse.json(badgeData, {

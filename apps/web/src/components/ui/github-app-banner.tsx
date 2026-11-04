@@ -4,6 +4,7 @@ import {
   ArrowUpRight,
   BarChart4,
   Building,
+  CheckCircle2,
   Lock,
   ShieldCheck,
   Sparkles,
@@ -69,11 +70,46 @@ export const GitHubAppBanner: React.FC<GitHubAppBannerProps> = ({
           </h4>
         </div>
 
-        <p className="text-xs text-muted-foreground font-semibold leading-relaxed">
-          {isAppInstalled && hasUninstalledOrgs
-            ? `The OSSIntel GitHub App is installed on your personal profile, but not on all of your organizations: ${uninstalledOrgs.join(", ")}. Connect them to enable complete ecosystem mapping.`
-            : "Authenticate as an installation to unlock full ecosystem insights, higher rate limits, and seamless metrics aggregation."}
-        </p>
+        {isAppInstalled && hasUninstalledOrgs ? (
+          <div className="space-y-3">
+            <div className="flex items-center gap-2 text-xs font-semibold text-foreground">
+              <span className="inline-flex items-center gap-1 text-emerald-600 dark:text-emerald-400 font-bold bg-emerald-500/10 border border-emerald-500/20 px-2 py-0.5 rounded-full text-[11px]">
+                <CheckCircle2 className="h-3 w-3" />@{profileLogin} connected
+              </span>
+              <span className="text-muted-foreground text-[11px]">
+                Personal profile authorized
+              </span>
+            </div>
+
+            <p className="text-xs text-muted-foreground font-medium leading-relaxed">
+              The following organizations you belong to have not authorized the
+              OSSIntel GitHub App yet. Click an organization to view on GitHub,
+              or click <strong>Connect Organizations</strong> to link them:
+            </p>
+
+            <div className="flex flex-wrap items-center gap-2 pt-1">
+              {uninstalledOrgs.map((org) => (
+                <a
+                  key={org}
+                  href={`https://github.com/${org}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-muted/80 hover:bg-primary/10 border border-border/80 hover:border-primary/40 rounded-lg text-xs font-bold text-foreground transition-all group/org"
+                  title={`View @${org} on GitHub`}
+                >
+                  <Building className="h-3.5 w-3.5 text-primary shrink-0" />
+                  <span>@{org}</span>
+                  <ArrowUpRight className="h-3 w-3 text-muted-foreground group-hover/org:text-primary transition-transform group-hover/org:translate-x-0.5 group-hover/org:-translate-y-0.5" />
+                </a>
+              ))}
+            </div>
+          </div>
+        ) : (
+          <p className="text-xs text-muted-foreground font-semibold leading-relaxed">
+            Authenticate as an installation to unlock full ecosystem insights,
+            higher rate limits, and seamless metrics aggregation.
+          </p>
+        )}
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2 text-[11px] text-foreground/90 font-bold">
           <div className="flex items-center gap-2">
@@ -110,7 +146,7 @@ export const GitHubAppBanner: React.FC<GitHubAppBannerProps> = ({
         >
           <GithubIcon className="h-4 w-4 shrink-0" />{" "}
           {isAppInstalled && hasUninstalledOrgs
-            ? "Configure Installations"
+            ? "Connect Organizations"
             : "Install GitHub App"}
         </a>
       </div>

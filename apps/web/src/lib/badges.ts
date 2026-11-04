@@ -16,7 +16,6 @@ import {
   calculateRepositoryScore,
 } from "@ossintel/scoring";
 import { Octokit } from "octokit";
-import { getInstallationToken } from "./github-app";
 import {
   getCachedDeveloperData,
   getCachedRepositoryData,
@@ -272,7 +271,10 @@ export const getRepoBadge = async (
   repo: string,
   options: RepoBadgeOptions = {},
 ): Promise<ShieldsBadgeData> => {
-  const token = await getInstallationToken(owner);
+  const token =
+    process.env.GITHUB_BADGES_SYNC_TOKEN ||
+    process.env.GITHUB_TOKEN ||
+    process.env.GITHUB_PAT;
   const raw = await getCachedRepositoryData(owner, repo, { token });
   const scores = calculateRepoScoreFromRaw(raw);
   return formatRepoBadge(scores, options);
@@ -285,7 +287,10 @@ export const getUserBadge = async (
   username: string,
   options: UserBadgeOptions = {},
 ): Promise<ShieldsBadgeData> => {
-  const token = await getInstallationToken(username);
+  const token =
+    process.env.GITHUB_BADGES_SYNC_TOKEN ||
+    process.env.GITHUB_TOKEN ||
+    process.env.GITHUB_PAT;
   const raw = await getCachedDeveloperData(username, 10, { token });
 
   const scores = calculateIdentityScore({
@@ -300,8 +305,8 @@ export const getUserBadge = async (
 export interface SyncBadgeOptions {
   repoOwner?: string; // defaults to process.env.GITHUB_BADGES_OWNER || "ossintel"
   repoName?: string; // defaults to process.env.GITHUB_BADGES_REPO || "badges"
-  branch?: string; // defaults to process.env.GITHUB_BADGES_BRANCH || "main"
-  filePath: string; // e.g. "badges/repo/owner/repo.json"
+  branch?: string; // defaults to process.env.GITHUB_BADGES_BRANCH || undefined (default branch)
+  filePath: string; // e.g. "repo/owner/repo.json"
   badgeData: ShieldsBadgeData;
   commitMessage?: string;
 }
@@ -313,22 +318,22 @@ export interface SyncBadgeOptions {
 export const syncBadgeToGithubAppRepo = async ({
   repoOwner = process.env.GITHUB_BADGES_OWNER || "ossintel",
   repoName = process.env.GITHUB_BADGES_REPO || "badges",
-  branch = process.env.GITHUB_BADGES_BRANCH || "main",
+  branch = process.env.GITHUB_BADGES_BRANCH || undefined,
   filePath,
   badgeData,
   commitMessage,
 }: SyncBadgeOptions): Promise<boolean> => {
+  const cleanPath = filePath.replace(/^\/+/, "");
   const jsonContent = `${JSON.stringify(badgeData, null, 2)}\n`;
 
-  // Resolve token: Try GitHub App installation token for the repoOwner
-  let token = await getInstallationToken(repoOwner);
-  if (!token) {
-    token = process.env.GITHUB_TOKEN;
-  }
+  const token =
+    process.env.GITHUB_BADGES_SYNC_TOKEN ||
+    process.env.GITHUB_TOKEN ||
+    process.env.GITHUB_PAT;
 
   if (!token) {
     console.warn(
-      `[Badges] Skipping GitHub repo sync for ${filePath}: No GitHub App or PAT token found.`,
+      `[Badges] Skipping GitHub repo sync for ${cleanPath}: No sync token found. Set GITHUB_BADGES_SYNC_TOKEN (or GITHUB_TOKEN / GITHUB_PAT).`,
     );
     return false;
   }
@@ -341,8 +346,8 @@ export const syncBadgeToGithubAppRepo = async ({
       const { data: existing } = await octokit.rest.repos.getContent({
         owner: repoOwner,
         repo: repoName,
-        path: filePath,
-        ref: branch,
+        path: cleanPath,
+        ...(branch ? { ref: branch } : {}),
       });
 
       if (
@@ -357,7 +362,7 @@ export const syncBadgeToGithubAppRepo = async ({
         // Idempotency: skip write if content is unchanged
         if (currentContent.trim() === jsonContent.trim()) {
           console.log(
-            `[Badges] File ${filePath} already up to date in ${repoOwner}/${repoName}.`,
+            `[Badges] File ${cleanPath} already up to date in ${repoOwner}/${repoName}.`,
           );
           return true;
         }
@@ -366,7 +371,7 @@ export const syncBadgeToGithubAppRepo = async ({
       const status = (err as { status?: number })?.status;
       if (status !== 404) {
         console.warn(
-          `[Badges] Could not inspect ${filePath} in ${repoOwner}/${repoName}:`,
+          `[Badges] Could not inspect ${cleanPath} in ${repoOwner}/${repoName}:`,
           err,
         );
       }
@@ -374,25 +379,25 @@ export const syncBadgeToGithubAppRepo = async ({
 
     const message =
       commitMessage ||
-      `chore(badges): update ${filePath} for ${badgeData.label} [skip ci]`;
+      `chore(badges): update ${cleanPath} for ${badgeData.label} [skip ci]`;
 
     await octokit.rest.repos.createOrUpdateFileContents({
       owner: repoOwner,
       repo: repoName,
-      path: filePath,
+      path: cleanPath,
       message,
       content: Buffer.from(jsonContent).toString("base64"),
       sha: existingSha,
-      branch,
+      ...(branch ? { branch } : {}),
     });
 
     console.log(
-      `[Badges] Successfully committed ${filePath} to ${repoOwner}/${repoName}@${branch}`,
+      `[Badges] Successfully committed ${cleanPath} to ${repoOwner}/${repoName}${branch ? `@${branch}` : ""}`,
     );
     return true;
   } catch (error) {
     console.error(
-      `[Badges] Failed to commit ${filePath} to ${repoOwner}/${repoName}:`,
+      `[Badges] Failed to commit ${cleanPath} to ${repoOwner}/${repoName}:`,
       error,
     );
     return false;
@@ -400,34 +405,30 @@ export const syncBadgeToGithubAppRepo = async ({
 };
 
 /**
- * Fire-and-forget sync of repo overall badge to ossintel/badges repo
+ * Sync repo overall badge to ossintel/badges repo
  */
-export const syncRepoBadgeBackground = (
+export const syncRepoBadgeBackground = async (
   owner: string,
   repo: string,
   scores: RepositoryScores,
-): void => {
+): Promise<boolean> => {
   const badgeData = formatRepoBadge(scores, { metric: "overall" });
-  syncBadgeToGithubAppRepo({
+  return await syncBadgeToGithubAppRepo({
     filePath: `repo/${owner.toLowerCase()}/${repo.toLowerCase()}.json`,
     badgeData,
-  }).catch((err) => {
-    console.debug(`[Badges] Background sync error for ${owner}/${repo}:`, err);
   });
 };
 
 /**
- * Fire-and-forget sync of user overall badge to ossintel/badges repo
+ * Sync user overall badge to ossintel/badges repo
  */
-export const syncUserBadgeBackground = (
+export const syncUserBadgeBackground = async (
   username: string,
   scores: IdentityScores,
-): void => {
+): Promise<boolean> => {
   const badgeData = formatUserBadge(scores, { metric: "overall" });
-  syncBadgeToGithubAppRepo({
+  return await syncBadgeToGithubAppRepo({
     filePath: `user/${username.toLowerCase()}.json`,
     badgeData,
-  }).catch((err) => {
-    console.debug(`[Badges] Background sync error for ${username}:`, err);
   });
 };

@@ -83,9 +83,9 @@ export const POST = async (request: Request) => {
           externalContributions: result.externalContributions,
           organizations: result.metadata.organizations,
         });
-        syncUserBadgeBackground(login, scores);
+        await syncUserBadgeBackground(login, scores);
       } catch (badgeErr) {
-        console.debug("[Badges] Background user badge sync skipped:", badgeErr);
+        console.error("[Badges] Background user badge sync error:", badgeErr);
       }
     }
 

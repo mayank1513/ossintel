@@ -34,14 +34,16 @@ export const GET = async (
       logo,
     });
 
-    // Asynchronously trigger sync to GitHub App repo if metric is default overall
+    // Trigger sync to GitHub App repo if metric is default overall
     if (metric === "overall") {
-      syncBadgeToGithubAppRepo({
-        filePath: `repo/${owner.toLowerCase()}/${cleanRepo.toLowerCase()}.json`,
-        badgeData,
-      }).catch((err) => {
-        console.debug("[Badges] Background repo sync error:", err);
-      });
+      try {
+        await syncBadgeToGithubAppRepo({
+          filePath: `repo/${owner.toLowerCase()}/${cleanRepo.toLowerCase()}.json`,
+          badgeData,
+        });
+      } catch (err) {
+        console.error("[Badges] Repo route badge sync error:", err);
+      }
     }
 
     return NextResponse.json(badgeData, {

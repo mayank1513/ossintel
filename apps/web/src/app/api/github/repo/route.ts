@@ -30,12 +30,12 @@ export const POST = async (request: Request) => {
       forceRefresh,
     );
 
-    // Asynchronously trigger background badge sync to ossintel/badges repo
+    // Trigger badge sync to ossintel/badges repo
     try {
       const scores = calculateRepoScoreFromRaw(result);
-      syncRepoBadgeBackground(ownerName, repoName, scores);
+      await syncRepoBadgeBackground(ownerName, repoName, scores);
     } catch (badgeErr) {
-      console.debug("[Badges] Background repo badge sync skipped:", badgeErr);
+      console.error("[Badges] Background repo badge sync error:", badgeErr);
     }
 
     return NextResponse.json(result);

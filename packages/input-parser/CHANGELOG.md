@@ -1,5 +1,11 @@
 # @ossintel/input-parser
 
+## 0.4.0
+
+### Minor Changes
+
+- [`b75160e`](https://github.com/ossintel/ossintel/commit/b75160e11f687a251a75746d46d144ec100be0be) Thanks [@mayank1513](https://github.com/mayank1513)! - Implement `.ossintel.json` configuration schema, directory/glob pattern exclusions, server cache discovery and normalization, Shields.io badge engine, and automatic background sync to `ossintel/badges`.
+
 ## 0.3.0
 
 ### Minor Changes

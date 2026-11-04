@@ -1,0 +1,59 @@
+{
+  "$schema": "./schemas/ossintel.schema.json",
+  "version": "1",
+  "profile": {
+    "orgs": {
+      "priority": [
+        {
+          "org": "md2docx",
+          "reason": "Flagship client-side AST document compilation ecosystem"
+        },
+        {
+          "org": "ossintel",
+          "reason": "Open-source intelligence & deterministic impact scoring platform"
+        }
+      ]
+    },
+    "repositories": {
+      "pinned": [
+        {
+          "repo": "ossintel/ossintel",
+          "reason": "Core monorepo, input parser, normalizer, and web dashboard"
+        },
+        {
+          "repo": "ossintel/badges",
+          "reason": "Zero-infrastructure Shields.io badge CDN distribution repository"
+        }
+      ]
+    }
+  },
+  "telemetry": {
+    "languages": {
+      "ignore": [
+        {
+          "language": "MDX",
+          "reason": "Auto-generated TypeDoc and Fumadocs API documentation corpus"
+        }
+      ],
+      "primaryOverride": "TypeScript"
+    },
+    "ignorePaths": [
+      {
+        "pattern": "apps/web/content/docs/**",
+        "reason": "Compiled Fumadocs documentation site corpus"
+      },
+      {
+        "pattern": "apps/web/.source/**",
+        "reason": "Fumadocs compiler build cache"
+      }
+    ]
+  },
+  "narrative": {
+    "summary": "OSSIntel transforms developer activity and registry distribution into transparent, deterministic ecosystem authority metrics.",
+    "highlights": [
+      "Modular four-pillar scoring architecture (Maintainer, Contributor, Influence, Organization)",
+      "Zero-infrastructure Shields.io badge CDN distribution via dedicated GitHub App repo",
+      "Automatic monorepo package and velocity detection"
+    ]
+  }
+}

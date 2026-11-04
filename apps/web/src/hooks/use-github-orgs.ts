@@ -6,7 +6,10 @@ import type {
   NormalizedRelease,
   NormalizedRepository,
 } from "@ossintel/github-normalizer";
-import type { PackageManifest } from "@ossintel/input-parser";
+import type {
+  NormalizedOssintelConfig,
+  PackageManifest,
+} from "@ossintel/input-parser";
 import type {
   Finding,
   PromptContext,
@@ -47,6 +50,7 @@ export interface RepoResponse {
   promptContext: PromptContext;
   languages: NormalizedLanguage[];
   contributorsCount: number;
+  config?: NormalizedOssintelConfig;
 }
 
 const fetchOrgData = async (orgName: string, forceRefresh: boolean) => {

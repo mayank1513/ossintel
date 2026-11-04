@@ -2,6 +2,8 @@
 
 [![OSSIntel Alpha Score](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/ossintel/badges/main/repo/ossintel/ossintel.json)](https://ossintel.js.org/repo/ossintel/ossintel)
 
+[![Install GitHub App](https://img.shields.io/badge/GitHub%20App-Install%20OSSIntel-2ea44f?style=flat&logo=github)](https://github.com/apps/ossintel)
+
 ![Banner](./ossintel-banner.jpg)
 
 > Open Source Intelligence Platform
@@ -153,6 +155,7 @@ The development workflow includes:
 Embed verifiable, deterministic OSSIntel telemetry in your `README.md` using [Shields.io Custom Endpoints](https://shields.io/badges/endpoint-badge).
 
 ### Zero-Infra GitHub CDN Badge (Recommended)
+
 Hosted directly in the GitHub App repository with global edge caching and zero API quota consumption:
 
 ```markdown
@@ -160,6 +163,7 @@ Hosted directly in the GitHub App repository with global edge caching and zero A
 ```
 
 ### Dynamic SWR API Endpoint
+
 Computes live telemetry on the fly with edge caching:
 
 ```markdown
@@ -167,19 +171,85 @@ Computes live telemetry on the fly with edge caching:
 ```
 
 ### Supported Metrics
+
 - **Repositories**: `overall` (Alpha Score), `velocity`, `health`, `community`, `impact`, `risk`
   - Query parameter: `?metric=velocity`
 - **Developers / Users**: `overall` (OSSIQ), `maintainer`, `contributor`, `influence`
   - Query parameter: `?metric=maintainer`
 
+## GitHub App Integration
+
+Install the official [OSSIntel GitHub App](https://github.com/apps/ossintel) on your personal account or organizations:
+
+- **Higher API Rate Limits**: Increases rate limits to 5,000 requests/hour, eliminating rate-limiting during deep workspace indexing.
+- **Private & Monorepo Telemetry**: Inspect private repositories and internal monorepo package graphs with fine-grained permissions.
+- **Automated Verifiable Badge Sync**: Repositories and developer profiles analyzed on OSSIntel automatically sync verifiable scoring badges to the global edge-cached badges repository.
+
+## Configuration (`.ossintel.json`)
+
+Customize how OSSIntel analyzes, calculates scores, and prioritizes entities by placing an `.ossintel.json` file in your repository root (or in `<username>/.github` or `<username>/<username>` for developer profiles).
+
+The schema is published and validated against [`https://ossintel.js.org/schemas/0.3.0/schema.json`](https://ossintel.js.org/schemas/0.3.0/schema.json).
+
+### Example Configuration
+
+```json
+{
+  "$schema": "https://ossintel.js.org/schemas/0.3.0/schema.json",
+  "version": "1",
+  "profile": {
+    "orgs": {
+      "priority": [
+        { "org": "my-primary-org", "reason": "Current core venture" }
+      ],
+      "exclude": [
+        { "org": "sandbox-demo-org", "reason": "Archived experiments" }
+      ]
+    },
+    "repositories": {
+      "pinned": [
+        { "repo": "flagship-compiler", "reason": "Core showcase repository" }
+      ],
+      "exclude": [
+        { "repo": "legacy-tutorial", "reason": "Outdated beginner project" }
+      ]
+    }
+  },
+  "telemetry": {
+    "languages": {
+      "ignore": [
+        { "language": "Shell", "reason": "Auxiliary build scripts" },
+        { "language": "HTML", "reason": "Compiled output artifacts" }
+      ],
+      "primaryOverride": "TypeScript"
+    },
+    "ignorePaths": [
+      { "pattern": "fixtures/**", "reason": "Test fixture files" },
+      { "pattern": "legacy/**", "reason": "Deprecated packages" }
+    ],
+    "monorepo": {
+      "workspaces": ["packages/*", "apps/*"],
+      "mainPackages": ["@scope/core", "@scope/cli"]
+    }
+  },
+  "narrative": {
+    "summary": "Engineering leader specializing in compilers, distributed systems, and UX.",
+    "highlights": [
+      "Architected 10x high-throughput document compiler pipeline",
+      "Created ecosystem-wide OSS telemetry engine"
+    ]
+  }
+}
+```
+
 ## Roadmap
 
-- Developer Intelligence
-- Repository Intelligence
-- Package Intelligence
-- Organization Intelligence
-- GitHub App
-- CLI
-- VS Code Extension
+- [x] Developer Intelligence
+- [x] Repository Intelligence
+- [x] Package Intelligence
+- [x] Organization Intelligence
+- [x] [GitHub App](https://github.com/apps/ossintel) (Available)
+- [ ] CLI
+- [ ] VS Code Extension
 
 <p align="center" style="text-align:center">with 💖 by <a href="https://mayank-chaudhari.vercel.app" target="_blank">Mayank Kumar Chaudhari</a></p>

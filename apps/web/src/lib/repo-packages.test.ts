@@ -104,4 +104,82 @@ describe("fetchRepoPackages", () => {
     expect(result.npmPackages).toHaveLength(0);
     expect(result.packageVelocities).toHaveLength(0);
   });
+
+  test("honors config.telemetry.ignorePaths by ignoring specified package paths", async () => {
+    vi.spyOn(globalThis, "fetch").mockImplementation(
+      async (input: RequestInfo | URL) => {
+        const url = input.toString();
+
+        if (url.includes("/git/trees/")) {
+          return {
+            ok: true,
+            json: async () => ({
+              tree: [
+                { path: "package.json", type: "blob", sha: "root-sha" },
+                {
+                  path: "packages/ignored-pkg/package.json",
+                  type: "blob",
+                  sha: "ignored-sha",
+                },
+                {
+                  path: "packages/active-pkg/package.json",
+                  type: "blob",
+                  sha: "active-sha",
+                },
+              ],
+            }),
+          } as Response;
+        }
+
+        if (url.endsWith("packages/active-pkg/package.json")) {
+          return {
+            ok: true,
+            json: async () => ({
+              name: "@test-scope/active",
+              version: "1.0.0",
+            }),
+          } as Response;
+        }
+
+        if (url.endsWith("package.json")) {
+          return {
+            ok: true,
+            json: async () => ({
+              name: "test-monorepo-root",
+              private: true,
+            }),
+          } as Response;
+        }
+
+        return { ok: false, status: 404 } as Response;
+      },
+    );
+
+    const mockConfig = {
+      version: "1",
+      profile: {
+        orgs: { priority: [], exclude: [] },
+        repositories: { pinned: [], exclude: [] },
+      },
+      telemetry: {
+        languages: { ignore: [] },
+        ignorePaths: [{ pattern: "packages/ignored-pkg/**" }],
+      },
+    };
+
+    const result = await fetchRepoPackages(
+      "test-owner",
+      "test-repo",
+      "main",
+      {},
+      mockConfig,
+    );
+
+    expect(result.manifests.some((m) => m.name === "@test-scope/active")).toBe(
+      true,
+    );
+    expect(
+      result.manifests.some((m) => m.name === "@test-scope/ignored-pkg"),
+    ).toBe(false);
+  });
 });

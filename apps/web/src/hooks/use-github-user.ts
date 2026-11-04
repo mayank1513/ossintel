@@ -5,6 +5,7 @@ import type {
   NormalizedOrganization,
   NormalizedRepository,
 } from "@ossintel/github-normalizer";
+import type { NormalizedOssintelConfig } from "@ossintel/input-parser";
 import { useQuery } from "@tanstack/react-query";
 import { useRef } from "react";
 import { fetchWithCache } from "@/lib/api-client";
@@ -15,6 +16,7 @@ export interface UserResponse {
     organizations: NormalizedOrganization[];
     suggestions: LinkedIdentitySuggestions;
     readme: string;
+    config?: NormalizedOssintelConfig;
   };
   repositories: NormalizedRepository[];
   externalContributions: NormalizedContribution[];
@@ -22,6 +24,7 @@ export interface UserResponse {
   pinnedRepositories?: string[];
   isAppInstalled?: boolean;
   uninstalledOrgs?: string[];
+  config?: NormalizedOssintelConfig;
 }
 
 export const useGithubUser = (username: string, limit = 10) => {

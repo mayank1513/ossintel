@@ -1,7 +1,8 @@
 import {
   detectManifests,
-  type ManifestDetectionResult,
+  type NormalizedOssintelConfig,
   type PackageManifest,
+  shouldIgnorePath,
 } from "@ossintel/input-parser";
 import { fetchNpmPackage, type NormalizedNpmPackage } from "@ossintel/npm";
 import type { PackageVelocity } from "@ossintel/scoring";
@@ -35,6 +36,7 @@ export const fetchRepoPackages = async (
   repo: string,
   defaultBranch = "main",
   options?: { token?: string },
+  config?: NormalizedOssintelConfig | null,
 ): Promise<RepoPackagesResult> => {
   const branch = defaultBranch || "main";
   let manifestPaths: string[] = ["package.json"];
@@ -68,7 +70,8 @@ export const fetchRepoPackages = async (
               !node.path.includes("/test/") &&
               !node.path.includes("/tests/") &&
               !node.path.includes("/fixtures/") &&
-              !node.path.includes("/examples/"),
+              !node.path.includes("/examples/") &&
+              (!config || !shouldIgnorePath(node.path, config)),
           )
           .map((node) => node.path);
 
@@ -114,7 +117,7 @@ export const fetchRepoPackages = async (
   }
 
   // 3. Auto-detect packages and filter out purely private non-monorepo configs
-  const detection = detectManifests(manifests);
+  const _detection = detectManifests(manifests);
   const publicCandidates = manifests.filter(
     (m) => typeof m.name === "string" && m.name.trim().length > 0 && !m.private,
   );

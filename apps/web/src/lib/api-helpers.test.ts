@@ -129,6 +129,18 @@ describe("api-helpers", () => {
       updatedAt: "2020-01-01",
     };
 
+    const mockConfig = {
+      version: "1",
+      profile: {
+        orgs: { priority: [], exclude: [] },
+        repositories: { pinned: [], exclude: [] },
+      },
+      telemetry: {
+        languages: { ignore: [] },
+        ignorePaths: [],
+      },
+    };
+
     const result = formatUserResponse(
       developer,
       [mockRepo()],
@@ -136,11 +148,14 @@ describe("api-helpers", () => {
       [],
       {},
       "readme-content",
+      mockConfig,
     );
 
     expect(result.type).toBe("user");
     expect(result.metadata.login).toBe("dev");
     expect(result.metadata.readme).toBe("readme-content");
     expect(result.repositories).toHaveLength(1);
+    expect(result.config?.version).toBe("1");
+    expect(result.metadata.config?.version).toBe("1");
   });
 });

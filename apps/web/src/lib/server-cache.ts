@@ -14,7 +14,13 @@ import {
   type NormalizedRelease,
   suggestLinkedIdentities,
 } from "@ossintel/github-normalizer";
-import type { PackageManifest } from "@ossintel/input-parser";
+import {
+  type NormalizedOssintelConfig,
+  normalizeOssintelConfig,
+  type PackageManifest,
+  shouldExcludeRepo,
+  shouldIgnoreLanguage,
+} from "@ossintel/input-parser";
 import type { NormalizedNpmPackage } from "@ossintel/npm";
 import type { PackageVelocity } from "@ossintel/scoring";
 import { revalidateTag, unstable_cache } from "next/cache";
@@ -89,6 +95,71 @@ const resolveCachedData = async <T>(
 };
 
 // ----------------------------------------------------
+// 0. OSSINTEL CONFIG DISCOVERY
+// ----------------------------------------------------
+
+/**
+ * Fetches and normalizes .ossintel.json from a GitHub repository if present.
+ */
+export const fetchRepoOssintelConfig = async (
+  owner: string,
+  repo: string,
+  options?: FetchOptions,
+): Promise<NormalizedOssintelConfig | null> => {
+  try {
+    const headers: Record<string, string> = {
+      Accept: "application/vnd.github+json",
+      "User-Agent": "OSSIntel-App",
+    };
+    if (options?.token) {
+      headers.Authorization = `token ${options.token}`;
+    }
+
+    const res = await fetch(
+      `https://api.github.com/repos/${encodeURIComponent(owner)}/${encodeURIComponent(repo)}/contents/.ossintel.json`,
+      {
+        headers,
+        signal: AbortSignal.timeout(4000),
+      },
+    );
+
+    if (!res.ok) return null;
+
+    const data = await res.json();
+    let rawText = "";
+    if (data.content && data.encoding === "base64") {
+      rawText = Buffer.from(data.content, "base64").toString("utf-8");
+    } else if (typeof data === "string") {
+      rawText = data;
+    }
+
+    if (!rawText) return null;
+    const parsed = JSON.parse(rawText);
+    return normalizeOssintelConfig(parsed);
+  } catch {
+    return null;
+  }
+};
+
+/**
+ * Discovers and parses .ossintel.json for a user/developer profile.
+ * Checks ${username}/.github first, then ${username}/${username}.
+ */
+export const fetchUserOssintelConfig = async (
+  username: string,
+  options?: FetchOptions,
+): Promise<NormalizedOssintelConfig | null> => {
+  const fromDotGithub = await fetchRepoOssintelConfig(
+    username,
+    ".github",
+    options,
+  );
+  if (fromDotGithub) return fromDotGithub;
+
+  return await fetchRepoOssintelConfig(username, username, options);
+};
+
+// ----------------------------------------------------
 // 1. DEVELOPER DATA CACHE
 // ----------------------------------------------------
 
@@ -98,12 +169,12 @@ const fetchDeveloperDataRaw = async (
   options: FetchOptions,
 ) => {
   const developer = await fetchDeveloper(username, options);
-  const personalRepos = await fetchRepositories(username, {
+  let personalRepos = await fetchRepositories(username, {
     ...options,
     allPages: true,
     perPage: GITHUB_APP_PAGE_SIZE,
   });
-  const organizations = await fetchOrganizations(username, options);
+  let organizations = await fetchOrganizations(username, options);
   let externalContributions: NormalizedContribution[] = [];
   try {
     externalContributions = await fetchExternalContributions(
@@ -135,6 +206,68 @@ const fetchDeveloperDataRaw = async (
     console.error("Failed to fetch readme in server-cache", e);
   }
 
+  let config: NormalizedOssintelConfig | null = null;
+  try {
+    config = await fetchUserOssintelConfig(username, options);
+  } catch (e) {
+    console.error("Failed to fetch user .ossintel.json in server-cache", e);
+  }
+
+  if (config) {
+    const userConfig = config;
+    // 1. Filter out excluded organizations
+    if (userConfig.profile.orgs.exclude.length > 0) {
+      const excludedOrgs = new Set(
+        userConfig.profile.orgs.exclude.map((o) => o.org.toLowerCase()),
+      );
+      organizations = organizations.filter(
+        (org) => !excludedOrgs.has(org.login.toLowerCase()),
+      );
+    }
+
+    // 2. Prioritize organizations
+    if (userConfig.profile.orgs.priority.length > 0) {
+      const priorityOrder = userConfig.profile.orgs.priority.map((o) =>
+        o.org.toLowerCase(),
+      );
+      organizations.sort((a, b) => {
+        const indexA = priorityOrder.indexOf(a.login.toLowerCase());
+        const indexB = priorityOrder.indexOf(b.login.toLowerCase());
+        if (indexA !== -1 && indexB !== -1) return indexA - indexB;
+        if (indexA !== -1) return -1;
+        if (indexB !== -1) return 1;
+        return 0;
+      });
+    }
+
+    // 3. Filter out excluded repositories
+    if (userConfig.profile.repositories.exclude.length > 0) {
+      personalRepos = personalRepos.filter(
+        (repo) => !shouldExcludeRepo(repo.fullName || repo.name, userConfig),
+      );
+    }
+
+    // 4. Pin repositories (sort pinned to top)
+    if (userConfig.profile.repositories.pinned.length > 0) {
+      const pinnedNames = userConfig.profile.repositories.pinned.map((p) =>
+        p.repo.toLowerCase(),
+      );
+      personalRepos.sort((a, b) => {
+        const aFull = (a.fullName || a.name).toLowerCase();
+        const bFull = (b.fullName || b.name).toLowerCase();
+        const aName = a.name.toLowerCase();
+        const bName = b.name.toLowerCase();
+        const isAPinned =
+          pinnedNames.includes(aFull) || pinnedNames.includes(aName);
+        const isBPinned =
+          pinnedNames.includes(bFull) || pinnedNames.includes(bName);
+        if (isAPinned && !isBPinned) return -1;
+        if (!isAPinned && isBPinned) return 1;
+        return 0;
+      });
+    }
+  }
+
   const suggestions = suggestLinkedIdentities(developer, personalRepos);
   return formatUserResponse(
     developer,
@@ -143,6 +276,7 @@ const fetchDeveloperDataRaw = async (
     externalContributions,
     suggestions,
     readme,
+    config,
   );
 };
 
@@ -268,6 +402,23 @@ const fetchRepositoryDataRaw = async (
     console.error("Failed to fetch languages in server-cache", e);
   }
 
+  let config: NormalizedOssintelConfig | null = null;
+  try {
+    config = await fetchRepoOssintelConfig(owner, repo, options);
+  } catch (e) {
+    console.error("Failed to fetch repo .ossintel.json in server-cache", e);
+  }
+
+  if (config) {
+    const repoConfig = config;
+    languages = languages.filter(
+      (lang) => !shouldIgnoreLanguage(lang.name, repoConfig),
+    );
+    if (repoConfig.telemetry.languages.primaryOverride) {
+      repository.language = repoConfig.telemetry.languages.primaryOverride;
+    }
+  }
+
   let packageManifests: PackageManifest[] = [];
   let npmPackages: NormalizedNpmPackage[] = [];
   let packageVelocities: PackageVelocity[] = [];
@@ -278,6 +429,7 @@ const fetchRepositoryDataRaw = async (
       repo,
       repository.defaultBranch || "main",
       options,
+      config,
     );
     packageManifests = pkgData.manifests;
     npmPackages = pkgData.npmPackages;
@@ -294,6 +446,7 @@ const fetchRepositoryDataRaw = async (
     packageManifests,
     npmPackages,
     packageVelocities,
+    config,
   };
 };
 

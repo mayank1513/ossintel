@@ -6,6 +6,7 @@ import type {
   NormalizedOrganization,
   NormalizedRepository,
 } from "@ossintel/github-normalizer";
+import type { NormalizedOssintelConfig } from "@ossintel/input-parser";
 import type { RepositoryInsights } from "@ossintel/insights";
 import type { RepositoryScores } from "@ossintel/scoring";
 import { NextResponse } from "next/server";
@@ -17,6 +18,7 @@ export const formatRepoResponse = (
   insightsResult: RepositoryInsights,
   languages: NormalizedLanguage[] = [],
   contributorsCount = 0,
+  config?: NormalizedOssintelConfig | null,
 ) => {
   return {
     type: "repo" as const,
@@ -44,6 +46,7 @@ export const formatRepoResponse = (
     promptContext: insightsResult.promptContext,
     languages,
     contributorsCount,
+    config: config ?? undefined,
   };
 };
 
@@ -77,6 +80,7 @@ export const formatUserResponse = (
   externalContributions: NormalizedContribution[],
   suggestions: LinkedIdentitySuggestions,
   readme: string,
+  config?: NormalizedOssintelConfig | null,
 ) => {
   return {
     type: "user" as const,
@@ -100,9 +104,11 @@ export const formatUserResponse = (
       readme,
       twitterUsername: developer.twitterUsername,
       email: developer.email,
+      config: config ?? undefined,
     },
     repositories: personalRepos,
     externalContributions,
+    config: config ?? undefined,
   };
 };
 

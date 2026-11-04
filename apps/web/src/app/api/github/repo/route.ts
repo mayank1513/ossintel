@@ -1,5 +1,9 @@
 import { NextResponse } from "next/server";
 import { handleGithubRouteError } from "@/lib/api-helpers";
+import {
+  calculateRepoScoreFromRaw,
+  syncRepoBadgeBackground,
+} from "@/lib/badges";
 import { getDecryptedToken } from "@/lib/cookie-token";
 import { getInstallationToken } from "@/lib/github-app";
 import { getCachedRepositoryData } from "@/lib/server-cache";
@@ -25,6 +29,15 @@ export const POST = async (request: Request) => {
       options,
       forceRefresh,
     );
+
+    // Asynchronously trigger background badge sync to ossintel/badges repo
+    try {
+      const scores = calculateRepoScoreFromRaw(result);
+      syncRepoBadgeBackground(ownerName, repoName, scores);
+    } catch (badgeErr) {
+      console.debug("[Badges] Background repo badge sync skipped:", badgeErr);
+    }
+
     return NextResponse.json(result);
   } catch (error: unknown) {
     console.error("Repository API failed", error);

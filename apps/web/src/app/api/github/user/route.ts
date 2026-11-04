@@ -1,6 +1,8 @@
 import { fetchPinnedRepositories } from "@ossintel/github-normalizer";
+import { calculateIdentityScore } from "@ossintel/scoring";
 import { NextResponse } from "next/server";
 import { handleGithubRouteError } from "@/lib/api-helpers";
+import { syncUserBadgeBackground } from "@/lib/badges";
 import { resolveInstallationAndUserToken } from "@/lib/cookie-token";
 import { getInstallationMap } from "@/lib/github-app";
 import {
@@ -72,6 +74,19 @@ export const POST = async (request: Request) => {
         `[User API DEBUG] Final uninstalledOrgs list:`,
         uninstalledOrgs,
       );
+    }
+
+    if (result.type === "user") {
+      try {
+        const scores = calculateIdentityScore({
+          repositories: result.repositories,
+          externalContributions: result.externalContributions,
+          organizations: result.metadata.organizations,
+        });
+        syncUserBadgeBackground(login, scores);
+      } catch (badgeErr) {
+        console.debug("[Badges] Background user badge sync skipped:", badgeErr);
+      }
     }
 
     return NextResponse.json({

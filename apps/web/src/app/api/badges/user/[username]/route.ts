@@ -1,6 +1,10 @@
 import { NextResponse } from "next/server";
 import {
+  BADGE_CACHE_HEADERS,
+  BADGE_CORS_HEADERS,
+  BADGE_ERROR_RESPONSE,
   getUserBadge,
+  parseBadgeQueryParams,
   syncBadgeToGithubAppRepo,
   type UserMetric,
 } from "@/lib/badges";
@@ -10,11 +14,7 @@ export const dynamic = "force-dynamic";
 export const OPTIONS = async () => {
   return new NextResponse(null, {
     status: 204,
-    headers: {
-      "Access-Control-Allow-Origin": "*",
-      "Access-Control-Allow-Methods": "GET, OPTIONS",
-      "Access-Control-Allow-Headers": "Content-Type",
-    },
+    headers: BADGE_CORS_HEADERS,
   });
 };
 
@@ -27,21 +27,10 @@ export const GET = async (
     const cleanUser = username.endsWith(".json")
       ? username.slice(0, -5)
       : username;
-
-    const url = new URL(request.url);
-    const metric = (url.searchParams.get("metric") as UserMetric) || "overall";
-    const style = url.searchParams.get("style") as
-      | "flat"
-      | "flat-square"
-      | "plastic"
-      | "for-the-badge"
-      | "social"
-      | undefined;
-    const label = url.searchParams.get("label") || undefined;
-    const logo = url.searchParams.get("logo") || undefined;
+    const { style, label, logo, metric } = parseBadgeQueryParams(request.url);
 
     const badgeData = await getUserBadge(cleanUser, {
-      metric,
+      metric: metric as UserMetric,
       style,
       label,
       logo,
@@ -49,7 +38,7 @@ export const GET = async (
 
     if (metric === "overall") {
       syncBadgeToGithubAppRepo({
-        filePath: `badges/user/${cleanUser.toLowerCase()}.json`,
+        filePath: `user/${cleanUser.toLowerCase()}.json`,
         badgeData,
       }).catch((err) => {
         console.debug("[Badges] Background user sync error:", err);
@@ -57,30 +46,16 @@ export const GET = async (
     }
 
     return NextResponse.json(badgeData, {
-      headers: {
-        "Content-Type": "application/json",
-        "Access-Control-Allow-Origin": "*",
-        "Cache-Control":
-          "public, max-age=3600, s-maxage=3600, stale-while-revalidate=86400",
-      },
+      headers: BADGE_CACHE_HEADERS,
     });
   } catch (error) {
     console.error("Failed to generate user badge", error);
-    return NextResponse.json(
-      {
-        schemaVersion: 1,
-        label: "OSSIntel",
-        message: "unavailable",
-        color: "inactive",
-        isError: true,
+    return NextResponse.json(BADGE_ERROR_RESPONSE, {
+      status: 200,
+      headers: {
+        "Content-Type": "application/json",
+        "Access-Control-Allow-Origin": "*",
       },
-      {
-        status: 200,
-        headers: {
-          "Content-Type": "application/json",
-          "Access-Control-Allow-Origin": "*",
-        },
-      },
-    );
+    });
   }
 };

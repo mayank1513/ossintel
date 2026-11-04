@@ -1,8 +1,19 @@
+import type {
+  NormalizedContributor,
+  NormalizedLanguage,
+  NormalizedRelease,
+  NormalizedRepository,
+} from "@ossintel/github-normalizer";
+import type { PackageManifest } from "@ossintel/input-parser";
+import type { NormalizedNpmPackage } from "@ossintel/npm";
+import type {
+  IdentityScores,
+  PackageVelocity,
+  RepositoryScores,
+} from "@ossintel/scoring";
 import {
   calculateIdentityScore,
   calculateRepositoryScore,
-  type IdentityScores,
-  type RepositoryScores,
 } from "@ossintel/scoring";
 import { Octokit } from "octokit";
 import { getInstallationToken } from "./github-app";
@@ -44,6 +55,60 @@ export interface BadgeOptions {
   logo?: string;
   cacheSeconds?: number;
 }
+
+export const BADGE_CORS_HEADERS = {
+  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Methods": "GET, OPTIONS",
+  "Access-Control-Allow-Headers": "Content-Type",
+} as const;
+
+export const BADGE_CACHE_HEADERS = {
+  "Content-Type": "application/json",
+  "Access-Control-Allow-Origin": "*",
+  "Cache-Control":
+    "public, max-age=3600, s-maxage=3600, stale-while-revalidate=86400",
+} as const;
+
+export const BADGE_ERROR_RESPONSE: ShieldsBadgeData = {
+  schemaVersion: 1,
+  label: "OSSIntel",
+  message: "unavailable",
+  color: "inactive",
+  isError: true,
+};
+
+export const parseBadgeQueryParams = (requestUrl: string) => {
+  const url = new URL(requestUrl);
+  return {
+    style:
+      (url.searchParams.get("style") as BadgeOptions["style"]) || undefined,
+    label: url.searchParams.get("label") || undefined,
+    logo: url.searchParams.get("logo") || undefined,
+    metric: url.searchParams.get("metric") || "overall",
+  };
+};
+
+export const createShieldsBadge = (
+  label: string,
+  message: string,
+  color: string,
+  options: BadgeOptions = {},
+): ShieldsBadgeData => {
+  const badge: ShieldsBadgeData = {
+    schemaVersion: 1,
+    label: options.label || label,
+    message,
+    color,
+    namedLogo: options.logo ?? "github",
+    cacheSeconds: options.cacheSeconds ?? 3600,
+  };
+
+  if (options.style) {
+    badge.style = options.style;
+  }
+
+  return badge;
+};
 
 export interface RepoBadgeOptions extends BadgeOptions {
   metric?: RepoMetric;
@@ -135,20 +200,7 @@ export const formatRepoBadge = (
       break;
   }
 
-  const badge: ShieldsBadgeData = {
-    schemaVersion: 1,
-    label: options.label || defaultLabel,
-    message,
-    color,
-    namedLogo: options.logo ?? "github",
-    cacheSeconds: options.cacheSeconds ?? 3600,
-  };
-
-  if (options.style) {
-    badge.style = options.style;
-  }
-
-  return badge;
+  return createShieldsBadge(defaultLabel, message, color, options);
 };
 
 /**
@@ -186,20 +238,30 @@ export const formatUserBadge = (
       break;
   }
 
-  const badge: ShieldsBadgeData = {
-    schemaVersion: 1,
-    label: options.label || defaultLabel,
-    message,
-    color,
-    namedLogo: options.logo ?? "github",
-    cacheSeconds: options.cacheSeconds ?? 3600,
-  };
+  return createShieldsBadge(defaultLabel, message, color, options);
+};
 
-  if (options.style) {
-    badge.style = options.style;
-  }
-
-  return badge;
+/**
+ * Maps raw API repository data to calculated RepositoryScores.
+ */
+export const calculateRepoScoreFromRaw = (raw: {
+  repository: NormalizedRepository;
+  contributors: NormalizedContributor[];
+  releases: NormalizedRelease[];
+  languages: NormalizedLanguage[];
+  packageManifests?: PackageManifest[];
+  npmPackages?: NormalizedNpmPackage[];
+  packageVelocities?: PackageVelocity[];
+}): RepositoryScores => {
+  return calculateRepositoryScore({
+    repository: raw.repository,
+    contributors: raw.contributors,
+    releases: raw.releases,
+    languages: raw.languages,
+    packageManifests: raw.packageManifests,
+    npmPackages: raw.npmPackages,
+    packageVelocities: raw.packageVelocities,
+  });
 };
 
 /**
@@ -212,17 +274,7 @@ export const getRepoBadge = async (
 ): Promise<ShieldsBadgeData> => {
   const token = await getInstallationToken(owner);
   const raw = await getCachedRepositoryData(owner, repo, { token });
-
-  const scores = calculateRepositoryScore({
-    repository: raw.repository,
-    contributors: raw.contributors,
-    releases: raw.releases,
-    languages: raw.languages,
-    packageManifests: raw.packageManifests,
-    npmPackages: raw.npmPackages,
-    packageVelocities: raw.packageVelocities,
-  });
-
+  const scores = calculateRepoScoreFromRaw(raw);
   return formatRepoBadge(scores, options);
 };
 
@@ -345,4 +397,37 @@ export const syncBadgeToGithubAppRepo = async ({
     );
     return false;
   }
+};
+
+/**
+ * Fire-and-forget sync of repo overall badge to ossintel/badges repo
+ */
+export const syncRepoBadgeBackground = (
+  owner: string,
+  repo: string,
+  scores: RepositoryScores,
+): void => {
+  const badgeData = formatRepoBadge(scores, { metric: "overall" });
+  syncBadgeToGithubAppRepo({
+    filePath: `repo/${owner.toLowerCase()}/${repo.toLowerCase()}.json`,
+    badgeData,
+  }).catch((err) => {
+    console.debug(`[Badges] Background sync error for ${owner}/${repo}:`, err);
+  });
+};
+
+/**
+ * Fire-and-forget sync of user overall badge to ossintel/badges repo
+ */
+export const syncUserBadgeBackground = (
+  username: string,
+  scores: IdentityScores,
+): void => {
+  const badgeData = formatUserBadge(scores, { metric: "overall" });
+  syncBadgeToGithubAppRepo({
+    filePath: `user/${username.toLowerCase()}.json`,
+    badgeData,
+  }).catch((err) => {
+    console.debug(`[Badges] Background sync error for ${username}:`, err);
+  });
 };

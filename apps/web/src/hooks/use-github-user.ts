@@ -6,7 +6,7 @@ import type {
   NormalizedRepository,
 } from "@ossintel/github-normalizer";
 import { useQuery } from "@tanstack/react-query";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { fetchWithCache } from "@/lib/api-client";
 
 export interface UserResponse {
@@ -26,10 +26,12 @@ export interface UserResponse {
 
 export const useGithubUser = (username: string, limit = 10) => {
   const [isRefreshing, setIsRefreshing] = useState(false);
+  const isRefreshingRef = useRef(false);
 
   const query = useQuery({
     queryKey: ["user", username?.toLowerCase(), limit],
     queryFn: async () => {
+      const forceRefresh = isRefreshingRef.current;
       try {
         const data = await fetchWithCache<UserResponse>(
           `user:${username.toLowerCase()}:${limit}`,
@@ -38,10 +40,11 @@ export const useGithubUser = (username: string, limit = 10) => {
             query: username,
             limit,
           },
-          isRefreshing,
+          forceRefresh,
         );
         return data;
       } finally {
+        isRefreshingRef.current = false;
         setIsRefreshing(false);
       }
     },
@@ -50,9 +53,10 @@ export const useGithubUser = (username: string, limit = 10) => {
   });
 
   const refresh = async () => {
+    isRefreshingRef.current = true;
     setIsRefreshing(true);
     await query.refetch();
   };
 
-  return { ...query, refresh };
+  return { ...query, refresh, isRefreshing };
 };

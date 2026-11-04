@@ -1,5 +1,12 @@
 # @ossintel/scoring
 
+## 0.2.2
+
+### Patch Changes
+
+- Updated dependencies [[`b75160e`](https://github.com/ossintel/ossintel/commit/b75160e11f687a251a75746d46d144ec100be0be)]:
+  - @ossintel/input-parser@0.4.0
+
 ## 0.2.1
 
 ### Patch Changes

@@ -1,0 +1,101 @@
+[**@ossintel/input-parser**](../index.mdx)
+
+***
+
+[@ossintel/input-parser](../index.mdx) / NormalizedOssintelConfig
+
+# Interface: NormalizedOssintelConfig
+
+Defined in: [config.ts:51](https://github.com/ossintel/ossintel/blob/main/packages/input-parser/src/config.ts#L51)
+
+## Properties
+
+### narrative?
+
+> `optional` **narrative?**: `object`
+
+Defined in: [config.ts:74](https://github.com/ossintel/ossintel/blob/main/packages/input-parser/src/config.ts#L74)
+
+#### highlights?
+
+> `optional` **highlights?**: `string`[]
+
+#### summary?
+
+> `optional` **summary?**: `string`
+
+***
+
+### profile
+
+> **profile**: `object`
+
+Defined in: [config.ts:53](https://github.com/ossintel/ossintel/blob/main/packages/input-parser/src/config.ts#L53)
+
+#### orgs
+
+> **orgs**: `object`
+
+##### orgs.exclude
+
+> **exclude**: [`OrgOverride`](OrgOverride.mdx)[]
+
+##### orgs.priority
+
+> **priority**: [`OrgOverride`](OrgOverride.mdx)[]
+
+#### repositories
+
+> **repositories**: `object`
+
+##### repositories.exclude
+
+> **exclude**: [`RepoOverride`](RepoOverride.mdx)[]
+
+##### repositories.pinned
+
+> **pinned**: [`RepoOverride`](RepoOverride.mdx)[]
+
+***
+
+### telemetry
+
+> **telemetry**: `object`
+
+Defined in: [config.ts:63](https://github.com/ossintel/ossintel/blob/main/packages/input-parser/src/config.ts#L63)
+
+#### ignorePaths
+
+> **ignorePaths**: [`PathOverride`](PathOverride.mdx)[]
+
+#### languages
+
+> **languages**: `object`
+
+##### languages.ignore
+
+> **ignore**: [`LanguageOverride`](LanguageOverride.mdx)[]
+
+##### languages.primaryOverride?
+
+> `optional` **primaryOverride?**: `string`
+
+#### monorepo?
+
+> `optional` **monorepo?**: `object`
+
+##### monorepo.mainPackages?
+
+> `optional` **mainPackages?**: `string`[]
+
+##### monorepo.workspaces?
+
+> `optional` **workspaces?**: `string`[]
+
+***
+
+### version
+
+> **version**: `string`
+
+Defined in: [config.ts:52](https://github.com/ossintel/ossintel/blob/main/packages/input-parser/src/config.ts#L52)

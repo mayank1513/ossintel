@@ -1,0 +1,109 @@
+[**@ossintel/input-parser**](../index.mdx)
+
+***
+
+[@ossintel/input-parser](../index.mdx) / RawOssintelConfig
+
+# Interface: RawOssintelConfig
+
+Defined in: [config.ts:21](https://github.com/ossintel/ossintel/blob/main/packages/input-parser/src/config.ts#L21)
+
+## Properties
+
+### $schema?
+
+> `optional` **$schema?**: `string`
+
+Defined in: [config.ts:22](https://github.com/ossintel/ossintel/blob/main/packages/input-parser/src/config.ts#L22)
+
+***
+
+### narrative?
+
+> `optional` **narrative?**: `object`
+
+Defined in: [config.ts:45](https://github.com/ossintel/ossintel/blob/main/packages/input-parser/src/config.ts#L45)
+
+#### highlights?
+
+> `optional` **highlights?**: `string`[]
+
+#### summary?
+
+> `optional` **summary?**: `string`
+
+***
+
+### profile?
+
+> `optional` **profile?**: `object`
+
+Defined in: [config.ts:24](https://github.com/ossintel/ossintel/blob/main/packages/input-parser/src/config.ts#L24)
+
+#### orgs?
+
+> `optional` **orgs?**: `object`
+
+##### orgs.exclude?
+
+> `optional` **exclude?**: (`string` \| \{ `org`: `string`; `reason?`: `string`; \})[]
+
+##### orgs.priority?
+
+> `optional` **priority?**: (`string` \| \{ `org`: `string`; `reason?`: `string`; \})[]
+
+#### repositories?
+
+> `optional` **repositories?**: `object`
+
+##### repositories.exclude?
+
+> `optional` **exclude?**: (`string` \| \{ `reason?`: `string`; `repo`: `string`; \})[]
+
+##### repositories.pinned?
+
+> `optional` **pinned?**: (`string` \| \{ `reason?`: `string`; `repo`: `string`; \})[]
+
+***
+
+### telemetry?
+
+> `optional` **telemetry?**: `object`
+
+Defined in: [config.ts:34](https://github.com/ossintel/ossintel/blob/main/packages/input-parser/src/config.ts#L34)
+
+#### ignorePaths?
+
+> `optional` **ignorePaths?**: (`string` \| \{ `pattern`: `string`; `reason?`: `string`; \})[]
+
+#### languages?
+
+> `optional` **languages?**: `object`
+
+##### languages.ignore?
+
+> `optional` **ignore?**: (`string` \| \{ `language`: `string`; `reason?`: `string`; \})[]
+
+##### languages.primaryOverride?
+
+> `optional` **primaryOverride?**: `string`
+
+#### monorepo?
+
+> `optional` **monorepo?**: `object`
+
+##### monorepo.mainPackages?
+
+> `optional` **mainPackages?**: `string`[]
+
+##### monorepo.workspaces?
+
+> `optional` **workspaces?**: `string`[]
+
+***
+
+### version?
+
+> `optional` **version?**: `string`
+
+Defined in: [config.ts:23](https://github.com/ossintel/ossintel/blob/main/packages/input-parser/src/config.ts#L23)

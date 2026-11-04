@@ -95,6 +95,29 @@ const pkgResult = detectManifest({
 
 > **Note**: `detectInput` also supports raw JSON strings as an opportunistic fallback, automatically routing to `platform: "vscode"` or `platform: "npm"`.
 
+### 3. Normalizing and Evaluating `.ossintel.json` Configuration
+
+`@ossintel/input-parser` exports configuration normalization utilities and evaluators conforming to the official schema (`https://ossintel.js.org/schemas/0.3.0/schema.json`):
+
+```typescript
+import {
+  normalizeOssintelConfig,
+  shouldIgnoreLanguage,
+  shouldIgnorePath,
+  shouldExcludeRepo,
+} from "@ossintel/input-parser";
+
+// Normalize raw parsed JSON
+const config = normalizeOssintelConfig(rawJson);
+
+// Check if a language or file path should be ignored during scoring/scanning
+const ignoreLang = shouldIgnoreLanguage("Shell", config);
+const ignorePath = shouldIgnorePath("legacy/old-package/package.json", config);
+
+// Check repository exclusions
+const isExcluded = shouldExcludeRepo("user/outdated-project", config);
+```
+
 ---
 
 ## 📦 Installation

@@ -1,6 +1,6 @@
 # OSSIntel
 
-[![OSSIntel Alpha Score](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/ossintel/badges/main/repo/ossintel/ossintel.json)](https://ossintel.js.org/repo/ossintel/ossintel)
+[![OSSIQ](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/ossintel/badges/main/repo/ossintel/ossintel.json)](https://ossintel.js.org/repo/ossintel/ossintel)
 [![Install GitHub App](https://img.shields.io/badge/GitHub%20App-Install%20OSSIntel-2ea44f?style=flat&logo=github)](https://github.com/apps/ossintel)
 
 ![Banner](./ossintel-banner.jpg)
@@ -158,7 +158,7 @@ Embed verifiable, deterministic OSSIntel telemetry in your `README.md` using [Sh
 Hosted directly in the GitHub App repository with global edge caching and zero API quota consumption:
 
 ```markdown
-[![OSSIntel Alpha Score](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/ossintel/badges/main/repo/ossintel/ossintel.json)](https://ossintel.js.org/repo/ossintel/ossintel)
+[![OSSIQ](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/ossintel/badges/main/repo/ossintel/ossintel.json)](https://ossintel.js.org/repo/ossintel/ossintel)
 ```
 
 ### Dynamic SWR API Endpoint
@@ -166,12 +166,12 @@ Hosted directly in the GitHub App repository with global edge caching and zero A
 Computes live telemetry on the fly with edge caching:
 
 ```markdown
-[![OSSIntel Alpha Score](https://img.shields.io/endpoint?url=https://ossintel.js.org/api/badges/repo/:owner/:repo)](https://ossintel.js.org/repo/:owner/:repo)
+[![OSSIQ](https://img.shields.io/endpoint?url=https://ossintel.js.org/api/badges/repo/:owner/:repo)](https://ossintel.js.org/repo/:owner/:repo)
 ```
 
 ### Supported Metrics
 
-- **Repositories**: `overall` (Alpha Score), `velocity`, `health`, `community`, `impact`, `risk`
+- **Repositories**: `overall` (OSSIQ), `velocity`, `health`, `community`, `impact`, `risk`
   - Query parameter: `?metric=velocity`
 - **Developers / Users**: `overall` (OSSIQ), `maintainer`, `contributor`, `influence`
   - Query parameter: `?metric=maintainer`

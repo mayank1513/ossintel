@@ -157,7 +157,7 @@ export const formatRepoBadge = (
   options: RepoBadgeOptions = {},
 ): ShieldsBadgeData => {
   const metric = options.metric || "overall";
-  let defaultLabel = "OSSIntel Alpha";
+  let defaultLabel = "OSSIQ";
   let message = `${scores.overall}/100`;
   let color = getScoreColor(scores.overall);
 
@@ -193,7 +193,7 @@ export const formatRepoBadge = (
       color = getRiskScoreColor(scores.risk);
       break;
     default:
-      defaultLabel = "OSSIntel Alpha";
+      defaultLabel = "OSSIQ";
       message = `${scores.overall}/100`;
       color = getScoreColor(scores.overall);
       break;
@@ -210,7 +210,7 @@ export const formatUserBadge = (
   options: UserBadgeOptions = {},
 ): ShieldsBadgeData => {
   const metric = options.metric || "overall";
-  let defaultLabel = "OSSIntel OSSIQ";
+  let defaultLabel = "OSSIQ";
   let message = `${scores.overall}/100`;
   let color = getScoreColor(scores.overall);
 
@@ -231,7 +231,7 @@ export const formatUserBadge = (
       color = getScoreColor(scores.influence);
       break;
     default:
-      defaultLabel = "OSSIntel OSSIQ";
+      defaultLabel = "OSSIQ";
       message = `${scores.overall}/100`;
       color = getScoreColor(scores.overall);
       break;

@@ -80,7 +80,7 @@ describe("Badges API Routes", () => {
 
       const data = await res.json();
       expect(data.schemaVersion).toBe(1);
-      expect(data.label).toBe("OSSIntel Alpha");
+      expect(data.label).toBe("OSSIQ");
       expect(data.message).toBe("92/100");
       expect(data.color).toBe("brightgreen");
     });
@@ -132,7 +132,7 @@ describe("Badges API Routes", () => {
       expect(res.status).toBe(200);
       const data = await res.json();
       expect(data.schemaVersion).toBe(1);
-      expect(data.label).toBe("OSSIntel OSSIQ");
+      expect(data.label).toBe("OSSIQ");
       expect(data.message).toBe("95/100");
       expect(data.color).toBe("brightgreen");
     });

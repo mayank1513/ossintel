@@ -61,7 +61,7 @@ describe("Badges Library - Shields.io Endpoint Compliance", () => {
     test("formats overall badge by default with Shields.io schemaVersion 1", () => {
       const badge = formatRepoBadge(mockRepoScores);
       expect(badge.schemaVersion).toBe(1);
-      expect(badge.label).toBe("OSSIntel Alpha");
+      expect(badge.label).toBe("OSSIQ");
       expect(badge.message).toBe("88/100");
       expect(badge.color).toBe("brightgreen");
       expect(badge.namedLogo).toBe("github");
@@ -128,7 +128,7 @@ describe("Badges Library - Shields.io Endpoint Compliance", () => {
     test("formats overall user badge with OSSIQ metric", () => {
       const badge = formatUserBadge(mockIdentityScores);
       expect(badge.schemaVersion).toBe(1);
-      expect(badge.label).toBe("OSSIntel OSSIQ");
+      expect(badge.label).toBe("OSSIQ");
       expect(badge.message).toBe("91/100");
       expect(badge.color).toBe("brightgreen");
     });

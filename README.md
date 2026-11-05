@@ -1,7 +1,6 @@
 # OSSIntel
 
 [![OSSIntel Alpha Score](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/ossintel/badges/main/repo/ossintel/ossintel.json)](https://ossintel.js.org/repo/ossintel/ossintel)
-
 [![Install GitHub App](https://img.shields.io/badge/GitHub%20App-Install%20OSSIntel-2ea44f?style=flat&logo=github)](https://github.com/apps/ossintel)
 
 ![Banner](./ossintel-banner.jpg)

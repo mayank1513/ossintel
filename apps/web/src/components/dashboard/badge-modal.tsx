@@ -20,9 +20,9 @@ export const BadgeModal: React.FC<BadgeModalProps> = ({
   target,
   currentScore,
 }) => {
-  const [metric, setMetric] = useState<string>("overall");
+  const [provider, setProvider] = useState<"ossintel" | "shields">("ossintel");
+  const [theme, setTheme] = useState<"dark" | "light">("dark");
   const [style, setStyle] = useState<string>("flat");
-  const [source, setSource] = useState<"github" | "api">("github");
   const [copyFormat, setCopyFormat] = useState<"markdown" | "html" | "url">(
     "markdown",
   );
@@ -30,37 +30,41 @@ export const BadgeModal: React.FC<BadgeModalProps> = ({
 
   if (!isOpen) return null;
 
-  // Resolve JSON endpoint based on source choice
-  let jsonUrl = "";
-  if (source === "github") {
-    jsonUrl = `https://raw.githubusercontent.com/ossintel/badges/main/${type === "repo" ? `repo/${target}` : `user/${target}`}.json`;
-  } else {
-    const query = metric !== "overall" ? `?metric=${metric}` : "";
-    jsonUrl = `https://ossintel.js.org/api/badges/${type === "repo" ? `repo/${target}` : `user/${target}`}${query}`;
-  }
-
-  // Construct Shields.io badge URL
-  const queryParams = new URLSearchParams();
-  queryParams.set("url", jsonUrl);
-  if (style !== "flat") {
-    queryParams.set("style", style);
-  }
-  const shieldsBadgeUrl = `https://img.shields.io/endpoint?${queryParams.toString()}`;
-
+  const targetLower = target.toLowerCase();
   const destinationUrl =
     type === "repo"
       ? `https://ossintel.js.org/repo/${target}`
       : `https://ossintel.js.org/user/${target}`;
 
-  const markdownSnippet = `[![OSSIntel](${shieldsBadgeUrl})](${destinationUrl})`;
-  const htmlSnippet = `<a href="${destinationUrl}"><img src="${shieldsBadgeUrl}" alt="OSSIntel" /></a>`;
+  // 1. OSSIntel Native Badge URL (Raw CDN SVG with eye logo & dual-color wordmark)
+  const ossintelBadgeUrl = `https://raw.githubusercontent.com/ossintel/badges/main/${
+    type === "repo" ? `repo/${targetLower}` : `user/${targetLower}`
+  }${theme === "light" ? "-light" : ""}.svg`;
+
+  // 2. Shields.io Custom Endpoint Badge URL
+  const rawJsonUrl = `https://raw.githubusercontent.com/ossintel/badges/main/${
+    type === "repo" ? `repo/${targetLower}` : `user/${targetLower}`
+  }.json`;
+  const shieldsQueryParams = new URLSearchParams();
+  shieldsQueryParams.set("url", rawJsonUrl);
+  if (style !== "flat") {
+    shieldsQueryParams.set("style", style);
+  }
+  const shieldsBadgeUrl = `https://img.shields.io/endpoint?${shieldsQueryParams.toString()}`;
+
+  // Active badge URL based on provider selection
+  const activeBadgeUrl =
+    provider === "ossintel" ? ossintelBadgeUrl : shieldsBadgeUrl;
+
+  const markdownSnippet = `[![OSSIQ](${activeBadgeUrl})](${destinationUrl})`;
+  const htmlSnippet = `<a href="${destinationUrl}"><img src="${activeBadgeUrl}" alt="OSSIQ" /></a>`;
 
   const copyText =
     copyFormat === "markdown"
       ? markdownSnippet
       : copyFormat === "html"
         ? htmlSnippet
-        : shieldsBadgeUrl;
+        : activeBadgeUrl;
 
   const handleCopy = async () => {
     try {
@@ -85,11 +89,10 @@ export const BadgeModal: React.FC<BadgeModalProps> = ({
               <ShieldCheck className="h-5 w-5" />
             </div>
             <div>
-              <h2 className="text-lg font-bold tracking-tight">
-                OSSIntel Shields.io Badges
-              </h2>
+              <h2 className="text-lg font-bold tracking-tight">OSSIQ Badges</h2>
               <p className="text-xs text-muted-foreground">
-                Embed deterministic telemetry and alpha scoring in your README
+                Embed deterministic developer intelligence and telemetry in your
+                README
               </p>
             </div>
           </div>
@@ -108,10 +111,10 @@ export const BadgeModal: React.FC<BadgeModalProps> = ({
             Live Preview
           </span>
           <div className="p-4 bg-background/80 border border-border/60 rounded-xl shadow-inner flex items-center justify-center min-h-[50px] w-full">
-            {/* biome-ignore lint/performance/noImgElement: Shields.io dynamic badge image */}
+            {/* biome-ignore lint/performance/noImgElement: dynamic badge image */}
             <img
-              src={shieldsBadgeUrl}
-              alt="OSSIntel Badge"
+              src={activeBadgeUrl}
+              alt="OSSIQ Badge"
               className="h-6 transition-all duration-300"
             />
           </div>
@@ -127,80 +130,69 @@ export const BadgeModal: React.FC<BadgeModalProps> = ({
         </div>
 
         {/* Configuration Controls */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-          {/* Metric Selector */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          {/* Badge Provider */}
           <div className="space-y-1.5">
             <label
-              htmlFor="badge-metric-select"
+              htmlFor="badge-provider-select"
               className="text-xs font-bold text-muted-foreground"
             >
-              Metric
+              Badge Provider
             </label>
             <select
-              id="badge-metric-select"
-              value={metric}
-              onChange={(e) => setMetric(e.target.value)}
+              id="badge-provider-select"
+              value={provider}
+              onChange={(e) =>
+                setProvider(e.target.value as "ossintel" | "shields")
+              }
               className="w-full bg-background border border-border rounded-xl px-3 py-2 text-xs font-medium focus:outline-none focus:ring-2 focus:ring-primary/40"
             >
-              {type === "repo" ? (
-                <>
-                  <option value="overall">Alpha Score (Overall)</option>
-                  <option value="velocity">Velocity</option>
-                  <option value="health">Health</option>
-                  <option value="community">Community</option>
-                  <option value="impact">Impact</option>
-                  <option value="risk">Risk</option>
-                </>
-              ) : (
-                <>
-                  <option value="overall">OSSIQ (Overall)</option>
-                  <option value="maintainer">Maintainer</option>
-                  <option value="contributor">Contributor</option>
-                  <option value="influence">Influence</option>
-                </>
-              )}
+              <option value="ossintel">OSSIntel (Native SVG)</option>
+              <option value="shields">Shields.io</option>
             </select>
           </div>
 
-          {/* Style Selector */}
-          <div className="space-y-1.5">
-            <label
-              htmlFor="badge-style-select"
-              className="text-xs font-bold text-muted-foreground"
-            >
-              Shield Style
-            </label>
-            <select
-              id="badge-style-select"
-              value={style}
-              onChange={(e) => setStyle(e.target.value)}
-              className="w-full bg-background border border-border rounded-xl px-3 py-2 text-xs font-medium focus:outline-none focus:ring-2 focus:ring-primary/40"
-            >
-              <option value="flat">Flat (Standard)</option>
-              <option value="flat-square">Flat Square</option>
-              <option value="for-the-badge">For the Badge</option>
-              <option value="plastic">Plastic</option>
-            </select>
-          </div>
-
-          {/* Host Source Selector */}
-          <div className="space-y-1.5">
-            <label
-              htmlFor="badge-source-select"
-              className="text-xs font-bold text-muted-foreground"
-            >
-              Hosting Provider
-            </label>
-            <select
-              id="badge-source-select"
-              value={source}
-              onChange={(e) => setSource(e.target.value as "github" | "api")}
-              className="w-full bg-background border border-border rounded-xl px-3 py-2 text-xs font-medium focus:outline-none focus:ring-2 focus:ring-primary/40"
-            >
-              <option value="github">GitHub App Repo (CDN)</option>
-              <option value="api">Dynamic API (Live SWR)</option>
-            </select>
-          </div>
+          {provider === "ossintel" ? (
+            /* Theme Selector for OSSIntel */
+            <div className="space-y-1.5">
+              <label
+                htmlFor="badge-theme-select"
+                className="text-xs font-bold text-muted-foreground"
+              >
+                Theme
+              </label>
+              <select
+                id="badge-theme-select"
+                value={theme}
+                onChange={(e) => setTheme(e.target.value as "dark" | "light")}
+                className="w-full bg-background border border-border rounded-xl px-3 py-2 text-xs font-medium focus:outline-none focus:ring-2 focus:ring-primary/40"
+              >
+                <option value="dark">Dark Theme (Default)</option>
+                <option value="light">Light Theme</option>
+              </select>
+            </div>
+          ) : (
+            /* Shield Style Selector for Shields.io */
+            <div className="space-y-1.5">
+              <label
+                htmlFor="badge-style-select"
+                className="text-xs font-bold text-muted-foreground"
+              >
+                Shield Style
+              </label>
+              <select
+                id="badge-style-select"
+                value={style}
+                onChange={(e) => setStyle(e.target.value)}
+                className="w-full bg-background border border-border rounded-xl px-3 py-2 text-xs font-medium focus:outline-none focus:ring-2 focus:ring-primary/40"
+              >
+                <option value="flat">Flat (Standard)</option>
+                <option value="flat-square">Flat Square</option>
+                <option value="for-the-badge">For the Badge</option>
+                <option value="plastic">Plastic</option>
+              </select>
+            </div>
+          )}
         </div>
 
         {/* Copy Snippet Tabs */}
@@ -269,15 +261,17 @@ export const BadgeModal: React.FC<BadgeModalProps> = ({
         {/* Documentation notice */}
         <div className="flex items-center justify-between text-[11px] text-muted-foreground/80 border-t border-border/60 pt-3">
           <span>
-            Hosted via GitHub App repo &amp; shields.io custom endpoint protocol
+            {provider === "ossintel"
+              ? "Dual-color native SVG edge-cached via GitHub Raw CDN"
+              : "Dynamic badge rendered via Shields.io custom endpoint protocol"}
           </span>
           <a
-            href="https://shields.io/badges/endpoint-badge"
+            href="https://github.com/ossintel/badges"
             target="_blank"
             rel="noopener noreferrer"
             className="text-primary hover:underline flex items-center gap-1 font-medium"
           >
-            Shields.io Spec <ExternalLink className="h-3 w-3" />
+            ossintel/badges <ExternalLink className="h-3 w-3" />
           </a>
         </div>
       </div>

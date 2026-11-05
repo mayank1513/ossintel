@@ -1,6 +1,6 @@
 # OSSIntel
 
-[![OSSIQ](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/ossintel/badges/main/repo/ossintel/ossintel.json)](https://ossintel.js.org/repo/ossintel/ossintel)
+[![OSSIQ](https://raw.githubusercontent.com/ossintel/badges/main/repo/ossintel/ossintel.svg)](https://ossintel.js.org/repo/ossintel/ossintel)
 [![Install GitHub App](https://img.shields.io/badge/GitHub%20App-Install%20OSSIntel-2ea44f?style=flat&logo=github)](https://github.com/apps/ossintel)
 
 ![Banner](./ossintel-banner.jpg)
@@ -149,32 +149,31 @@ The development workflow includes:
 6. AI-assisted implementation
 7. Human review and refinement
 
-## Shields.io Badges
+## Badges & Telemetry
 
-Embed verifiable, deterministic OSSIntel telemetry in your `README.md` using [Shields.io Custom Endpoints](https://shields.io/badges/endpoint-badge).
+Embed verifiable, deterministic OSSIntel telemetry in your `README.md`.
 
-### Zero-Infra GitHub CDN Badge (Recommended)
+### 1. OSSIntel Native SVG Badges (Recommended)
 
-Hosted directly in the GitHub App repository with global edge caching and zero API quota consumption:
+Zero-infrastructure, dual-color badges with the OSSIntel eye wordmark, edge-cached via GitHub Raw CDN:
+
+**Dark Theme (Default):**
+```markdown
+[![OSSIQ](https://raw.githubusercontent.com/ossintel/badges/main/repo/ossintel/ossintel.svg)](https://ossintel.js.org/repo/ossintel/ossintel)
+```
+
+**Light Theme:**
+```markdown
+[![OSSIQ](https://raw.githubusercontent.com/ossintel/badges/main/repo/ossintel/ossintel-light.svg)](https://ossintel.js.org/repo/ossintel/ossintel)
+```
+
+### 2. Shields.io Endpoint Badge
+
+Compatible with [Shields.io Custom Endpoints](https://shields.io/badges/endpoint-badge):
 
 ```markdown
 [![OSSIQ](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/ossintel/badges/main/repo/ossintel/ossintel.json)](https://ossintel.js.org/repo/ossintel/ossintel)
 ```
-
-### Dynamic SWR API Endpoint
-
-Computes live telemetry on the fly with edge caching:
-
-```markdown
-[![OSSIQ](https://img.shields.io/endpoint?url=https://ossintel.js.org/api/badges/repo/:owner/:repo)](https://ossintel.js.org/repo/:owner/:repo)
-```
-
-### Supported Metrics
-
-- **Repositories**: `overall` (OSSIQ), `velocity`, `health`, `community`, `impact`, `risk`
-  - Query parameter: `?metric=velocity`
-- **Developers / Users**: `overall` (OSSIQ), `maintainer`, `contributor`, `influence`
-  - Query parameter: `?metric=maintainer`
 
 ## GitHub App Integration
 
